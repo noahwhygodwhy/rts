@@ -1,6 +1,8 @@
 #include "Entity.hpp"
 #include "glad.h"
 #include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 
 vector<Vertex> makeVertices(float width, float height)
@@ -19,13 +21,15 @@ string vec22String(ivec2 theVec)
     return to_string(theVec.x) + "." + to_string(theVec.y);
 }
 
-Entity::Entity(vec2 location, int width, int height, Controller c, const unordered_map<string, vector<Texture>*>& textures)
+Entity::Entity(vec2 location, int width, int height, Controller c, const unordered_map<textureAttributes, vector<Texture>*>& textures)
 {
     this->textures = textures;
     this->vertices = makeVertices(width, height);
     this->indices = {0, 3, 1, 1, 3, 2};
 	this->location = location;
 	this->orientation = ivec2(1, 0);
+    this->textureState = { orientation.x, orientation.y, "standing" };
+    this->textureAnimationStep = 0;
 }
 
 Entity::~Entity()
@@ -62,8 +66,10 @@ void Entity::setupBuffer()
 
     glBindVertexArray(0);
 }
-void Entity::draw(Shader& shader, glm::mat4 transform)
+void Entity::draw(Shader& shader)
 {
+    mat4 transform = glm::translate(mat4(1), vec3(this->location, 0));
+    
 
     unsigned int diffuseNum = 1;
     unsigned int specularNum = 1;
@@ -71,49 +77,24 @@ void Entity::draw(Shader& shader, glm::mat4 transform)
     unsigned int heightNum = 1;
     //printf("There are %i textures\n", textures.size());
 
-    for (unsigned int i = 0; i < textures[this->state]->size(); i++)
-    {
-        glActiveTexture(GL_TEXTURE0 + i);//i love that this works
+    //TODO: this needs to not be a for loop
+    //i needs to be the texture next up in the loop, an iterator looping through but
+    //always starting at 0
 
-        string number;
-        string name = textures[this->state]->at(i).type;
-        if (name == "texture_diffuse")
-        {
-            number = to_string(diffuseNum++);
-        }
-        else if (name == "texture_specular")
-        {
-            number = to_string(specularNum++);
-        }
-        else if (name == "texture_normal")
-        {
-            number = to_string(normalNum++);
-        }
-        else if (name == "texture_height")
-        {
-            number = to_string(heightNum++);
-        }
-        else
-        {
-            printf("ERROR IN DRAW(), NO TEXTURE TYPE");
-            exit(-1);
-        }
 
-        shader.setInt(("material." + name + number).c_str(), i);
+    glActiveTexture(GL_TEXTURE0);//i love that this works
 
-        glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
-        glBindTexture(GL_TEXTURE_2D, textures[this->state]->at(i).id);
+    string name = textures[this->textureState]->at(this->textureAnimationStep).type;
 
-    }
+    glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
+    glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep).id);
+    
     shader.setMatFour("transform", transform);
-
 
     glBindVertexArray(VAO);
 
-
     shader.setBool("hitbox", false);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-
 
     //shader.setBool("hitbox", true);
     //glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
@@ -121,5 +102,14 @@ void Entity::draw(Shader& shader, glm::mat4 transform)
     glBindVertexArray(0);
 
 
-    //glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0);
+}
+
+void Entity::tick(float deltaTime)
+{
+    this->textureAnimationStep += 1;
+    if (this->textureAnimationStep >= this->textures[textureState]->size())
+    {
+        this->textureAnimationStep == 0;
+    }
 }

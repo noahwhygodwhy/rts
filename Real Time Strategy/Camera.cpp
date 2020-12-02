@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include "DirectionEnum.h"
+//#include "DirectionEnum.h"
 #include "Camera.hpp"
 #include "glm/gtx/string_cast.hpp"
 

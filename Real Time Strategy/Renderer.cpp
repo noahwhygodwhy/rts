@@ -22,7 +22,7 @@ Renderer::Renderer(int x, int y)
 	screenX = x;
 	screenY = y;
 	window = glfwCreateWindow(x, y, "Title Goes here", NULL, NULL);
-	cam = Camera(vec3(0, 1, 0), vec3(0, 1, 0), 0, 0, 10, 1, 1);
+	this->cam = Camera(vec3(0, 1, 0), vec3(0, 1, 0), 0, 0, 10, 1, 1);
 }
 
 Renderer::~Renderer()
@@ -125,6 +125,7 @@ void Renderer::run()
 		for (Entity* t : things) //Everything else
 		{
 			t->draw(shader); //the order of these two infuriates me, but it doesn't work
+			t->tick(deltaTime);
 			//t->gravityTick(deltaTime, window);
 			//t->tick(deltaTime, window);
 			//handleHits(things, t);

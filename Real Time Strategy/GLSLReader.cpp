@@ -4,17 +4,16 @@
 #include <streambuf>
 #include <string>
 #include <iostream>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 
 #include "GLSLReader.hpp"
 
 using namespace std;
-
 string fileToString(string filename)
 {
 	printf("opening file %s\n", filename.c_str());
-
-	//TODO: generate a texture map for each folder (which will be each entity type)
-
 
 	string content;
 	int length;

@@ -2,10 +2,9 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#//include "Camera.hpp"
+#include "Camera.hpp"
 #include "Shader.hpp"
 #include <vector>
-#include "Mesh.hpp"
 #include "Entity.hpp"
 #include "glad.h"
 #include <GLFW/glfw3.h>

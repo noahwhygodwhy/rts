@@ -39,9 +39,6 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files\OGLS</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files\OGLS</Filter>
-    </ClCompile>
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files\OGLS</Filter>
     </ClCompile>
@@ -63,9 +60,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.hpp">
-      <Filter>Header Files\OGLS</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.hpp">
       <Filter>Header Files\OGLS</Filter>
     </ClInclude>
     <ClInclude Include="Shader.hpp">

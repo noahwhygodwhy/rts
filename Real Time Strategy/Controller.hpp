@@ -10,6 +10,8 @@ using namespace glm;
 class Controller
 {
 public:
+	Controller();
+	~Controller();
 	void tick(float deltaTime);
 private:
 	
