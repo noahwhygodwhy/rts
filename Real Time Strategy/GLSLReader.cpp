@@ -13,6 +13,9 @@ string fileToString(string filename)
 {
 	printf("opening file %s\n", filename.c_str());
 
+	//TODO: generate a texture map for each folder (which will be each entity type)
+
+
 	string content;
 	int length;
 	ifstream stream(filename);

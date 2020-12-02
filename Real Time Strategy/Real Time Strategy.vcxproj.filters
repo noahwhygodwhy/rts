@@ -19,6 +19,12 @@
     <Filter Include="Header Files\OGLS">
       <UniqueIdentifier>{98dbcc45-8eaa-4ea6-938d-7338b0c759a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Controllers">
+      <UniqueIdentifier>{2a291379-71d6-420a-b8e1-0f35626a3c50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Controllers">
+      <UniqueIdentifier>{fadcf5c5-3e79-42a3-9466-d5e92698d0e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rts.cpp">
@@ -44,6 +50,9 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\OGLS</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller.cpp">
+      <Filter>Source Files\Controllers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="Camera.hpp">
       <Filter>Header Files\OGLS</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.hpp">
+      <Filter>Header Files\Controllers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

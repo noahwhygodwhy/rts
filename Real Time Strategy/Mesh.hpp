@@ -21,6 +21,12 @@ struct Vertex {
 	vec3 position;
 	vec3 normal;
 	vec2 texCoords;
+	Vertex(vec3 p, vec3 n, vec2 tc)
+	{
+		this->position = p;
+		this->normal = n;
+		this->texCoords = tc;
+	}
 };
 
 struct Texture {
