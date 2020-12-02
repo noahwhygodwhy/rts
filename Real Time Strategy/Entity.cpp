@@ -96,7 +96,6 @@ void Entity::tick(float deltaTime)
 
 void Entity::setOrientation(vec2 newO)
 {
-    printf("new orientation %f, %f\n", newO.x, newO.y);
     this->orientation = newO;
     this->textureAnimationStep = 0;
     this->textureState.x = newO.x;

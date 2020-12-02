@@ -15,14 +15,13 @@ static vec3 camPos = vec3();
 
 Renderer::Renderer(int x, int y)
 {
-	layerCount = 0;
 	EBO = 0;
 	VBO = 0;
 	VAO = 0;
 	screenX = x;
 	screenY = y;
 	window = glfwCreateWindow(x, y, "Title Goes here", NULL, NULL);
-	this->cam = Camera(vec3(0, 1, 0), vec3(0, 1, 0), 0, 0, 10, 1, 1);
+	this->cam = Camera(vec2(0, 0), 500.0f, 1.0f);
 }
 
 Renderer::~Renderer()
@@ -30,7 +29,7 @@ Renderer::~Renderer()
 }
 
 
-void Renderer::processInput(GLFWwindow* window)
+void Renderer::processInput(GLFWwindow* window, float deltaTime)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
@@ -45,22 +44,74 @@ void Renderer::processInput(GLFWwindow* window)
 	if (w || a || s || d)
 	{
 		vec2 newO = vec2((int)d - (int)a, (int)w - (int)s);
-		if (newO == vec2(0))
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+		newO = newO * vec2(((float)height) / ((float)width), ((float)width) / ((float)height));
+		this->cam.move(newO, deltaTime);
+
+		/*if (newO == vec2(0))
 		{
 			newO = vec2(1, 0);
 		}
-		this->things[0]->setOrientation(newO);
+		this->things[0]->setOrientation(newO);*/
 	}
 }
 
 static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+
 }
 static void mouseButtCallback(GLFWwindow* window, int button, int action, int mods)
 {
+	//int width, height;
+	//glfwGetWindowSize(window, &width, &height);
+	//float hafh = height / 2;
+	//float hafw = width / 2;
+
+
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+
+	Renderer* r = (Renderer*)glfwGetWindowUserPointer(window);
+
+	printf("fullscreen: %f, %f\n", r->screenX, r->screenY);
+
+
+
+	float hafw = r->screenX / 2;
+	float hafh = r->screenY / 2;
+	printf("half screen: %f, %f\n", hafw, hafh);
+
+	Camera cam = r->cam;
+	vec2 viewCenter = cam.position + vec2(hafw, hafh);
+
+	printf("windowCenter: %f, %f\n", viewCenter.x, viewCenter.y);
+
+	float minx = viewCenter.x - (hafw * cam.zoom);
+	float miny = viewCenter.y - (hafh * cam.zoom);
+	float maxx = viewCenter.x + (hafw * cam.zoom);
+	float maxy = viewCenter.y + (hafh * cam.zoom);
+
+	printf("minx %f\n", minx);
+	printf("miny %f\n", miny);
+	printf("maxx %f\n", maxx);
+	printf("maxy %f\n", maxy);
+
+	double trueXpos = ((xpos / r->screenX) * (maxx - minx)) + minx;
+	double trueYpos = ((ypos /  r->screenY) * (maxy - miny)) + miny;
+
+	printf("%f, %f\n", trueXpos, trueYpos);
+
+	r->things[0]->location = vec2(trueXpos, trueYpos)* vec2(r->screenY/r->screenX, r->screenX/r->screenY);
+
+	//divide position by true window dimension, and multiply it by the range visible, then add the min of the range visible
 }
-static void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
-{}
+static void scrollCallback(GLFWwindow* window, double xoff, double yoff)
+{
+	Renderer* r = (Renderer*)glfwGetWindowUserPointer(window);
+	Camera cam = r->cam;
+	cam.zoomCall(yoff);
+}
 
 
 
@@ -73,6 +124,9 @@ void frameBufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	printf("######%#@%@#%@#new window size\n");
 	glViewport(0, 0, width, height);
+	Renderer* r = (Renderer*) glfwGetWindowUserPointer(window);
+	r->screenX = width;
+	r->screenY = height;
 }
 
 bool Renderer::initialize()
@@ -112,7 +166,11 @@ bool Renderer::initialize()
 	glEnable(GL_LINE_SMOOTH);
 	glLineWidth(2.0f);
 
-	glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	glfwSetWindowUserPointer(this->window, this);
+	glfwSetScrollCallback(this->window, scrollCallback);
+	glfwSetMouseButtonCallback(this->window, mouseButtCallback);
 
 	return true;
 }
@@ -127,9 +185,7 @@ void Renderer::run()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-
-
-		processInput(this->window);
+		processInput(this->window, deltaTime);
 		shader.use();
 
 
@@ -139,31 +195,11 @@ void Renderer::run()
 			t->tick(deltaTime);
 		}
 
-
-
-
-
-		const float radius =1;
-		float camX = sin(glfwGetTime()) * radius;
-		float camY = cos(glfwGetTime()) * radius;
-		//camX = 0;
-		//camZ = 10;
-		//camX = 10;
-		//float camY = -2;
-		//vec3 obloc = vec3(((Thing*)things.at(0))->transform[3]);
-		mat4 view = glm::lookAt(glm::vec3(camX, camY, 0), vec3(camX,camY,-1), glm::vec3(0.0, 1.0, 0.0));
-		view = mat4(1);
-		//mat4 view(1);
-		//camPos = vec3(camX, camY, camZ);
-		//camVector = glm::normalize(obloc - camPos);
-		//mat4 view = glm::lookAt(glm::vec3(camX, camY, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
-
-
-		//mat4 view = lookAt(vec3(32 + sin(glfwGetTime()/10)*20, 85, 32+cos(glfwGetTime()/10)*20), vec3(32, 60, 32), vec3(0.0f, 1.0f, 0.0f));
+		mat4 view = cam.getView();
 		shader.setMatFour("view", view);
-		mat4 projection = ortho(0.0f, (float)screenY, (float)screenX, 0.0f, -1.0f, 1.0f);
-		shader.setMatFour("projection", projection);
 
+		mat4 projection = ortho(0.0f, screenY, screenX, 0.0f, -1.0f, 1.0f);
+		shader.setMatFour("projection", projection);
 
 		glfwSwapBuffers(this->window);
 		glfwPollEvents();

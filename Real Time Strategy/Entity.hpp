@@ -67,12 +67,12 @@ public:
 	~Entity();
 	void setOrientation(vec2 newO);
 	ivec2 orientation;
+	vec2 location;
 private:
 	unsigned int VAO, VBO, EBO;
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
 	void setupBuffer();
-	vec2 location;
 	float speed;
 	Controller controller;
 	unordered_map<textureAttributes, vector<Texture>*> textures;

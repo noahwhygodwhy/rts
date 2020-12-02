@@ -96,7 +96,7 @@ int main(void)
 
 	unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap = getEntityTextures("./resources/entityTextures");
 
-	Entity* e = new Entity(vec2(100, 100), 250, 500, Controller(), entityTextureMapMap["basicEntity"]);
+	Entity* e = new Entity(vec2(0, 0), 40, 80, Controller(), entityTextureMapMap["basicEntity"]);
 	r.addEntity(e);
 	printf("###running\n");
 	r.run();

@@ -17,18 +17,15 @@ public:
 	bool initialize();
 	void run();
 	void addEntity(Entity* th);
-	void processInput(GLFWwindow* window);
-private:
+	void processInput(GLFWwindow* window, float deltaTime);
+	Camera cam;
 	vector<Entity*> things;
-	unsigned int largeTextureStack = 0;
-	int screenX;
-	int screenY;
-	//Camera cam;
+	float screenX;
+	float screenY;
+private:
 	Shader shader;
 	GLFWwindow* window;
 	unsigned int VBO, VAO, EBO;
-	int32_t layerCount;
-	Camera cam;
 
 };
 
