@@ -8,10 +8,10 @@
 vector<Vertex> makeVertices(float width, float height)
 {
     vector<Vertex> toReturn;
-    toReturn.push_back({ vec3(0, 0, 0), vec3(0, 0, 1), vec2(0, 0) });       //bottom left
-    toReturn.push_back({ vec3(width/100, 0, 0), vec3(0, 0, 1), vec2(1, 0) });//top left
-    toReturn.push_back({ vec3(width/100, height/100, 0), vec3(0, 0, 1), vec2(1, 1) });//top right
-    toReturn.push_back({ vec3(0, height/100, 0), vec3(0, 0, 1), vec2(0, 1) });//bottom right
+    toReturn.push_back({ vec2(0, 0), vec2(0, 0) });       //bottom left
+    toReturn.push_back({ vec2(width, 0), vec2(1, 0) });//top left
+    toReturn.push_back({ vec2(width, height), vec2(1, 1) });//top right
+    toReturn.push_back({ vec2(0, height), vec2(0, 1) });//bottom right
     return toReturn;
 }
 
@@ -28,8 +28,9 @@ Entity::Entity(vec2 location, int width, int height, Controller c, const unorder
     this->indices = {0, 3, 1, 1, 3, 2};
 	this->location = location;
 	this->orientation = ivec2(1, 0);
-    this->textureState = { orientation.x, orientation.y, "standing" };
+    this->textureState = { orientation.x, orientation.y, "walking" };
     this->textureAnimationStep = 0;
+    this->setupBuffer();
 }
 
 Entity::~Entity()
@@ -56,13 +57,10 @@ void Entity::setupBuffer()
 
     // vertex positions
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-    // vertex normals
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     // vertex texture coords
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
 
     glBindVertexArray(0);
 }
@@ -70,46 +68,37 @@ void Entity::draw(Shader& shader)
 {
     mat4 transform = glm::translate(mat4(1), vec3(this->location, 0));
     
-
-    unsigned int diffuseNum = 1;
-    unsigned int specularNum = 1;
-    unsigned int normalNum = 1;
-    unsigned int heightNum = 1;
-    //printf("There are %i textures\n", textures.size());
-
-    //TODO: this needs to not be a for loop
-    //i needs to be the texture next up in the loop, an iterator looping through but
-    //always starting at 0
-
-
-    glActiveTexture(GL_TEXTURE0);//i love that this works
-
-    string name = textures[this->textureState]->at(this->textureAnimationStep).type;
+    glActiveTexture(GL_TEXTURE0);
 
     glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
-    glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep).id);
+
+    glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep/ ANIMATION_SLOWDOWN_FACTOR).id);
     
     shader.setMatFour("transform", transform);
 
     glBindVertexArray(VAO);
 
-    shader.setBool("hitbox", false);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
-    //shader.setBool("hitbox", true);
-    //glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
-
     glBindVertexArray(0);
-
-
-    glActiveTexture(GL_TEXTURE0);
 }
 
 void Entity::tick(float deltaTime)
 {
+
     this->textureAnimationStep += 1;
-    if (this->textureAnimationStep >= this->textures[textureState]->size())
+    if (this->textureAnimationStep > (this->textures[textureState]->size()* ANIMATION_SLOWDOWN_FACTOR)-1)
     {
-        this->textureAnimationStep == 0;
+        this->textureAnimationStep = 0;
     }
+}
+
+
+void Entity::setOrientation(vec2 newO)
+{
+    printf("new orientation %f, %f\n", newO.x, newO.y);
+    this->orientation = newO;
+    this->textureAnimationStep = 0;
+    this->textureState.x = newO.x;
+    this->textureState.y = newO.y;
 }

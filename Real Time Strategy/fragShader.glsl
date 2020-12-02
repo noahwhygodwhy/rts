@@ -13,26 +13,21 @@ out vec4 FragColor;
  //   };
 
 in vec2 texCoords;
-in vec3 coords;
+in vec2 coords;
 //uniform Material material;
 
 uniform sampler2D ourTexture;
-uniform bool black;
-uniform bool hitbox;
 //uniform sampler2D texture_diffuse3;
 //uniform sampler2D texture_specular1;
 //uniform sampler2D texture_specular2;
 
 void main()
 {
-    FragColor = texture(ourTexture, texCoords);
-    if(black)
+    vec4 color = texture(ourTexture, texCoords);
+    if (color.a == 0)
     {
-        FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        discard;
     }
-    if(hitbox)
-    {
-        FragColor = vec4(1.0f, 1.5, 1.0f, 1.0f);
-    }
+    FragColor = color;
 }
 

@@ -12,7 +12,7 @@
 using namespace std;
 using namespace glm;
 
-
+static int ANIMATION_SLOWDOWN_FACTOR = 8;
 
 struct textureAttributes
 {
@@ -41,18 +41,13 @@ namespace std {
 			return a.x == b.x && a.y == b.y && a.action == b.action;
 		}
 	};
-	/*bool operator==(const textureAttributes& a, const textureAttributes& b)
-	{
-		return a.x == b.x && a.y == b.y && a.action == b.action;
-	}*/
 }
 
 
 
 
 struct Vertex {
-	vec3 position;
-	vec3 normal;
+	vec2 position;
 	vec2 texCoords;
 };
 
@@ -70,14 +65,14 @@ public:
 	void tick(float deltaTime);
 
 	~Entity();
-
+	void setOrientation(vec2 newO);
+	ivec2 orientation;
 private:
 	unsigned int VAO, VBO, EBO;
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
 	void setupBuffer();
 	vec2 location;
-	ivec2 orientation;
 	float speed;
 	Controller controller;
 	unordered_map<textureAttributes, vector<Texture>*> textures;

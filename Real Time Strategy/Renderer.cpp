@@ -36,6 +36,21 @@ void Renderer::processInput(GLFWwindow* window)
 	{
 		glfwSetWindowShouldClose(window, true);
 	}
+
+	bool w = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
+	bool a = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+	bool s = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
+	bool d = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
+
+	if (w || a || s || d)
+	{
+		vec2 newO = vec2((int)d - (int)a, (int)w - (int)s);
+		if (newO == vec2(0))
+		{
+			newO = vec2(1, 0);
+		}
+		this->things[0]->setOrientation(newO);
+	}
 }
 
 static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -117,40 +132,28 @@ void Renderer::run()
 		processInput(this->window);
 		shader.use();
 
-		/*for (auto l : lights)
-		{
-
-		}*/
 
 		for (Entity* t : things) //Everything else
 		{
-			t->draw(shader); //the order of these two infuriates me, but it doesn't work
+			t->draw(shader);
 			t->tick(deltaTime);
-			//t->gravityTick(deltaTime, window);
-			//t->tick(deltaTime, window);
-			//handleHits(things, t);
-			//printf("%s\n", glm::to_string(((Thing*)t)->transform).c_str());
-			//	t->tick(deltaTime, this->window); //the other way around :|
-			//handleHits(things, t);
 		}
 
-		//mat4 view = this->cam.getView(mat4(1.0));
 
 
 
 
-		const float radius = 20.0f;
+		const float radius =1;
 		float camX = sin(glfwGetTime()) * radius;
-		float camZ = cos(glfwGetTime()) * radius;
-		camX = 0;
-		camZ = 10;
+		float camY = cos(glfwGetTime()) * radius;
+		//camX = 0;
 		//camZ = 10;
 		//camX = 10;
-		float camY = -2;
+		//float camY = -2;
 		//vec3 obloc = vec3(((Thing*)things.at(0))->transform[3]);
-		mat4 view = glm::lookAt(glm::vec3(camX, camY, camZ), vec3(0), glm::vec3(0.0, 1.0, 0.0));
-
-
+		mat4 view = glm::lookAt(glm::vec3(camX, camY, 0), vec3(camX,camY,-1), glm::vec3(0.0, 1.0, 0.0));
+		view = mat4(1);
+		//mat4 view(1);
 		//camPos = vec3(camX, camY, camZ);
 		//camVector = glm::normalize(obloc - camPos);
 		//mat4 view = glm::lookAt(glm::vec3(camX, camY, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
@@ -158,7 +161,7 @@ void Renderer::run()
 
 		//mat4 view = lookAt(vec3(32 + sin(glfwGetTime()/10)*20, 85, 32+cos(glfwGetTime()/10)*20), vec3(32, 60, 32), vec3(0.0f, 1.0f, 0.0f));
 		shader.setMatFour("view", view);
-		mat4 projection = perspective(radians(70.0f), (float)screenX / (float)screenY, 0.1f, 256.0f);
+		mat4 projection = ortho(0.0f, (float)screenY, (float)screenX, 0.0f, -1.0f, 1.0f);
 		shader.setMatFour("projection", projection);
 
 

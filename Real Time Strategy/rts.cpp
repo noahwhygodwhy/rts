@@ -4,9 +4,14 @@
 #include <filesystem>
 #include "Entity.hpp"
 #include "Shader.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 using namespace std;
 namespace fs = std::filesystem;
+
+
+unordered_map<string, unsigned int> loadedTextures;
 
 vector<string> split(string s, char c)
 {
@@ -22,36 +27,54 @@ vector<string> split(string s, char c)
 
 Texture makeTexture(string filepath)
 {
-	return Texture();
+	Texture t;
+	t.type = "diffuse";
+	t.path = filepath;
+	if (loadedTextures.count(filepath))
+	{
+		t.id = loadedTextures[filepath];
+	}
+	else
+	{
+		int width, height, nrChannels;
+		unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 4);
+
+		unsigned int texture;
+		//printf("%p\n", &texture);
+		glGenTextures(1, &texture);
+		//printf("%i\n", texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_image_free(data);
+		t.id = texture;
+	}
+
+	return t;
 }
 
 
-int main(void)
+unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEntityTextures(string path)
 {
-	//TODO: generate a texture map for each folder (which will be each entity type)
-
-
-	//TODO: this is still messed up. hash function maybe?
-
-
-
-	fs::directory_iterator syst = std::filesystem::directory_iterator("./resources/entityTextures");
-
 	unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap;
+	fs::directory_iterator syst = std::filesystem::directory_iterator("./resources/entityTextures");
 	for (fs::directory_entry entityTextures : syst)
 	{
 		unordered_map<textureAttributes, vector<Texture>*> entityTextureMap;
-		printf("%i\n", entityTextureMap.size());
 		for (fs::directory_entry textureFile : std::filesystem::directory_iterator(entityTextures.path()))
 		{
 			vector<string> pieces = split(textureFile.path().filename().stem().string(), '.');
 			textureAttributes theAttribs = { stoi(pieces[1]), stoi(pieces[2]), pieces[0] };
 
-			printf("doing %s\n", textureFile.path().filename().stem().string().c_str());
-
 			Texture theTexture = makeTexture(textureFile.path().string());
 
-			if (entityTextureMap.count(theAttribs)==0)
+			if (entityTextureMap.count(theAttribs) == 0)
 			{
 				entityTextureMap[theAttribs] = new vector<Texture>();
 			}
@@ -59,15 +82,22 @@ int main(void)
 		}
 		entityTextureMapMap[entityTextures.path().filename().string()] = entityTextureMap;
 	}
-	
-	exit(0);
+	return entityTextureMapMap;
+}
+
+
+int main(void)
+{
+
 	printf("###starting\n");
 	Renderer r = Renderer(1920, 1080);
 	printf("###initializing\n");
 	r.initialize();
 
-	Entity e = Entity(vec2(0, 0), 10, 10, Controller(), entityTextureMapMap["basicEntity"]);
+	unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap = getEntityTextures("./resources/entityTextures");
 
+	Entity* e = new Entity(vec2(100, 100), 250, 500, Controller(), entityTextureMapMap["basicEntity"]);
+	r.addEntity(e);
 	printf("###running\n");
 	r.run();
 	printf("###ending\n");
