@@ -28,6 +28,7 @@ Camera::Camera()
 void Camera::zoomCall(int direction)
 {
 	this->zoom += ((float)direction) * 0.1f;
+	this->zoom = std::max(std::min(this->zoom, 5.0f), 0.5f);
 }
 
 mat4 Camera::getView()

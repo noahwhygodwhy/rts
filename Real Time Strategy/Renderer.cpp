@@ -67,31 +67,31 @@ static void mouseButtCallback(GLFWwindow* window, int button, int action, int mo
 
 		Renderer* r = (Renderer*)glfwGetWindowUserPointer(window);
 
-		printf("fullscreen: %f, %f\n", r->screenX, r->screenY);
+		//printf("fullscreen: %f, %f\n", r->screenX, r->screenY);
 
 		float hafw = r->screenX / 2;
 		float hafh = r->screenY / 2;
-		printf("half screen: %f, %f\n", hafw, hafh);
+		//printf("half screen: %f, %f\n", hafw, hafh);
 
 		Camera cam = r->cam;
 		vec2 viewCenter = cam.position + vec2(hafw, hafh);
 
-		printf("windowCenter: %f, %f\n", viewCenter.x, viewCenter.y);
+		//printf("windowCenter: %f, %f\n", viewCenter.x, viewCenter.y);
 
-		float minx = viewCenter.x - (hafw * cam.zoom);
-		float miny = viewCenter.y - (hafh * cam.zoom);
-		float maxx = viewCenter.x + (hafw * cam.zoom);
-		float maxy = viewCenter.y + (hafh * cam.zoom);
+		float minx = viewCenter.x - (hafw / cam.zoom);
+		float miny = viewCenter.y - (hafh / cam.zoom);
+		float maxx = viewCenter.x + (hafw / cam.zoom);
+		float maxy = viewCenter.y + (hafh / cam.zoom);
 
-		printf("minx %f\n", minx);
-		printf("miny %f\n", miny);
-		printf("maxx %f\n", maxx);
-		printf("maxy %f\n", maxy);
+		//printf("minx %f\n", minx);
+		//printf("miny %f\n", miny);
+		//printf("maxx %f\n", maxx);
+		//printf("maxy %f\n", maxy);
 
 		double trueXpos = ((xpos / r->screenX) * (maxx - minx)) + minx;
 		double trueYpos = ((ypos / r->screenY) * (maxy - miny)) + miny;
 
-		printf("%f, %f\n", trueXpos, trueYpos);
+		//printf("%f, %f\n", trueXpos, trueYpos);
 
 		r->things[0]->location = vec2(trueXpos, trueYpos);// * vec2(r->screenY / r->screenX, r->screenX / r->screenY);*/
 
