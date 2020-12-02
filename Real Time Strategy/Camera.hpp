@@ -24,7 +24,7 @@ public:
 	// Camera options
 	float movementSpeed;
 	float zoom;
-	//int id;
+	int id;
 
 	Camera(vec2 initPos, float mvspd, float zooooooom);
 	Camera();

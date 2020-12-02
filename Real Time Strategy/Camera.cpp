@@ -8,26 +8,26 @@
 using namespace std;
 using namespace glm;
 
-//static int asdfasdf = 0;
+static int asdfasdf = 0;
 
 Camera::Camera(vec2 initPos, float mvspd, float zooooooom)
 {
 	this->position = initPos;
 	movementSpeed = mvspd;
 	zoom = zooooooom;
+	this->id = asdfasdf++;
 }
 Camera::Camera()
 {
 	this->position = vec2(0);
 	movementSpeed = 1;
 	zoom = 1;
+	this->id = asdfasdf++;
 }
 
 void Camera::zoomCall(int direction)
 {
-	this->zoom += direction * 0.1 * this->zoom;
-	zoom = glm::max(glm::min(zoom, 6.0f), 0.5f);
-	printf("zoom: %f\n", this->zoom);
+	this->zoom += ((float)direction) * 0.1f;
 }
 
 mat4 Camera::getView()

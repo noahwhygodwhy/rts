@@ -46,14 +46,8 @@ void Renderer::processInput(GLFWwindow* window, float deltaTime)
 		vec2 newO = vec2((int)d - (int)a, (int)w - (int)s);
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
-		newO = newO * vec2(((float)height) / ((float)width), ((float)width) / ((float)height));
 		this->cam.move(newO, deltaTime);
 
-		/*if (newO == vec2(0))
-		{
-			newO = vec2(1, 0);
-		}
-		this->things[0]->setOrientation(newO);*/
 	}
 }
 
@@ -63,54 +57,52 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 }
 static void mouseButtCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	//int width, height;
-	//glfwGetWindowSize(window, &width, &height);
-	//float hafh = height / 2;
-	//float hafw = width / 2;
 
+	if (action == GLFW_PRESS)
+	{
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
 
-	double xpos, ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
+		vec2 clickLoc = vec2(xpos, ypos);
 
-	Renderer* r = (Renderer*)glfwGetWindowUserPointer(window);
+		Renderer* r = (Renderer*)glfwGetWindowUserPointer(window);
 
-	printf("fullscreen: %f, %f\n", r->screenX, r->screenY);
+		printf("fullscreen: %f, %f\n", r->screenX, r->screenY);
 
+		float hafw = r->screenX / 2;
+		float hafh = r->screenY / 2;
+		printf("half screen: %f, %f\n", hafw, hafh);
 
+		Camera cam = r->cam;
+		vec2 viewCenter = cam.position + vec2(hafw, hafh);
 
-	float hafw = r->screenX / 2;
-	float hafh = r->screenY / 2;
-	printf("half screen: %f, %f\n", hafw, hafh);
+		printf("windowCenter: %f, %f\n", viewCenter.x, viewCenter.y);
 
-	Camera cam = r->cam;
-	vec2 viewCenter = cam.position + vec2(hafw, hafh);
+		float minx = viewCenter.x - (hafw * cam.zoom);
+		float miny = viewCenter.y - (hafh * cam.zoom);
+		float maxx = viewCenter.x + (hafw * cam.zoom);
+		float maxy = viewCenter.y + (hafh * cam.zoom);
 
-	printf("windowCenter: %f, %f\n", viewCenter.x, viewCenter.y);
+		printf("minx %f\n", minx);
+		printf("miny %f\n", miny);
+		printf("maxx %f\n", maxx);
+		printf("maxy %f\n", maxy);
 
-	float minx = viewCenter.x - (hafw * cam.zoom);
-	float miny = viewCenter.y - (hafh * cam.zoom);
-	float maxx = viewCenter.x + (hafw * cam.zoom);
-	float maxy = viewCenter.y + (hafh * cam.zoom);
+		double trueXpos = ((xpos / r->screenX) * (maxx - minx)) + minx;
+		double trueYpos = ((ypos / r->screenY) * (maxy - miny)) + miny;
 
-	printf("minx %f\n", minx);
-	printf("miny %f\n", miny);
-	printf("maxx %f\n", maxx);
-	printf("maxy %f\n", maxy);
+		printf("%f, %f\n", trueXpos, trueYpos);
 
-	double trueXpos = ((xpos / r->screenX) * (maxx - minx)) + minx;
-	double trueYpos = ((ypos /  r->screenY) * (maxy - miny)) + miny;
+		r->things[0]->location = vec2(trueXpos, trueYpos);// * vec2(r->screenY / r->screenX, r->screenX / r->screenY);*/
 
-	printf("%f, %f\n", trueXpos, trueYpos);
-
-	r->things[0]->location = vec2(trueXpos, trueYpos)* vec2(r->screenY/r->screenX, r->screenX/r->screenY);
+	}
 
 	//divide position by true window dimension, and multiply it by the range visible, then add the min of the range visible
 }
 static void scrollCallback(GLFWwindow* window, double xoff, double yoff)
 {
 	Renderer* r = (Renderer*)glfwGetWindowUserPointer(window);
-	Camera cam = r->cam;
-	cam.zoomCall(yoff);
+	r->cam.zoomCall(yoff);
 }
 
 
@@ -198,7 +190,7 @@ void Renderer::run()
 		mat4 view = cam.getView();
 		shader.setMatFour("view", view);
 
-		mat4 projection = ortho(0.0f, screenY, screenX, 0.0f, -1.0f, 1.0f);
+		mat4 projection = ortho(0.0f, screenX, screenY, 0.0f, -1.0f, 1.0f);
 		shader.setMatFour("projection", projection);
 
 		glfwSwapBuffers(this->window);
