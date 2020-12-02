@@ -55,12 +55,44 @@ static void keyCallback(GLFWwindow* window, int key, int scancode, int action, i
 {
 
 }
+
+vec2 calculateMousePos(GLFWwindow* window)
+{
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+
+	Renderer* r = (Renderer*)glfwGetWindowUserPointer(window);
+
+	vec2 windowDims = vec2(r->screenX, r->screenY);
+
+	Camera cam = r->cam;
+	vec2 viewCenter = cam.position + (windowDims/2.0f);
+
+	vec2 scaledWindowDims = windowDims / cam.zoom;
+
+	//TODO: you were here
+
+	//cam.position = viewCenter - (scaledWindowDims/2.0f);
+
+
+	//vec2 mousePosition = cam.position
+
+	//vec2 mousePosition = (viewCenter - scaledHalves) + (vec2((xpos / r->screenX), (ypos / r->screenY)) + (scaledHalves * 2.0f));
+
+	return mousePosition;
+}
+
 static void mouseButtCallback(GLFWwindow* window, int button, int action, int mods)
 {
 
 	if (action == GLFW_PRESS)
 	{
-		double xpos, ypos;
+		vec2 mousePos = calculateMousePos(window);
+
+		Renderer* r = (Renderer*)glfwGetWindowUserPointer(window);
+		r->things[0]->location = mousePos;// * vec2(r->screenY / r->screenX, r->screenX / r->screenY);*/
+
+		/*double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 
 		vec2 clickLoc = vec2(xpos, ypos);
@@ -94,7 +126,7 @@ static void mouseButtCallback(GLFWwindow* window, int button, int action, int mo
 		//printf("%f, %f\n", trueXpos, trueYpos);
 
 		r->things[0]->location = vec2(trueXpos, trueYpos);// * vec2(r->screenY / r->screenX, r->screenX / r->screenY);*/
-
+		
 	}
 
 	//divide position by true window dimension, and multiply it by the range visible, then add the min of the range visible
