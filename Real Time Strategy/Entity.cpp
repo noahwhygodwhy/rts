@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-vector<Vertex> makeVertices(float width, float height)
+vector<Vertex> Entity::makeSquareVertices(float width, float height)
 {
     vector<Vertex> toReturn;
     toReturn.push_back({ vec2(0, 0), vec2(0, 0) });       //bottom left
@@ -15,7 +15,6 @@ vector<Vertex> makeVertices(float width, float height)
     return toReturn;
 }
 
-
 string vec22String(ivec2 theVec)
 {
     return to_string(theVec.x) + "." + to_string(theVec.y);
@@ -24,7 +23,7 @@ string vec22String(ivec2 theVec)
 Entity::Entity(vec2 location, int width, int height, Controller c, const unordered_map<textureAttributes, vector<Texture>*>& textures)
 {
     this->textures = textures;
-    this->vertices = makeVertices(width, height);
+    this->vertices = this->makeSquareVertices(width, height);
     this->indices = {0, 3, 1, 1, 3, 2};
 	this->location = location;
 	this->orientation = ivec2(1, 0);

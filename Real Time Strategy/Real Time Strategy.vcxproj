@@ -147,6 +147,7 @@
     <ClCompile Include="GLSLReader.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="rts.cpp" />
+    <ClCompile Include="SelectionBox.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -157,8 +158,10 @@
     <ClInclude Include="GLSLReader.hpp" />
     <ClInclude Include="khrplatform.h" />
     <ClInclude Include="Renderer.hpp" />
+    <ClInclude Include="SelectionBox.hpp" />
     <ClInclude Include="Shader.hpp" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="UsefulStructs.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragShader.glsl" />

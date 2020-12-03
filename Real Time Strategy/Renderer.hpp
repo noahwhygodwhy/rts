@@ -22,12 +22,14 @@ public:
 	vector<Entity*> things;
 	float screenX;
 	float screenY;
+	mat4 projMat;
 private:
 	Shader shader;
 	GLFWwindow* window;
 	unsigned int VBO, VAO, EBO;
-
+	
 };
+
 
 
 
