@@ -2,13 +2,13 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include "UsefulStructs.hpp"
 #include "glm/glm.hpp"
 #include "Controller.hpp"
 #include <unordered_map>
 #include <vector>
 #include <string>
 #include "Shader.hpp"
-#include "UsefulStructs.hpp"
 
 
 using namespace std;

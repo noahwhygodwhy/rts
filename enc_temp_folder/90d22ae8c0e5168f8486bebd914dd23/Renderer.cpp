@@ -70,6 +70,9 @@ vec2 calculateMousePos(GLFWwindow* window)
 		1.0f);
 
 	vec4 mousePosInWorld = glm::inverse(r->projMat*cam.getView()) * mousePosInClip;
+
+	printf("%f, %f\n", vec2(mousePosInWorld).x, vec2(mousePosInWorld).y);
+
 	return vec2(mousePosInWorld);
 }
 

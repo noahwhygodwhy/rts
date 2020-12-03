@@ -9,6 +9,7 @@ SelectionBox::SelectionBox(unordered_map<textureAttributes, vector<Texture>*> te
     this->textureState = { 0, 0, "selection" };
     this->faceIndices = { 0, 3, 1, 1, 3, 2 };
     this->edgeIndices = { 0, 3, 3, 2, 2, 1, 1, 0 };
+    this->setupBuffer();
 
 }
 
@@ -21,10 +22,10 @@ vector<Vertex> SelectionBox::makeSquareVertices(vec2 pointA, vec2 pointB)
     vec2 a = glm::min(pointA, pointB);
     vec2 b = glm::max(pointA, pointB);
     vector<Vertex> toReturn;
-    toReturn.push_back(Vertex{ vec2(a.x, a.y), vec2(0, 0) });
-    toReturn.push_back(Vertex{ vec2(b.x, a.y), vec2(0, 0) });
-    toReturn.push_back(Vertex{ vec2(b.x, b.y), vec2(0, 0) });
-    toReturn.push_back(Vertex{ vec2(a.x, b.y), vec2(0, 0) });
+    toReturn.push_back({ vec2(a.x, a.y), vec2(0, 0) });
+    toReturn.push_back({ vec2(b.x, a.y), vec2(0, 0) });
+    toReturn.push_back({ vec2(b.x, b.y), vec2(0, 0) });
+    toReturn.push_back({ vec2(a.x, b.y), vec2(0, 0) });
     return toReturn;
 }
 
@@ -38,10 +39,10 @@ void SelectionBox::setupBuffer()
 
     //printf("there are %i indices and %i vertices\n", indices.size(), vertices.size());
 
-    glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+    glBindVertexArray(VAO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, FaceEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, faceIndices.size() * sizeof(unsigned int), &faceIndices[0], GL_STATIC_DRAW);
@@ -62,28 +63,52 @@ void SelectionBox::setupBuffer()
 
 void SelectionBox::draw(Shader& shader)
 {
-    if (this->active)
-    {
-        mat4 transform = mat4(1);
+    this->vertices = makeSquareVertices(this->a, this->b);
+    glBindVertexArray(VAO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_DYNAMIC_DRAW);
 
-        glActiveTexture(GL_TEXTURE0);
+    mat4 transform = mat4(1);
+    transform = glm::translate(transform, vec3(0, 0, 0.1));
 
-        glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
+    glActiveTexture(GL_TEXTURE0);
 
-        glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep / ANIMATION_SLOWDOWN_FACTOR).id);
+    glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
 
-        shader.setMatFour("transform", transform);
+    glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep / SELECTION_ANIMATION_SLOWDOWN_FACTOR).id);
 
-        glBindVertexArray(VAO);
+    shader.setMatFour("transform", transform);
 
-        glLineWidth(2.0f);
+    glBindVertexArray(VAO);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, FaceEBO);
-        glDrawElements(GL_TRIANGLES, faceIndices.size(), GL_UNSIGNED_INT, 0);
+    glLineWidth(2.0f);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EdgeEBO);
-        glDrawElements(GL_LINES, edgeIndices.size(), GL_UNSIGNED_INT, 0);
 
-        glBindVertexArray(0);
-    }
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, FaceEBO);
+    glDrawElements(GL_TRIANGLES, faceIndices.size(), GL_UNSIGNED_INT, 0);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EdgeEBO);
+    glDrawElements(GL_LINES, edgeIndices.size(), GL_UNSIGNED_INT, 0);
+
+    glBindVertexArray(0);
+    
+}
+
+
+
+void SelectionBox::start(vec2 mousePos)
+{
+    this->active = true;
+    this->a = mousePos;
+    this->b = mousePos;
+}
+void SelectionBox::stop()
+{
+    this->active = false;
+}
+
+void SelectionBox::tick(vec2 mousePos)
+{
+    this->b = mousePos;
 }

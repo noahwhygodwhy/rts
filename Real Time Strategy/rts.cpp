@@ -3,6 +3,7 @@
 #include <iostream>
 #include <filesystem>
 #include "Entity.hpp"
+#include "SelectionBox.hpp"
 #include "Shader.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -98,8 +99,12 @@ int main(void)
 
 	Entity* e = new Entity(vec2(0, 0), 40, 80, Controller(), entityTextureMapMap["basicEntity"]);
 	Entity* e2 = new Entity(vec2(0, 0), 40, 80, Controller(), entityTextureMapMap["basicEntity"]);
+
+	SelectionBox sb = SelectionBox(entityTextureMapMap["selection"]);
+
 	r.addEntity(e);
 	r.addEntity(e2);
+	r.sb = sb;
 	printf("###running\n");
 	r.run();
 	printf("###ending\n");

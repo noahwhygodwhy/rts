@@ -8,6 +8,7 @@
 #include "Entity.hpp"
 #include "glad.h"
 #include <GLFW/glfw3.h>
+#include "SelectionBox.hpp"
 
 class Renderer
 {
@@ -23,6 +24,7 @@ public:
 	float screenX;
 	float screenY;
 	mat4 projMat;
+	SelectionBox sb;
 private:
 	Shader shader;
 	GLFWwindow* window;

@@ -1,6 +1,12 @@
+#pragma once
 #ifndef USEFUL_STRUCTS_H
 #define USEFUL_STRUCTS_H
 
+#include <string>
+#include <glm/glm.hpp>
+
+using namespace std;
+using namespace glm;
 
 struct textureAttributes
 {
@@ -19,6 +25,7 @@ struct Texture {
 	string type;
 	string path;
 };
+
 
 namespace std {
 	template<>
@@ -41,5 +48,7 @@ namespace std {
 		}
 	};
 }
+
+
 
 #endif
