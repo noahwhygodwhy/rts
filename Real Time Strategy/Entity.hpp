@@ -40,6 +40,7 @@ private:
 	int textureAnimationStep;
 	vector<Vertex> makeSquareVertices(float width, float height);
 	bool selected = false;
+	vec2 dims;
 };
 
 #endif

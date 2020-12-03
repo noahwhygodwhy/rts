@@ -104,7 +104,6 @@ void Renderer::addEntity(Entity* th)
 }
 void frameBufferSizeCallback(GLFWwindow* window, int width, int height)
 {
-	printf("######%#@%@#%@#new window size\n");
 	glViewport(0, 0, width, height);
 	Renderer* r = (Renderer*) glfwGetWindowUserPointer(window);
 	r->screenX = width;

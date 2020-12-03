@@ -30,6 +30,7 @@ public:
     void setFloat(const string& name, float value) const;
     void setMatFour(const string& name, mat4 value) const;
     void setVecThree(const string& name, vec3 value) const;
+    void setVecFour(const string& name, vec4 value) const;
 private:
 };
 

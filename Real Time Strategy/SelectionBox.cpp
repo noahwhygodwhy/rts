@@ -21,6 +21,8 @@ vector<Vertex> SelectionBox::makeSquareVertices(vec2 pointA, vec2 pointB)
 {
     vec2 a = glm::min(pointA, pointB);
     vec2 b = glm::max(pointA, pointB);
+    this->minPoint = a;
+    this->maxPoint = b;
     vector<Vertex> toReturn;
     toReturn.push_back({ vec2(a.x, a.y), vec2(0, 0) });
     toReturn.push_back({ vec2(b.x, a.y), vec2(0, 0) });
@@ -79,6 +81,11 @@ void SelectionBox::draw(Shader& shader)
     shader.setMatFour("transform", transform);
 
     glBindVertexArray(VAO);
+
+
+    shader.setBool("outline", false);
+    shader.setVecThree("outlineColor", vec4(0));
+
 
     glLineWidth(2.0f);
 

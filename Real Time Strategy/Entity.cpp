@@ -29,7 +29,9 @@ Entity::Entity(vec2 location, int width, int height, Controller c, const unorder
 	this->orientation = ivec2(1, 0);
     this->textureState = { orientation.x, orientation.y, "walking" };
     this->textureAnimationStep = 0;
+    this->dims = vec2(width, height);
     this->setupBuffer();
+
 }
 
 Entity::~Entity()
@@ -66,34 +68,54 @@ void Entity::setupBuffer()
 void Entity::draw(Shader& shader)
 {
 
+
+    glActiveTexture(GL_TEXTURE0);
+
+    glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
+
+    glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep / ANIMATION_SLOWDOWN_FACTOR).id);
+
     
-    
+
+
+
 
 
 
     mat4 transform = glm::translate(mat4(1), vec3(this->location, 0));
     
-    if (this->selected)
+    /*if (this->selected)
     {
+        /*vec2 highlightScaleFactor = vec2(1.1f);
+        if (this->dims.x > this->dims.y)
+        {
+            highlightScaleFactor.y *= this->dims.x / this->dims.y;
+        }
+        else
+        {
+            highlightScaleFactor.x *= this->dims.y / this->dims.x;
+        }
 
-    }
+        float highlightScaleFactor = 1.1f;
+        vec3 difference = vec3(-((dims * highlightScaleFactor) - dims) / 2.0f, -0.1f);
+        mat4 scaledTransform = glm::translate(glm::scale(transform, vec3(highlightScaleFactor)), difference);
+        shader.setBool("ignoreAlpha", false);
+        shader.setVecThree("tintRatio", vec3(1.0f, 1.0f, 1.0f));
+        shader.setVecThree("tint", vec3(1.0f, 1.0f, 0.0f));
+        shader.setMatFour("transform", scaledTransform);
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    }*/
     
-    glActiveTexture(GL_TEXTURE0);
-
-    glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
-
-    glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep/ ANIMATION_SLOWDOWN_FACTOR).id);
+    shader.setBool("outline", true);
+    shader.setVecFour("outlineColor", vec4(1.0f, 1.0f, 0.0f, 1.0f));
 
     shader.setBool("ignoreAlpha", false);
-    shader.setVecThree("tintRatio", vec3(0.5, 0.5, 0.5));
-    shader.setVecThree("tint", vec3(0, 0, 0));
+    shader.setVecThree("tintRatio", vec3(0.5f, 0.5f, 0.5f));
+    shader.setVecThree("tint", vec3(0.0f, 0.0f, 0.0f));
     shader.setMatFour("transform", transform);
-
     glBindVertexArray(VAO);
-
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-
-    glBindVertexArray(0);
 }
 
 void Entity::tick(float deltaTime)

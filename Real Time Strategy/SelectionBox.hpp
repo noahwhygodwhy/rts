@@ -38,6 +38,8 @@ public:
 	bool active;
 	void start(vec2 mousePos);
 	void stop();
+	vec2 minPoint;
+	vec2 maxPoint;
 private:
 	unsigned int VAO, VBO, FaceEBO, EdgeEBO;
 	vector<Vertex> vertices;
@@ -47,7 +49,6 @@ private:
 	unordered_map<textureAttributes, vector<Texture>*> textures;
 	textureAttributes textureState;
 	int textureAnimationStep;
-
 };
 
 

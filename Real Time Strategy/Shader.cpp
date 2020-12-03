@@ -116,5 +116,8 @@ void Shader::setMatFour(const string& name, mat4 value) const
 void Shader::setVecThree(const string& name, vec3 value) const
 {
     glUniform3fv(glGetUniformLocation(program, name.c_str()), 1, value_ptr(value));
-    //glUniform3fv()
+}
+void Shader::setVecFour(const string& name, vec4 value) const
+{
+    glUniform4fv(glGetUniformLocation(program, name.c_str()), 1, value_ptr(value));
 }
