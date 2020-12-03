@@ -162,7 +162,6 @@ bool Renderer::initialize()
 	glFrontFace(GL_CCW);
 
 	glEnable(GL_LINE_SMOOTH);
-	glLineWidth(2.0f);
 
 	//glDepthFunc(GL_LESS);
 

@@ -1,7 +1,15 @@
 #include "SelectionBox.hpp"
 
-SelectionBox::SelectionBox() 
+
+
+
+SelectionBox::SelectionBox(unordered_map<textureAttributes, vector<Texture>*> textures)
 {
+    this->textures = textures;
+    this->textureState = { 0, 0, "selection" };
+    this->faceIndices = { 0, 3, 1, 1, 3, 2 };
+    this->edgeIndices = { 0, 3, 3, 2, 2, 1, 1, 0 };
+
 }
 
 SelectionBox::~SelectionBox()
@@ -54,19 +62,28 @@ void SelectionBox::setupBuffer()
 
 void SelectionBox::draw(Shader& shader)
 {
-    mat4 transform = mat4(1);
+    if (this->active)
+    {
+        mat4 transform = mat4(1);
 
-    glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE0);
 
-    glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
+        glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
 
-    glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep / ANIMATION_SLOWDOWN_FACTOR).id);
+        glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep / ANIMATION_SLOWDOWN_FACTOR).id);
 
-    shader.setMatFour("transform", transform);
+        shader.setMatFour("transform", transform);
 
-    glBindVertexArray(VAO);
+        glBindVertexArray(VAO);
 
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        glLineWidth(2.0f);
 
-    glBindVertexArray(0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, FaceEBO);
+        glDrawElements(GL_TRIANGLES, faceIndices.size(), GL_UNSIGNED_INT, 0);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EdgeEBO);
+        glDrawElements(GL_LINES, edgeIndices.size(), GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(0);
+    }
 }
