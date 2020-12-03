@@ -21,12 +21,24 @@ uniform sampler2D ourTexture;
 //uniform sampler2D texture_specular1;
 //uniform sampler2D texture_specular2;
 
+uniform vec3 tint;
+uniform vec3 tintRatio;
+uniform bool ignoreAlpha;
+
 void main()
 {
     vec4 color = texture(ourTexture, texCoords);
-    if (color.a == 0)
+    //if (color.a == 0)
+    //{
+    //    discard;
+    //}
+    if (tint != vec3(0))
     {
-        discard;
+        color = vec4(mix(vec3(color), tint, tintRatio), color.a);
+    }
+    if(ignoreAlpha)
+    {
+        color.a = 1.0f;
     }
     FragColor = color;
 }

@@ -39,6 +39,7 @@ private:
 	textureAttributes textureState;
 	int textureAnimationStep;
 	vector<Vertex> makeSquareVertices(float width, float height);
+	bool selected = false;
 };
 
 #endif

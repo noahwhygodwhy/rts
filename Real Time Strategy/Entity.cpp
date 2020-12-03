@@ -65,14 +65,28 @@ void Entity::setupBuffer()
 }
 void Entity::draw(Shader& shader)
 {
+
+    
+    
+
+
+
     mat4 transform = glm::translate(mat4(1), vec3(this->location, 0));
+    
+    if (this->selected)
+    {
+
+    }
     
     glActiveTexture(GL_TEXTURE0);
 
     glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
 
     glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep/ ANIMATION_SLOWDOWN_FACTOR).id);
-    
+
+    shader.setBool("ignoreAlpha", false);
+    shader.setVecThree("tintRatio", vec3(0.5, 0.5, 0.5));
+    shader.setVecThree("tint", vec3(0, 0, 0));
     shader.setMatFour("transform", transform);
 
     glBindVertexArray(VAO);

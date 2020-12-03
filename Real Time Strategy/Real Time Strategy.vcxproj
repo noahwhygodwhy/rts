@@ -164,9 +164,9 @@
     <ClInclude Include="UsefulStructs.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragShader.glsl" />
+    <None Include="entity.FragShader.glsl" />
     <None Include="packages.config" />
-    <None Include="vertShader.glsl" />
+    <None Include="entity.vertShader.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

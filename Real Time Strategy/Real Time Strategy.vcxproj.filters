@@ -25,6 +25,9 @@
     <Filter Include="Header Files\Controllers">
       <UniqueIdentifier>{fadcf5c5-3e79-42a3-9466-d5e92698d0e2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\OGLS\shaders">
+      <UniqueIdentifier>{eaab0b92-fa4d-46df-965a-9f981bddd3a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rts.cpp">
@@ -91,12 +94,12 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragShader.glsl">
-      <Filter>Source Files\OGLS</Filter>
-    </None>
-    <None Include="vertShader.glsl">
-      <Filter>Source Files\OGLS</Filter>
-    </None>
     <None Include="packages.config" />
+    <None Include="entity.FragShader.glsl">
+      <Filter>Source Files\OGLS\shaders</Filter>
+    </None>
+    <None Include="entity.vertShader.glsl">
+      <Filter>Source Files\OGLS\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

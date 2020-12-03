@@ -82,14 +82,20 @@ void SelectionBox::draw(Shader& shader)
 
     glLineWidth(2.0f);
 
-
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, FaceEBO);
-    glDrawElements(GL_TRIANGLES, faceIndices.size(), GL_UNSIGNED_INT, 0);
-
+    shader.setVecThree("tint", this->color);
+    shader.setVecThree("tintRatio", vec3(1.0f, 1.0f, 1.0f));
+    shader.setBool("ignoreAlpha", true);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EdgeEBO);
     glDrawElements(GL_LINES, edgeIndices.size(), GL_UNSIGNED_INT, 0);
+
+
+    shader.setVecThree("tint", this->color);
+    shader.setVecThree("tintRatio", vec3(0.5f, 0.5f, 0.5f));
+    shader.setBool("ignoreAlpha", false);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, FaceEBO);
+    glDrawElements(GL_TRIANGLES, faceIndices.size(), GL_UNSIGNED_INT, 0);
+;
 
     glBindVertexArray(0);
     
@@ -102,6 +108,7 @@ void SelectionBox::start(vec2 mousePos)
     this->active = true;
     this->a = mousePos;
     this->b = mousePos;
+    this->color = vec3(0.1f, 0.1f, 0.7f);
 }
 void SelectionBox::stop()
 {

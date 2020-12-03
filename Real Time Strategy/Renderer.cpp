@@ -138,7 +138,7 @@ bool Renderer::initialize()
 		exit(-1);
 	}
 
-	shader = Shader("vertShader.glsl", "fragShader.glsl");
+	shader = Shader("entity.vertShader.glsl", "entity.fragShader.glsl");
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_FRAMEBUFFER_SRGB);
@@ -146,6 +146,10 @@ bool Renderer::initialize()
 	glFrontFace(GL_CCW);
 
 	glEnable(GL_LINE_SMOOTH);
+
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//glDepthFunc(GL_LESS);
 
