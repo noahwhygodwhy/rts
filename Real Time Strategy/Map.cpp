@@ -1,13 +1,15 @@
 #include "Map.hpp"
-#include "stb_image.h"
+#include "Renderer.hpp"
+
+
 
 Map::Map(string path)
 {
-	
 }
 
 Map::~Map()
 {
+
 }
 
 

@@ -1,7 +1,11 @@
-#include "SelectionBox.hpp"
+
+#include <glm/glm.hpp>
 #include "UtilityFunctions.hpp"
+#include "SelectionBox.hpp"
 #include <unordered_set>
 
+using namespace std;
+using namespace glm;
 
 SelectionBox::SelectionBox(unordered_map<textureAttributes, vector<Texture>*> textures)
 {
@@ -206,4 +210,17 @@ void SelectionBox::detectClickSelection(vector<Entity*> things, vec2 mousePos, b
             }
         }
     }
+}
+
+bool SelectionBox::intersecting(vec2 minA, vec2 maxA, vec2 minB, vec2 maxB)
+{
+    if (minA.x > maxB.x || minB.x > maxA.x)
+    {
+        return false;
+    }
+    if (minA.y > maxB.y || minB.y > maxA.y)
+    {
+        return false;
+    }
+    return true;
 }

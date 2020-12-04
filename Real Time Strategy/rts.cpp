@@ -6,14 +6,11 @@
 #include "SelectionBox.hpp"
 #include "Map.hpp"
 #include "Shader.hpp"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
+#include "Map.hpp"
 using namespace std;
 namespace fs = std::filesystem;
 
 
-unordered_map<string, unsigned int> loadedTextures;
 
 vector<string> split(string s, char c)
 {
@@ -25,40 +22,6 @@ vector<string> split(string s, char c)
 		toReturn.push_back(segment);
 	}
 	return toReturn;
-}
-
-Texture makeTexture(string filepath)
-{
-	Texture t;
-	t.type = "diffuse";
-	t.path = filepath;
-	if (loadedTextures.count(filepath))
-	{
-		t.id = loadedTextures[filepath];
-	}
-	else
-	{
-		int width, height, nrChannels;
-		unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 4);
-
-		unsigned int texture;
-		//printf("%p\n", &texture);
-		glGenTextures(1, &texture);
-		//printf("%i\n", texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		stbi_image_free(data);
-		t.id = texture;
-	}
-
-	return t;
 }
 
 

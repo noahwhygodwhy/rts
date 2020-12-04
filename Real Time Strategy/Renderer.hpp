@@ -36,3 +36,5 @@ private:
 vec2 calculateMousePos(GLFWwindow* window);
 
 #endif
+
+Texture makeTexture(string filepath);

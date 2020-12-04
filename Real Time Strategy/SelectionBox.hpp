@@ -31,6 +31,7 @@ public:
 
 	void draw(Shader& shader);
 	void tick(vector<Entity*> things, vec2 mousePos);
+	bool intersecting(vec2 minA, vec2 maxA, vec2 minB, vec2 maxB);
 	vec2 a;
 	vec2 b;
 	vec3 color;
