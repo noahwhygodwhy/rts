@@ -11,6 +11,8 @@
 #include <vector>
 #include "Shader.hpp"
 #include <unordered_map>
+#include "Entity.hpp"
+#include <unordered_set>
 
 using namespace std;
 using namespace glm;
@@ -23,23 +25,25 @@ class SelectionBox
 {
 public:
 	SelectionBox(unordered_map<textureAttributes, vector<Texture>*> textures);
-	SelectionBox()
-	{
-
-	}
+	SelectionBox(){}
 	~SelectionBox();
 	vector<Vertex> makeSquareVertices(vec2 pointA, vec2 pointB);
 
 	void draw(Shader& shader);
-	void tick(vec2 mousePos);
+	void tick(vector<Entity*> things, vec2 mousePos);
 	vec2 a;
 	vec2 b;
 	vec3 color;
 	bool active;
 	void start(vec2 mousePos);
-	void stop();
+	void stop(vector<Entity*> things, bool shift);
+	void stopPrematurely();
 	vec2 minPoint;
 	vec2 maxPoint;
+	void detectClickSelection(vector<Entity*> things, vec2 mousePos, bool shift);
+	unordered_set<Entity*> selected;
+	unordered_set<Entity*> curSelection;
+
 private:
 	unsigned int VAO, VBO, FaceEBO, EdgeEBO;
 	vector<Vertex> vertices;

@@ -33,6 +33,6 @@ private:
 };
 
 
-
+vec2 calculateMousePos(GLFWwindow* window);
 
 #endif

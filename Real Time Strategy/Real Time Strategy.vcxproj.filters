@@ -28,6 +28,12 @@
     <Filter Include="Source Files\OGLS\shaders">
       <UniqueIdentifier>{eaab0b92-fa4d-46df-965a-9f981bddd3a8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Map">
+      <UniqueIdentifier>{f8f0fda6-9747-48e7-a1c7-863857be38ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Map">
+      <UniqueIdentifier>{c7be5fbc-5393-4faa-b18e-0a15a44c7438}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rts.cpp">
@@ -56,6 +62,9 @@
     </ClCompile>
     <ClCompile Include="SelectionBox.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Source Files\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +100,12 @@
     </ClInclude>
     <ClInclude Include="UsefulStructs.hpp">
       <Filter>Header Files\OGLS</Filter>
+    </ClInclude>
+    <ClInclude Include="UtilityFunctions.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.hpp">
+      <Filter>Header Files\Map</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

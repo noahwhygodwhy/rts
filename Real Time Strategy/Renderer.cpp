@@ -2,16 +2,14 @@
 #include "Camera.hpp"
 #include "glm/gtx/string_cast.hpp"
 #include "Entity.hpp"
+#include "UtilityFunctions.hpp"
 
 
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
-
-static vec3 camVector = vec3();
-static vec3 camPos = vec3();
-//TODO: you were moving the camera from the renderer to the Player
+float mouseTime;
 
 Renderer::Renderer(int x, int y)
 {
@@ -77,14 +75,56 @@ static void mouseButtCallback(GLFWwindow* window, int button, int action, int mo
 {
 	Renderer* r = (Renderer*)glfwGetWindowUserPointer(window);
 	vec2 mousePos = calculateMousePos(window);
-	if (action == GLFW_PRESS)
+
+	if (button == GLFW_MOUSE_BUTTON_RIGHT)
 	{
-		r->things[0]->location = mousePos;// * vec2(r->screenY / r->screenX, r->screenX / r->screenY);*/
-		r->sb.start(mousePos);
+		if (action == GLFW_RELEASE)
+		{
+			Entity* target = 0;
+			for (Entity* e : r->things)
+			{
+				if (intersecting(e->location, e->location + e->dims, mousePos, mousePos))
+				{
+					target = e;
+					break;
+				}
+			}
+			if (target == 0)
+			{
+				for (Entity* e : r->sb.selected)
+				{
+					e->setTarget(mousePos);
+				}
+			}
+			else
+			{
+				for (Entity* e : r->sb.selected)
+				{
+					e->setTarget(target);
+				}
+			}
+		}
 	}
-	if (action == GLFW_RELEASE)
+	else if (button == GLFW_MOUSE_BUTTON_LEFT)
 	{
-		r->sb.stop();
+		if (action == GLFW_PRESS)
+		{
+			mouseTime = glfwGetTime();
+			r->sb.start(mousePos);
+		}
+		if (action == GLFW_RELEASE)
+		{
+			bool shift = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
+			if (glfwGetTime() - mouseTime > 0.1f)
+			{
+				r->sb.stop(r->things, shift);
+			}
+			else
+			{
+				r->sb.stopPrematurely();
+				r->sb.detectClickSelection(r->things, mousePos, shift);
+			}
+		}
 	}
 
 	//divide position by true window dimension, and multiply it by the range visible, then add the min of the range visible
@@ -165,6 +205,7 @@ void Renderer::run()
 	this->projMat = ortho(0.0f, screenX, screenY, 0.0f, -1.0f, 1.0f);
 	while (!glfwWindowShouldClose(this->window))
 	{	
+		vec2 mousePos = calculateMousePos(window);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -175,7 +216,12 @@ void Renderer::run()
 		processInput(this->window, deltaTime);
 		shader.use();
 
-
+		
+		if (sb.active)
+		{
+			this->sb.draw(shader);
+			this->sb.tick(this->things, mousePos);
+		}
 
 		for (Entity* t : things) //Everything else
 		{
@@ -183,11 +229,7 @@ void Renderer::run()
 			t->tick(deltaTime);
 		}
 
-		if (sb.active)
-		{
-			this->sb.draw(shader);
-			this->sb.tick(calculateMousePos(window));
-		}
+
 
 		mat4 view = cam.getView();
 		shader.setMatFour("view", view);

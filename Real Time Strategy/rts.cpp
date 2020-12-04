@@ -4,6 +4,7 @@
 #include <filesystem>
 #include "Entity.hpp"
 #include "SelectionBox.hpp"
+#include "Map.hpp"
 #include "Shader.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -95,15 +96,22 @@ int main(void)
 	printf("###initializing\n");
 	r.initialize();
 
+	printf("###initialized, adding things\n");
 	unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap = getEntityTextures("./resources/entityTextures");
 
-	Entity* e = new Entity(vec2(0, 0), 40, 80, Controller(), entityTextureMapMap["basicEntity"]);
-	Entity* e2 = new Entity(vec2(0, 0), 40, 80, Controller(), entityTextureMapMap["basicEntity"]);
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			Entity* e = new Entity(vec2(i*40, j*80), vec2(40, 80), 15, Controller(), entityTextureMapMap["basicEntity"]);
+			r.addEntity(e);
+		}
+	}
+
+	Map map = Map("./resources/maps/map1/");
 
 	SelectionBox sb = SelectionBox(entityTextureMapMap["selection"]);
 
-	r.addEntity(e);
-	r.addEntity(e2);
 	r.sb = sb;
 	printf("###running\n");
 	r.run();

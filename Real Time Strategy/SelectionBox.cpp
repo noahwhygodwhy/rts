@@ -1,6 +1,6 @@
 #include "SelectionBox.hpp"
-
-
+#include "UtilityFunctions.hpp"
+#include <unordered_set>
 
 
 SelectionBox::SelectionBox(unordered_map<textureAttributes, vector<Texture>*> textures)
@@ -117,12 +117,93 @@ void SelectionBox::start(vec2 mousePos)
     this->b = mousePos;
     this->color = vec3(0.1f, 0.1f, 0.7f);
 }
-void SelectionBox::stop()
+void SelectionBox::stop(vector<Entity*> things, bool shift)
+{
+    this->active = false;
+
+    if (shift)
+    {
+        this->selected.merge(this->curSelection);
+    }
+    else
+    {
+        this->selected = this->curSelection;
+    }
+    curSelection.clear();
+
+    for (Entity* e : things)
+    {
+        e->selected = selected.count(e) == 1;
+    }
+}
+
+void SelectionBox::stopPrematurely()
 {
     this->active = false;
 }
 
-void SelectionBox::tick(vec2 mousePos)
+
+void SelectionBox::tick(vector<Entity*> things, vec2 mousePos)
 {
     this->b = mousePos;
+
+    vec2 boxMins = glm::min(this->a, this->b);
+    vec2 boxMaxs = glm::max(this->a, this->b);
+
+    for (Entity* e : things)
+    {
+        //todo; 4 different if statements, if intersecting and if shift
+        if (intersecting(e->location, e->location + e->dims, boxMins, boxMaxs))
+        {
+            e->selected = true;
+            if (this->curSelection.count(e) == 0)
+            {
+                this->curSelection.insert(e);
+            }
+        }
+        else
+        {
+            if (this->selected.count(e) == 0)
+            {
+                e->selected = false;
+            }
+            if (this->curSelection.count(e) == 1)
+            {
+                this->curSelection.erase(e);
+            }
+        }
+    }
+
+}
+
+void SelectionBox::detectClickSelection(vector<Entity*> things, vec2 mousePos, bool shift)
+{
+    for (Entity* e : things)
+    {
+        if (intersecting(mousePos, mousePos, e->location, e->location + e->dims))
+        {
+            if (shift)
+            {
+                if (this->selected.count(e)==1)
+                {
+                    this->selected.erase(e);
+                    e->selected = false;
+                }
+                else
+                {
+                    this->selected.insert(e);
+                    e->selected = true;
+                }
+            }
+            else
+            {
+                this->selected.clear();
+                this->selected.insert(e);
+                for (Entity* secondE : things)
+                {
+                    secondE->selected = secondE == e;
+                }
+            }
+        }
+    }
 }

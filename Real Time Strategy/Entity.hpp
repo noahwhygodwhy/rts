@@ -16,18 +16,32 @@ using namespace glm;
 
 static int ANIMATION_SLOWDOWN_FACTOR = 8;
 
-
 class Entity
 {
 public:
-	Entity(vec2 location, int width, int height, Controller c,const unordered_map<textureAttributes, vector<Texture>*>& textures);
+	Entity(vec2 location, vec2 dims, float hitboxRadius, Controller c,const unordered_map<textureAttributes, vector<Texture>*>& textures);
 	void draw(Shader& shader);
 	void tick(float deltaTime);
-
+	void setTarget(vec2 targetLocation);
+	void setTarget(Entity* targetEntity);
 	~Entity();
 	void setOrientation(vec2 newO);
 	ivec2 orientation;
 	vec2 location;
+	vec2 dims;
+	float hitboxRadius;
+	bool selected;
+	int id;
+
+
+
+	void walkToLocation(vec2 position);
+
+	bool operator==(const Entity& other)const
+	{
+		return this->id == other.id;
+	}
+
 private:
 	unsigned int VAO, VBO, EBO;
 	vector<Vertex> vertices;
@@ -39,8 +53,6 @@ private:
 	textureAttributes textureState;
 	int textureAnimationStep;
 	vector<Vertex> makeSquareVertices(float width, float height);
-	bool selected = false;
-	vec2 dims;
 };
 
 #endif

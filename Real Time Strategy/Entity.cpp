@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
+static int idCounter = 0;
 vector<Vertex> Entity::makeSquareVertices(float width, float height)
 {
     vector<Vertex> toReturn;
@@ -20,16 +21,19 @@ string vec22String(ivec2 theVec)
     return to_string(theVec.x) + "." + to_string(theVec.y);
 }
 
-Entity::Entity(vec2 location, int width, int height, Controller c, const unordered_map<textureAttributes, vector<Texture>*>& textures)
+Entity::Entity(vec2 location, vec2 dims, float hitboxRadius, Controller c, const unordered_map<textureAttributes, vector<Texture>*>& textures)
 {
     this->textures = textures;
-    this->vertices = this->makeSquareVertices(width, height);
+    this->vertices = this->makeSquareVertices(dims.x, dims.y);
     this->indices = {0, 3, 1, 1, 3, 2};
 	this->location = location;
 	this->orientation = ivec2(1, 0);
     this->textureState = { orientation.x, orientation.y, "walking" };
     this->textureAnimationStep = 0;
-    this->dims = vec2(width, height);
+    this->dims = dims;
+    this->hitboxRadius = hitboxRadius;
+    this->selected = false;
+    this->id = idCounter++;
     this->setupBuffer();
 
 }
@@ -75,39 +79,10 @@ void Entity::draw(Shader& shader)
 
     glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep / ANIMATION_SLOWDOWN_FACTOR).id);
 
-    
-
-
-
-
-
-
     mat4 transform = glm::translate(mat4(1), vec3(this->location, 0));
     
-    /*if (this->selected)
-    {
-        /*vec2 highlightScaleFactor = vec2(1.1f);
-        if (this->dims.x > this->dims.y)
-        {
-            highlightScaleFactor.y *= this->dims.x / this->dims.y;
-        }
-        else
-        {
-            highlightScaleFactor.x *= this->dims.y / this->dims.x;
-        }
-
-        float highlightScaleFactor = 1.1f;
-        vec3 difference = vec3(-((dims * highlightScaleFactor) - dims) / 2.0f, -0.1f);
-        mat4 scaledTransform = glm::translate(glm::scale(transform, vec3(highlightScaleFactor)), difference);
-        shader.setBool("ignoreAlpha", false);
-        shader.setVecThree("tintRatio", vec3(1.0f, 1.0f, 1.0f));
-        shader.setVecThree("tint", vec3(1.0f, 1.0f, 0.0f));
-        shader.setMatFour("transform", scaledTransform);
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    }*/
     
-    shader.setBool("outline", true);
+    shader.setBool("outline", this->selected);
     shader.setVecFour("outlineColor", vec4(1.0f, 1.0f, 0.0f, 1.0f));
 
     shader.setBool("ignoreAlpha", false);
@@ -135,4 +110,31 @@ void Entity::setOrientation(vec2 newO)
     this->textureAnimationStep = 0;
     this->textureState.x = newO.x;
     this->textureState.y = newO.y;
+}
+
+namespace std
+{
+    template <>
+    struct hash<Entity>
+    {
+        size_t operator()(const Entity& k) const
+        {
+            return k.id;
+        }
+    };
+}
+
+
+void Entity::setTarget(vec2 targetLocation)
+{
+
+}
+void Entity::setTarget(Entity* targetEntity)
+{
+
+}
+
+void Entity::walkToLocation(vec2 position)
+{
+
 }
