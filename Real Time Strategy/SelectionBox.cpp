@@ -69,6 +69,7 @@ void SelectionBox::setupBuffer()
 
 void SelectionBox::draw(Shader& shader)
 {
+    printf("drawing selection box\n");
     this->vertices = makeSquareVertices(this->a, this->b);
     glBindVertexArray(VAO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_DYNAMIC_DRAW);
@@ -79,6 +80,11 @@ void SelectionBox::draw(Shader& shader)
     glActiveTexture(GL_TEXTURE0);
 
     glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
+
+    for (auto x : this->textures)
+    {
+        printf("%i\n", x.second->at(0).id);
+    }
 
     glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep / SELECTION_ANIMATION_SLOWDOWN_FACTOR).id);
 
@@ -116,10 +122,13 @@ void SelectionBox::draw(Shader& shader)
 
 void SelectionBox::start(vec2 mousePos)
 {
+    printf("here1\n");
     this->active = true;
     this->a = mousePos;
     this->b = mousePos;
     this->color = vec3(0.1f, 0.1f, 0.7f);
+
+    printf("here2\n");
 }
 void SelectionBox::stop(vector<Entity*> things, bool shift)
 {
@@ -177,7 +186,6 @@ void SelectionBox::tick(vector<Entity*> things, vec2 mousePos)
             }
         }
     }
-
 }
 
 void SelectionBox::detectClickSelection(vector<Entity*> things, vec2 mousePos, bool shift)

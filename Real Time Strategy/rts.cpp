@@ -62,20 +62,18 @@ int main(void)
 	printf("###initialized, adding things\n");
 	unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap = getEntityTextures("./resources/entityTextures");
 
-	for (int i = 0; i < 5; i++)
+	/*for (int i = 0; i < 5; i++)
 	{
 		for (int j = 0; j < 5; j++)
 		{
 			Entity* e = new Entity(vec2(i*40, j*80), vec2(40, 80), 15, Controller(), entityTextureMapMap["basicEntity"]);
 			r.addEntity(e);
 		}
-	}
+	}*/
 
-	Map map = Map("./resources/maps/map1/");
+	r.map = Map("./resources/maps/map1/", vec2(8000, 8000));
+	r.sb = SelectionBox(entityTextureMapMap["selection"]);
 
-	SelectionBox sb = SelectionBox(entityTextureMapMap["selection"]);
-
-	r.sb = sb;
 	printf("###running\n");
 	r.run();
 	printf("###ending\n");

@@ -116,6 +116,7 @@ static void mouseButtCallback(GLFWwindow* window, int button, int action, int mo
 		{
 			mouseTime = glfwGetTime();
 			r->sb.start(mousePos);
+			
 		}
 		if (action == GLFW_RELEASE)
 		{
@@ -221,7 +222,8 @@ void Renderer::run()
 		processInput(this->window, deltaTime);
 		shader.use();
 
-		
+		this->map.draw(shader);
+
 		if (sb.active)
 		{
 			this->sb.draw(shader);
@@ -249,6 +251,11 @@ void Renderer::run()
 
 
 
+unsigned char* imageToBytes(string filepath, int* x, int* y, int* nrChannels)
+{
+	return stbi_load(filepath.c_str(), x, y, nrChannels, 4);
+}
+
 Texture makeTexture(string filepath)
 {
 	Texture t;
@@ -261,7 +268,7 @@ Texture makeTexture(string filepath)
 	else
 	{
 		int width, height, nrChannels;
-		unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &nrChannels, 4);
+		unsigned char* data = imageToBytes(filepath, &width, &height, &nrChannels);
 
 		unsigned int texture;
 		//printf("%p\n", &texture);
@@ -279,7 +286,10 @@ Texture makeTexture(string filepath)
 		stbi_image_free(data);
 		t.id = texture;
 		t.dims = vec2(width, height);
+		t.channels = nrChannels;
 	}
 
 	return t;
 }
+
+

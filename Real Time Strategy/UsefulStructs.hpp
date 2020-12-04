@@ -23,6 +23,7 @@ struct Vertex {
 struct Texture {
 	unsigned int id = 0;
 	vec2 dims;
+	int channels;
 	string type;
 	string path;
 };

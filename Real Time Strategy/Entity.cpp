@@ -89,8 +89,11 @@ void Entity::draw(Shader& shader)
     shader.setVecThree("tintRatio", vec3(0.5f, 0.5f, 0.5f));
     shader.setVecThree("tint", vec3(0.0f, 0.0f, 0.0f));
     shader.setMatFour("transform", transform);
+
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+    glBindVertexArray(0);
 }
 
 void Entity::tick(float deltaTime)

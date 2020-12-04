@@ -9,6 +9,7 @@
 #include "glad.h"
 #include <GLFW/glfw3.h>
 #include "SelectionBox.hpp"
+#include "Map.hpp"
 
 class Renderer
 {
@@ -25,6 +26,7 @@ public:
 	float screenY;
 	mat4 projMat;
 	SelectionBox sb;
+	Map map;
 private:
 	Shader shader;
 	GLFWwindow* window;
@@ -38,3 +40,4 @@ vec2 calculateMousePos(GLFWwindow* window);
 #endif
 
 Texture makeTexture(string filepath);
+unsigned char* imageToBytes(string filepath, int* x, int* y, int* nrChannels);
