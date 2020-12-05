@@ -10,8 +10,6 @@ float sobelX[3][3] = { {1.0, 0.0, -1.0},{2.0, 0.0, -2.0}, {1.0, 0.0, -1.0} };
 float sobelY[3][3] = { {1.0, 2.0, 1.0},{0.0, 0.0, 0.0}, {-1.0, -2.0, -1.0} };
 
 
-
-//TODO: sobelY is returning redicoulously large numbers. fix it
 double sobel(float sobelMat[3][3], unsigned char* imageData, int width, int height, int nrChannels, int x, int y, int colorOffset)
 {
     int sum = 0;

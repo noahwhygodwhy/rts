@@ -73,7 +73,7 @@ int main(void)
 		}
 	}*/
 
-	r.map = Map(".\\resources\\maps\\map1\\", vec2(8000, 8000));
+	r.map = Map(".\\resources\\maps\\map1\\", vec2(2000, 2000));
 	r.sb = SelectionBox(entityTextureMapMap["selection"]);
 
 	printf("###running\n");
