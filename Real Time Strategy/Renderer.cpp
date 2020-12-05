@@ -6,6 +6,8 @@
 #include "UtilityFunctions.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
 static unordered_map<string, unsigned int> loadedTextures;
 
@@ -253,7 +255,7 @@ void Renderer::run()
 
 unsigned char* imageToBytes(string filepath, int* x, int* y, int* nrChannels)
 {
-	return stbi_load(filepath.c_str(), x, y, nrChannels, 4);
+	return stbi_load(filepath.c_str(), x, y, nrChannels, NUM_CHANNELS);
 }
 
 Texture makeTexture(string filepath)
@@ -286,10 +288,13 @@ Texture makeTexture(string filepath)
 		stbi_image_free(data);
 		t.id = texture;
 		t.dims = vec2(width, height);
-		t.channels = nrChannels;
+		t.channels = NUM_CHANNELS;
 	}
 
 	return t;
 }
 
-
+void saveImage(string filename, unsigned char* data, int width, int height, int nrChannels)
+{
+	stbi_write_png(filename.c_str(), width, height, NUM_CHANNELS, data, NUM_CHANNELS *width);
+}

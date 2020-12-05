@@ -34,6 +34,9 @@
     <Filter Include="Header Files\Map">
       <UniqueIdentifier>{c7be5fbc-5393-4faa-b18e-0a15a44c7438}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\SVGPP">
+      <UniqueIdentifier>{40d85f3e-152e-4ad1-9b3c-41d3afa13d4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rts.cpp">
@@ -65,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="Map.cpp">
       <Filter>Source Files\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml2.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +112,15 @@
     </ClInclude>
     <ClInclude Include="Map.hpp">
       <Filter>Header Files\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image_write.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="svgpp\svgpp.hpp">
+      <Filter>Header Files\SVGPP</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml2.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

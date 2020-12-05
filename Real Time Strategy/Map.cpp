@@ -1,6 +1,7 @@
 
 #include "Renderer.hpp"
 #include "Map.hpp"
+#include "tinyxml2.h"
 
 using namespace glm;
 using namespace std;
@@ -11,16 +12,16 @@ float sobelY[3][3] = { {1.0, 2.0, 1.0},{0.0, 0.0, 0.0}, {-1.0, -2.0, -1.0} };
 
 
 
-//TODO: sobelY is returning redicoulously large numbers. fix it
-double sobel(float sobelMat[3][3], unsigned char* imageData, int width, int height, int nrChannels, int x, int y, int colorOffset)
+double sobel(float sobelMat[3][3], unsigned char* imageData, int width, int height, int nrChannels, int pixelOffset, int colorOffset)
 {
     int sum = 0;
-    int pixelIndex = (x * nrChannels) + ((x * y) * nrChannels) + 1;
     for (int i = 0; i < 3; i++)
     {
         for (int j = 0; j < 3; j++)
         {
-            sum += sobelMat[i][j] * (pixelIndex + ((i - 1) * width * nrChannels) + (j * nrChannels));
+            int yAdjust = (i - 1) * (width * NUM_CHANNELS);
+            int xAdjust = (j - 1) * (NUM_CHANNELS);
+            sum += sobelMat[i][j] * *(imageData + pixelOffset + yAdjust + xAdjust + colorOffset);
         }
     }
     return (double)sum;
@@ -29,56 +30,67 @@ double sobel(float sobelMat[3][3], unsigned char* imageData, int width, int heig
 
 unsigned char* makeSobalImage(unsigned char* originalImage, int width, int height, int nrChannels)
 {
-
-    for (int i = 0; i < 200; i+=nrChannels)
-    {
-        unsigned char* x = (unsigned char*) (originalImage + i);
-        printf("pixel info of %i: %i,%i,%i\n", i/nrChannels, *x, *(x+1), *(x+2));
-    }
-
-
-    unsigned char* sobelImage = new unsigned char[(width * height * nrChannels)+1];
+    unsigned char* sobelImage = new unsigned char[(width * height * NUM_CHANNELS)+1];
 
     int sumX = 0;
     int sumY = 0;
     int sum;
-    for (int y = 0; y < height; y++)
+    int maxSobalVal = 0;
+
+
+    for (int i = 0; i < width * height; i++)
     {
-        for (int x = 0; x < width; x++)
+        int pixelOffset = i * NUM_CHANNELS;
+        int y = i / width;
+        int x = i % height;
+
+
+        if (x == 0 || y == 0 || x == width - 1 || y == height - 1)
         {
-            if (x == 0 || y == 0 || x == width - 1 || y == height - 1)
+            *(sobelImage + pixelOffset + 0) = 0;
+            *(sobelImage + pixelOffset + 1) = 0;
+            *(sobelImage + pixelOffset + 2) = 0;
+            *(sobelImage + pixelOffset + 3) = 255;
+        }
+        else
+        {
+            double rsx = sobel(sobelX, originalImage, width, height, NUM_CHANNELS, pixelOffset, 0);
+            double rsy = sobel(sobelY, originalImage, width, height, NUM_CHANNELS, pixelOffset, 0);
+            double rrealSum = sqrt((rsx * rsx) + (rsy * rsy));
+
+            double gsx = sobel(sobelX, originalImage, width, height, NUM_CHANNELS, pixelOffset, 1);
+            double gsy = sobel(sobelY, originalImage, width, height, NUM_CHANNELS, pixelOffset, 1);
+            double grealSum = sqrt((gsx * gsx) + (gsy * gsy));
+
+            double bsx = sobel(sobelX, originalImage, width, height, NUM_CHANNELS, pixelOffset, 2);
+            double bsy = sobel(sobelY, originalImage, width, height, NUM_CHANNELS, pixelOffset, 2);
+            double brealSum = sqrt((bsx * bsx) + (bsy * bsy));
+
+            int avgSum = (int)((rrealSum + grealSum + brealSum) / 765.0f);
+
+            maxSobalVal = std::max(maxSobalVal, avgSum);
+
+            for (int colorOffset = 0; colorOffset < 3; colorOffset++)
             {
-                *(sobelImage + ((y * width) * nrChannels) + (x * nrChannels)) = 0;
+                *(sobelImage + pixelOffset + colorOffset) = avgSum;
             }
-            else
-            {
-                double rsx = sobel(sobelX, originalImage, width, height, nrChannels, x, y, 0);
-                printf("rsx of %i, %i: %f\n", y, x, rsx);
-                double rsy = sobel(sobelY, originalImage, width, height, nrChannels, x, y, 0);
-                printf("rsy of %i, %i: %f\n", y, x, rsy);
-                double rrealSum = sqrt((rsx * rsx) + (rsy * rsy));
-                printf("rrealsum of %i, %i: %f\n", y, x, rrealSum);
-
-                double gsx = sobel(sobelX, originalImage, width, height, nrChannels, x, y, 1);
-                double gsy = sobel(sobelY, originalImage, width, height, nrChannels, x, y, 1);
-                double grealSum = sqrt((gsx * gsx) + (gsy * gsy));
-
-                double bsx = sobel(sobelX, originalImage, width, height, nrChannels, x, y, 2);
-                double bsy = sobel(sobelY, originalImage, width, height, nrChannels, x, y, 2);
-                double brealSum = sqrt((bsx * bsx) + (bsy * bsy));
-
-                int avgSum = (int) (rrealSum + grealSum + brealSum / (765));
-                printf("average sum of pixel at %i, %i: %i\n", y, x, avgSum);
-
-                for (int colorOffset = 0; colorOffset < 3; colorOffset++)
-                {
-                    *(sobelImage + ((y * width) * nrChannels) + (x * nrChannels) + colorOffset) = avgSum;
-                }
-                *(sobelImage + ((y * width) * nrChannels) + (x * nrChannels) + 3) = 255;
-
-            }
+            *(sobelImage + pixelOffset + 3) = 255;
+            
         }
     }
+
+    for (int i = 0; i < width * height; i++)
+    {
+        int pixelOffset = i * NUM_CHANNELS;
+        int y = i / width;
+        int x = i % height;
+        for (int j = 0; j < 3; j++)
+        {
+            *(sobelImage + pixelOffset + j) = *(sobelImage + pixelOffset + j) / maxSobalVal * 255;
+        }
+
+    }
+
     return sobelImage;
 }
 
@@ -88,11 +100,14 @@ Texture makeNavMesh(string filePath)
 
     int width, height, nrChannels;
     unsigned char* originalImage = imageToBytes(filePath.c_str(), &width, &height, &nrChannels);
+    printf("original image channels: %i\n", NUM_CHANNELS);
 
     printf("original image: %p\n", originalImage);
 
     printf("making sobel\n");
-    unsigned char* sobelImage = makeSobalImage(originalImage, width, height, nrChannels);
+    unsigned char* sobelImage = makeSobalImage(originalImage, width, height, NUM_CHANNELS);
+    saveImage("SOBEL_IMAGE8325.png", sobelImage, width, height, NUM_CHANNELS);
+    //saveImage("SOBEL_IMAGE8325.png", originalImage, width, height, nrChannels);
     printf("done sobel\n");
 
     Texture t;
@@ -118,11 +133,27 @@ Texture makeNavMesh(string filePath)
 
     t.id = texture;
     t.dims = vec2(width, height);
-    t.channels = nrChannels;
+    t.channels = NUM_CHANNELS;
     
     return t;
 }
 
+void generateNavMeshVerts(string inFilePath, string outFilePath)
+{
+    vector<vec2> points;
+    tinyxml2::XMLDocument theFile;
+    theFile.LoadFile(inFilePath.c_str());
+    //printf(" first child element: %s\n", theFile.FirstChildElement("svg")->FirstChildElement("g"));
+    tinyxml2::XMLElement* g = theFile.FirstChildElement("svg")->FirstChildElement("g");
+    for (tinyxml2::XMLElement* ele = g->FirstChildElement(); ele; ele = ele->NextSiblingElement())
+    {
+        string pointString = ele->FindAttribute("points")->Value();
+
+        printf("%s\n", ele->FindAttribute("points")->Value());
+    }
+    //TODO: reads in the texture file, makes the sobel image, translates that into edges and vertices, triangularizes those points,  with that one method
+    //then writes those triangles to a file of some sort
+}
 
 
 Map::Map(string path, vec2 dims)

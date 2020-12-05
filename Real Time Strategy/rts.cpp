@@ -53,6 +53,9 @@ unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEnt
 
 int main(void)
 {
+	generateNavMeshVerts(".\\resources\\maps\\map1\\navMesh.svg", "testNavMeshOut.json");
+
+	exit(0);
 
 	printf("###starting\n");
 	Renderer r = Renderer(1920, 1080);

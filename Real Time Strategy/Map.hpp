@@ -27,4 +27,5 @@ private:
 
 };
 
+void generateNavMeshVerts(string inFilePath, string outFilePath);
 #endif

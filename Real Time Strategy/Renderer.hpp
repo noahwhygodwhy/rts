@@ -11,6 +11,9 @@
 #include "SelectionBox.hpp"
 #include "Map.hpp"
 
+
+static int NUM_CHANNELS = 4;
+
 class Renderer
 {
 public:
@@ -41,3 +44,4 @@ vec2 calculateMousePos(GLFWwindow* window);
 
 Texture makeTexture(string filepath);
 unsigned char* imageToBytes(string filepath, int* x, int* y, int* nrChannels);
+void saveImage(string filename, unsigned char* data, int width, int height, int nrChannels);

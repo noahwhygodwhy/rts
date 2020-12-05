@@ -150,6 +150,7 @@
     <ClCompile Include="rts.cpp" />
     <ClCompile Include="SelectionBox.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="tinyxml2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.hpp" />
@@ -163,6 +164,9 @@
     <ClInclude Include="SelectionBox.hpp" />
     <ClInclude Include="Shader.hpp" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="stb_image_write.h" />
+    <ClInclude Include="svgpp\svgpp.hpp" />
+    <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="UsefulStructs.hpp" />
     <ClInclude Include="UtilityFunctions.hpp" />
   </ItemGroup>
