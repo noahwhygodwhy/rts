@@ -141,7 +141,6 @@ void Map::draw(Shader& shader)
     shader.setMatFour("transform", mat4(1.0f));
 
     glBindVertexArray(this->VAO);
-    printf("drawing vao at %p\n", &this->VAO);
 
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 

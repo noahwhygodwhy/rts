@@ -28,7 +28,7 @@ vector<string> split(string s, char c)
 unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEntityTextures(string path)
 {
 	unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap;
-	fs::directory_iterator syst = std::filesystem::directory_iterator("./resources/entityTextures");
+	fs::directory_iterator syst = std::filesystem::directory_iterator(path);
 	for (fs::directory_entry entityTextures : syst)
 	{
 		unordered_map<textureAttributes, vector<Texture>*> entityTextureMap;
@@ -60,7 +60,9 @@ int main(void)
 	r.initialize();
 
 	printf("###initialized, adding things\n");
-	unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap = getEntityTextures("./resources/entityTextures");
+	unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap = getEntityTextures(".\\resources\\entityTextures");
+
+	r.addEntity(new Entity(vec2(40,80), vec2(40, 80), 15, Controller(), entityTextureMapMap["basicEntity"]));
 
 	/*for (int i = 0; i < 5; i++)
 	{
@@ -71,7 +73,7 @@ int main(void)
 		}
 	}*/
 
-	r.map = Map("./resources/maps/map1/", vec2(8000, 8000));
+	r.map = Map(".\\resources\\maps\\map1\\", vec2(8000, 8000));
 	r.sb = SelectionBox(entityTextureMapMap["selection"]);
 
 	printf("###running\n");

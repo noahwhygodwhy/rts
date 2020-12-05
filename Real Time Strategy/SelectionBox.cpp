@@ -13,6 +13,7 @@ SelectionBox::SelectionBox(unordered_map<textureAttributes, vector<Texture>*> te
     this->textureState = { 0, 0, "selection" };
     this->faceIndices = { 0, 3, 1, 1, 3, 2 };
     this->edgeIndices = { 0, 3, 3, 2, 2, 1, 1, 0 };
+    this->textureAnimationStep = 0;
     this->setupBuffer();
 
 }
@@ -81,13 +82,20 @@ void SelectionBox::draw(Shader& shader)
 
     glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
 
-    for (auto x : this->textures)
+    printf("selection box textures:\n");
+    for (pair<textureAttributes, vector<Texture>*> x : this->textures)
     {
-        printf("%i\n", x.second->at(0).id);
+        for (Texture tex : *x.second)
+        {
+            printf("%s\n", tex.path.c_str());
+        }
     }
+    printf("the used one: %s\n", textures[this->textureState]->at(0).path.c_str());
+    printf("animation step: %i\n", this->textureAnimationStep / SELECTION_ANIMATION_SLOWDOWN_FACTOR);
 
     glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep / SELECTION_ANIMATION_SLOWDOWN_FACTOR).id);
 
+    printf("here01\n");
     shader.setMatFour("transform", transform);
 
     glBindVertexArray(VAO);
@@ -95,7 +103,6 @@ void SelectionBox::draw(Shader& shader)
 
     shader.setBool("outline", false);
     shader.setVecThree("outlineColor", vec4(0));
-
 
     glLineWidth(2.0f);
 
@@ -106,13 +113,15 @@ void SelectionBox::draw(Shader& shader)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EdgeEBO);
     glDrawElements(GL_LINES, edgeIndices.size(), GL_UNSIGNED_INT, 0);
 
+    printf("here02\n");
 
     shader.setVecThree("tint", this->color);
     shader.setVecThree("tintRatio", vec3(0.5f, 0.5f, 0.5f));
     shader.setBool("ignoreAlpha", false);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, FaceEBO);
     glDrawElements(GL_TRIANGLES, faceIndices.size(), GL_UNSIGNED_INT, 0);
-;
+
+    printf("here03\n");
 
     glBindVertexArray(0);
     
@@ -158,6 +167,15 @@ void SelectionBox::stopPrematurely()
 
 void SelectionBox::tick(vector<Entity*> things, vec2 mousePos)
 {
+
+    this->textureAnimationStep += 1;
+    if (this->textureAnimationStep > (this->textures[textureState]->size() * ANIMATION_SLOWDOWN_FACTOR) - 1)
+    {
+        this->textureAnimationStep = 0;
+    }
+
+
+    printf("selection box tick\n");
     this->b = mousePos;
 
     vec2 boxMins = glm::min(this->a, this->b);
@@ -190,6 +208,7 @@ void SelectionBox::tick(vector<Entity*> things, vec2 mousePos)
 
 void SelectionBox::detectClickSelection(vector<Entity*> things, vec2 mousePos, bool shift)
 {
+    printf("detect click selection\n");
     for (Entity* e : things)
     {
         if (intersecting(mousePos, mousePos, e->location, e->location + e->dims))
