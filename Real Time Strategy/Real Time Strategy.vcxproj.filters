@@ -34,8 +34,8 @@
     <Filter Include="Header Files\Map">
       <UniqueIdentifier>{c7be5fbc-5393-4faa-b18e-0a15a44c7438}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\SVGPP">
-      <UniqueIdentifier>{40d85f3e-152e-4ad1-9b3c-41d3afa13d4c}</UniqueIdentifier>
+    <Filter Include="Header Files\Utility">
+      <UniqueIdentifier>{10ec928c-cd79-4705-86b6-e87f9bb4a1da}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +72,9 @@
     <ClCompile Include="tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Polygon.cpp">
+      <Filter>Source Files\Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h">
@@ -104,23 +107,29 @@
     <ClInclude Include="SelectionBox.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UsefulStructs.hpp">
-      <Filter>Header Files\OGLS</Filter>
-    </ClInclude>
-    <ClInclude Include="UtilityFunctions.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Map.hpp">
       <Filter>Header Files\Map</Filter>
     </ClInclude>
     <ClInclude Include="stb_image_write.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="svgpp\svgpp.hpp">
-      <Filter>Header Files\SVGPP</Filter>
-    </ClInclude>
     <ClInclude Include="tinyxml2.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon.hpp">
+      <Filter>Header Files\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="UtilityFunctions.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="UsefulStructs.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Sobel.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Delaunay.hpp">
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

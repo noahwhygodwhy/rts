@@ -1,6 +1,6 @@
 
 #include <glm/glm.hpp>
-#include "UtilityFunctions.hpp"
+//#include "UtilityFunctions.hpp"
 #include "SelectionBox.hpp"
 #include <unordered_set>
 

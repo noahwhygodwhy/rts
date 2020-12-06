@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include "Entity.hpp"
-#include "UtilityFunctions.hpp"
+//#include "UtilityFunctions.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION

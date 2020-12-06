@@ -2,97 +2,27 @@
 #include "Renderer.hpp"
 #include "Map.hpp"
 #include "tinyxml2.h"
-
+#include "Polygon.hpp"
+#include <array>
+#include "Sobel.hpp"
+#include "Delaunay.hpp"
 using namespace glm;
 using namespace std;
 
 
-float sobelX[3][3] = { {1.0, 0.0, -1.0},{2.0, 0.0, -2.0}, {1.0, 0.0, -1.0} };
-float sobelY[3][3] = { {1.0, 2.0, 1.0},{0.0, 0.0, 0.0}, {-1.0, -2.0, -1.0} };
 
-
-
-double sobel(float sobelMat[3][3], unsigned char* imageData, int width, int height, int nrChannels, int pixelOffset, int colorOffset)
+vector<string> splitOnSpaces(string s)
 {
-    int sum = 0;
-    for (int i = 0; i < 3; i++)
+    stringstream toSplit(s);
+    string segment;
+    vector<string> toReturn;
+    while (getline(toSplit, segment, ' '))
     {
-        for (int j = 0; j < 3; j++)
-        {
-            int yAdjust = (i - 1) * (width * NUM_CHANNELS);
-            int xAdjust = (j - 1) * (NUM_CHANNELS);
-            sum += sobelMat[i][j] * *(imageData + pixelOffset + yAdjust + xAdjust + colorOffset);
-        }
+        toReturn.push_back(segment);
     }
-    return (double)sum;
+    return toReturn;
 }
 
-
-unsigned char* makeSobalImage(unsigned char* originalImage, int width, int height, int nrChannels)
-{
-    unsigned char* sobelImage = new unsigned char[(width * height * NUM_CHANNELS)+1];
-
-    int sumX = 0;
-    int sumY = 0;
-    int sum;
-    int maxSobalVal = 0;
-
-
-    for (int i = 0; i < width * height; i++)
-    {
-        int pixelOffset = i * NUM_CHANNELS;
-        int y = i / width;
-        int x = i % height;
-
-
-        if (x == 0 || y == 0 || x == width - 1 || y == height - 1)
-        {
-            *(sobelImage + pixelOffset + 0) = 0;
-            *(sobelImage + pixelOffset + 1) = 0;
-            *(sobelImage + pixelOffset + 2) = 0;
-            *(sobelImage + pixelOffset + 3) = 255;
-        }
-        else
-        {
-            double rsx = sobel(sobelX, originalImage, width, height, NUM_CHANNELS, pixelOffset, 0);
-            double rsy = sobel(sobelY, originalImage, width, height, NUM_CHANNELS, pixelOffset, 0);
-            double rrealSum = sqrt((rsx * rsx) + (rsy * rsy));
-
-            double gsx = sobel(sobelX, originalImage, width, height, NUM_CHANNELS, pixelOffset, 1);
-            double gsy = sobel(sobelY, originalImage, width, height, NUM_CHANNELS, pixelOffset, 1);
-            double grealSum = sqrt((gsx * gsx) + (gsy * gsy));
-
-            double bsx = sobel(sobelX, originalImage, width, height, NUM_CHANNELS, pixelOffset, 2);
-            double bsy = sobel(sobelY, originalImage, width, height, NUM_CHANNELS, pixelOffset, 2);
-            double brealSum = sqrt((bsx * bsx) + (bsy * bsy));
-
-            int avgSum = (int)((rrealSum + grealSum + brealSum) / 765.0f);
-
-            maxSobalVal = std::max(maxSobalVal, avgSum);
-
-            for (int colorOffset = 0; colorOffset < 3; colorOffset++)
-            {
-                *(sobelImage + pixelOffset + colorOffset) = avgSum;
-            }
-            *(sobelImage + pixelOffset + 3) = 255;
-            
-        }
-    }
-
-    for (int i = 0; i < width * height; i++)
-    {
-        int pixelOffset = i * NUM_CHANNELS;
-        int y = i / width;
-        int x = i % height;
-        for (int j = 0; j < 3; j++)
-        {
-            *(sobelImage + pixelOffset + j) = *(sobelImage + pixelOffset + j) / maxSobalVal * 255;
-        }
-
-    }
-
-    return sobelImage;
-}
 
 Texture makeNavMesh(string filePath)
 {
@@ -140,17 +70,35 @@ Texture makeNavMesh(string filePath)
 
 void generateNavMeshVerts(string inFilePath, string outFilePath)
 {
-    vector<vec2> points;
+    vector<Polygon> shapes;
     tinyxml2::XMLDocument theFile;
     theFile.LoadFile(inFilePath.c_str());
-    //printf(" first child element: %s\n", theFile.FirstChildElement("svg")->FirstChildElement("g"));
     tinyxml2::XMLElement* g = theFile.FirstChildElement("svg")->FirstChildElement("g");
     for (tinyxml2::XMLElement* ele = g->FirstChildElement(); ele; ele = ele->NextSiblingElement())
     {
-        string pointString = ele->FindAttribute("points")->Value();
-
-        printf("%s\n", ele->FindAttribute("points")->Value());
+        vector<string> pointStrings = splitOnSpaces(ele->FindAttribute("points")->Value());
+        vector<int> pointInts;
+        for (string s : pointStrings)
+        {
+            pointInts.push_back(stoi(s));
+        }
+        shapes.push_back(Polygon(pointInts));
     }
+    vector<vec2> allPoints;
+    for (Polygon x : shapes)
+    {
+        allPoints.insert(allPoints.end(), x.points.begin(), x.points.end());
+    }
+    vector<array<vec2, 3>> triangles = delaunay(allPoints);
+
+    array<vec2, 3> superTriangle = { mins, vec2(mins.x, mins.y + ((maxs.y - mins.y) * 2)), vec2(mins.x + ((maxs.x - mins.x) * 2), mins.y) };
+    vector<array<vec2, 3>> triangles; //probably not guarenteed to be CCW
+
+
+
+
+
+
     //TODO: reads in the texture file, makes the sobel image, translates that into edges and vertices, triangularizes those points,  with that one method
     //then writes those triangles to a file of some sort
 }

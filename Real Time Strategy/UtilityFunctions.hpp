@@ -2,23 +2,21 @@
 #ifndef UTILITY_FUNCTIONS_H
 #define UTILITY_FUNCTIONS_H
 
-#include<glm/glm.hpp>
+#include <vector>
+#include <sstream>
 
 using namespace std;
-using namespace glm;
-
-
-/*bool intersecting(vec2 minA, vec2 maxA, vec2 minB, vec2 maxB)
+/*
+vector<string> split(string s, char c)
 {
-    if (minA.x > maxB.x || minB.x > maxA.x)
+    stringstream toSplit(s);
+    string segment;
+    vector<string> toReturn;
+    while (getline(toSplit, segment, c))
     {
-        return false;
+        toReturn.push_back(segment);
     }
-    if (minA.y > maxB.y || minB.y > maxA.y)
-    {
-        return false;
-    }
-    return true;
+    return toReturn;
 }*/
 
 #endif;

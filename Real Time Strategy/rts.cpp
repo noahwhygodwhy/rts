@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "UtilityFunctions.hpp"
 #include "Renderer.hpp"
 #include <iostream>
 #include <filesystem>
@@ -6,24 +7,23 @@
 #include "SelectionBox.hpp"
 #include "Map.hpp"
 #include "Shader.hpp"
-#include "Map.hpp"
+
 using namespace std;
 namespace fs = std::filesystem;
 
 
 
-vector<string> split(string s, char c)
+std::vector<std::string> split(std::string s, char c)
 {
-	stringstream toSplit(s);
-	string segment;
-	vector<string> toReturn;
+	std::stringstream toSplit(s);
+	std::string segment;
+	std::vector<std::string> toReturn;
 	while (getline(toSplit, segment, c))
 	{
 		toReturn.push_back(segment);
 	}
 	return toReturn;
 }
-
 
 unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEntityTextures(string path)
 {
