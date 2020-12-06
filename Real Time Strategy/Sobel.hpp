@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef SOBEL_H
 #define SOBEL_H
 

@@ -4,7 +4,6 @@
 #include "tinyxml2.h"
 #include "Polygon.hpp"
 #include <array>
-#include "Sobel.hpp"
 #include "Delaunay.hpp"
 using namespace glm;
 using namespace std;
@@ -35,8 +34,8 @@ Texture makeNavMesh(string filePath)
     printf("original image: %p\n", originalImage);
 
     printf("making sobel\n");
-    unsigned char* sobelImage = makeSobalImage(originalImage, width, height, NUM_CHANNELS);
-    saveImage("SOBEL_IMAGE8325.png", sobelImage, width, height, NUM_CHANNELS);
+    //unsigned char* sobelImage = makeSobalImage(originalImage, width, height, NUM_CHANNELS);
+    //saveImage("SOBEL_IMAGE8325.png", sobelImage, width, height, NUM_CHANNELS);
     //saveImage("SOBEL_IMAGE8325.png", originalImage, width, height, nrChannels);
     printf("done sobel\n");
 
@@ -52,7 +51,7 @@ Texture makeNavMesh(string filePath)
     glBindTexture(GL_TEXTURE_2D, texture);
 
     printf("about to use sobel\n");
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, sobelImage);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, originalImage);
     printf("used sobel\n");
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -68,9 +67,14 @@ Texture makeNavMesh(string filePath)
     return t;
 }
 
-void generateNavMeshVerts(string inFilePath, string outFilePath)
+bool counterClockwise(Triangle t)
 {
-    vector<Polygon> shapes;
+    return (t.points[1].x - t.points[0].x) * (t.points[2].y - t.points[0].y) - (t.points[2].x - t.points[0].x) * (t.points[1].y - t.points[0].y);
+}
+
+vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath)
+{
+    /*vector<Polygon> shapes;
     tinyxml2::XMLDocument theFile;
     theFile.LoadFile(inFilePath.c_str());
     tinyxml2::XMLElement* g = theFile.FirstChildElement("svg")->FirstChildElement("g");
@@ -88,12 +92,28 @@ void generateNavMeshVerts(string inFilePath, string outFilePath)
     for (Polygon x : shapes)
     {
         allPoints.insert(allPoints.end(), x.points.begin(), x.points.end());
+    }*/
+    vector<vec2> allPoints;
+
+    for (int i = 0; i < 50; i++)
+    {
+        int x = rand() % 1000;
+        int y = rand() % 1000;
+        allPoints.push_back(vec2(x, y));
     }
-    vector<array<vec2, 3>> triangles = delaunay(allPoints);
+    vector<Triangle> triangles = delaunay(allPoints); //not guarenteed to be CCW
 
-    array<vec2, 3> superTriangle = { mins, vec2(mins.x, mins.y + ((maxs.y - mins.y) * 2)), vec2(mins.x + ((maxs.x - mins.x) * 2), mins.y) };
-    vector<array<vec2, 3>> triangles; //probably not guarenteed to be CCW
 
+    for (Triangle& t : triangles)
+    {
+        if (!counterClockwise(t))
+        {
+            vec2 temp = t.points[1];
+            t.points[1] = t.points[2];
+            t.points[2] = temp;
+        }
+    }
+    return triangles;
 
 
 
@@ -106,16 +126,28 @@ void generateNavMeshVerts(string inFilePath, string outFilePath)
 
 Map::Map(string path, vec2 dims)
 {
+    vector<Triangle> triangles = generateNavMeshVerts("","");
+    this->vertices = vector<Vertex>();
+    this->indices = vector<unsigned int>();
+    int ind = 0;
+    for (Triangle t : triangles)
+    {
+        for (vec2 p : t.points)
+        {
+            this->indices.push_back(ind++);
+            this->vertices.push_back({ p, vec2(0) });
+        }
+    }
     this->dims = dims;
     this->texture = makeNavMesh(path + "navMeshb.png");
     //this->texture = makeTexture(path + "navMesh.png");
-    this->vertices = {
+    /*this->vertices = {
         {vec2(0, 0), vec2(0, 0)},   //bottom left
         {vec2(dims.x, 0), vec2(1, 0)},  //bottom right
         {vec2(0, dims.y), vec2(0, 1)}, //top left
         {vec2(dims.x, dims.y), vec2(1, 1)} //top right
-    };
-    this->indices = { 0, 2, 1, 2, 3, 1 };
+    };*/
+    //this->indices = { 0, 2, 1, 2, 3, 1 };
     setupBuffer();
     //this->texture = makeTexture(path + "mapImage.png");
     //this->navMesh = makeNavMesh(path + "navMesh.png");

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef MAP_H
 #define MAP_H
 
@@ -27,5 +28,5 @@ private:
 
 };
 
-void generateNavMeshVerts(string inFilePath, string outFilePath);
+//vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath);
 #endif
