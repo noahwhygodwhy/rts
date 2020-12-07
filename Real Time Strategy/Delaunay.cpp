@@ -164,6 +164,8 @@ void checkMiddleEdge(Triangle& a, Triangle& b)
             sharedPoints.push_back(v);
         }
     }
+
+
     if (uniquePoints.size() != 2 || sharedPoints.size() != 4)
     {
 
@@ -291,15 +293,55 @@ vec2 getCenter(const Triangle& t)
     return vec2(middleX, middleY);
 }
 
-void fixIllegalTriangles(vector<Triangle>& tris, vector<vec2>& points)
-{
-    for (Triangle t : tris)
+void fixIllegalTriangles(Triangle& tri, vector<Triangle>& tris, const vector<vec2>& points)
+{/*
+    for each triangle
+        if its adjancent to tri
+            find the center of the circle of tri
+            if the point they dont share is in the circle
+                flip the edge
+                run fixIllegalTriangeles for both*/
+
+
+    //TODO: this part but with caffeine 
+    for (Triangle& t : tris)
     {
-        for (Triangle ta : tris)
+        if (!(t == tri))
         {
-            if (adjacent(t, ta))
+            if (adjacent(tri, t))
             {
-                checkMiddleEdge(t, ta);
+                vec2 center = getCenter(tri);
+                float radius = distance(center, tri.points[0]);
+
+                vec2 tnotSharedPoint(0);
+                vec2 sharedPoint1(0);
+                vec2 sharedPoint2(0);
+                vec2 trinotSharedPoint(0);
+                for (vec2 x : t.points)
+                {
+                    if (count(tri.points.begin(), tri.points.end(), x) == 0)
+                    {
+                        tnotSharedPoint = x;
+                        break;
+                    }
+                }
+                for (vec2 x : tri.points)
+                {
+                    if (count(t.points.begin(), t.points.end(), x) == 0)
+                    {
+                        trinotSharedPoint = x;
+                        break;
+                    }
+                }
+                if (distance(center, tnotSharedPoint) < radius)
+                {
+                    Triangle a = { trinotSharedPoint, tnotSharedPoint, sharedPoint1 };
+                    Triangle b = { trinotSharedPoint, tnotSharedPoint, sharedPoint2 };
+                    t.points = a.points;
+                    tri.points = b.points;
+                    fixIllegalTriangles(tri, tris, points);
+                    fixIllegalTriangles(t, tris, points);
+                }
             }
         }
     }
@@ -344,21 +386,15 @@ vector<Triangle> delaunay(vector<vec2> pointsIn)
     for (vec2 point : pointsIn)
     {
         printf("on point %i\n", i++);
-        printf("starting with %i triangles\n", triangles.size());
+        printf("starting with %llu triangles\n", triangles.size());
         vector<Triangle> containingTriangle = findContainer(triangles, point);
-        printf("this many triangles contain the point: %i:\n", containingTriangle.size());
+        printf("this many triangles contain the point: %llu:\n", containingTriangle.size());
 
         vector<Triangle> newTriangles = splitTriangle(containingTriangle, point);
-        printf("splitting into %i triangles\n", newTriangles.size());
+        printf("splitting into %llu triangles\n", newTriangles.size());
 
-        printf("containing triangle(s):");
-        for (Triangle t : containingTriangle)
-        {
-            t.print();
-        }
 
-        int i2 = 0;
-        printf("erasing %i triangles\n", containingTriangle.size());
+        printf("erasing %llu triangles\n", containingTriangle.size());
 
         for (Triangle t : containingTriangle)
         {
@@ -367,14 +403,17 @@ vector<Triangle> delaunay(vector<vec2> pointsIn)
             //std::remove(triangles.begin(), triangles.end(), t);
         }
 
-        printf("inserting %i triangles\n", newTriangles.size());
+        printf("inserting %llu triangles\n", newTriangles.size());
 
         triangles.insert(triangles.end(), newTriangles.begin(), newTriangles.end());
-        fixIllegalTriangles(triangles, pointsIn);
+        for (Triangle t : triangles)
+        {
+            fixIllegalTriangles(t, triangles, pointsIn);
+        }
         //Then go through and flip all illegal triangles
         //http://web.mit.edu/alexmv/Public/6.850-lectures/lecture09.pdf
     }
-    printf("returning %i triangles\n", triangles.size());
+    printf("returning %llu triangles\n", triangles.size());
 
 
 

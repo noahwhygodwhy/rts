@@ -87,7 +87,8 @@ float distance(const vec2& p1, const vec2& p2);
 void checkMiddleEdge(Triangle& a, Triangle& b);
 
 vec2 getCenter(const Triangle& t);
-void fixIllegalTriangles(vector<Triangle>& tris, vector<vec2>& points);
+
+void fixIllegalTriangles(Triangle& t, vector<Triangle>& tris, const vector<vec2>& points);
 
 bool shareAPoint(Triangle& t, Triangle& superTriangle);
 

@@ -94,7 +94,7 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath)
     }*/
     vector<vec2> allPoints;
     srand(42);
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 150; i++)
     {
         int x = rand() % 1000;
         int y = rand() % 1000;
