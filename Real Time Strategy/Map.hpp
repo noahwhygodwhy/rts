@@ -2,8 +2,8 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include <string>
-
+#include "Delaunay.hpp"
+#include <string> 
 using namespace std;
 
 

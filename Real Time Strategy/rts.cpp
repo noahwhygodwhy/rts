@@ -7,6 +7,7 @@
 #include "SelectionBox.hpp"
 #include "Map.hpp"
 #include "Shader.hpp"
+#include "Delaunay.hpp"
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -50,9 +51,16 @@ unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEnt
 	return entityTextureMapMap;
 }
 
-
 int main(void)
 {
+	vec2 p1(-6, 3);
+	vec2 p2(-3, 2);
+	vec2 p3(0, 3);
+	vec2 center = getCenter({ p1,p2,p3 });
+	printf("center: %f, %f\n", center.x, center.y);
+
+
+	exit(0);
 	//generateNavMeshVerts(".\\resources\\maps\\map1\\navMesh.svg", "testNavMeshOut.json");
 
 	//exit(0);

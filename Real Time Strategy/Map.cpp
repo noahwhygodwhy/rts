@@ -4,7 +4,6 @@
 #include "tinyxml2.h"
 #include "Polygon.hpp"
 #include <array>
-#include "Delaunay.hpp"
 using namespace glm;
 using namespace std;
 
@@ -94,7 +93,7 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath)
         allPoints.insert(allPoints.end(), x.points.begin(), x.points.end());
     }*/
     vector<vec2> allPoints;
-
+    srand(42);
     for (int i = 0; i < 50; i++)
     {
         int x = rand() % 1000;
@@ -132,11 +131,18 @@ Map::Map(string path, vec2 dims)
     int ind = 0;
     for (Triangle t : triangles)
     {
+        for (int i = 0; i < 3; i++)
+        {
+            this->vertices.push_back({ t.points[i], vec2(0) });
+            this->vertices.push_back({ t.points[(i+1)%3], vec2(0) });
+        }
+        /*
         for (vec2 p : t.points)
         {
             this->indices.push_back(ind++);
+
             this->vertices.push_back({ p, vec2(0) });
-        }
+        }*/
     }
     this->dims = dims;
     this->texture = makeNavMesh(path + "navMeshb.png");
@@ -171,13 +177,17 @@ void Map::draw(Shader& shader)
     shader.setVecFour("outlineColor", vec4(1.0f, 1.0f, 0.0f, 1.0f));
 
     shader.setBool("ignoreAlpha", false);
-    shader.setVecThree("tintRatio", vec3(0.0f, 0.0f, 0.0f));
-    shader.setVecThree("tint", vec3(1.0f, 0.0f, 0.0f));
+    shader.setVecThree("tintRatio", vec3(0.0f));
+    //float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    //float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    //float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    shader.setVecThree("tint", vec3(1.0f));
     shader.setMatFour("transform", mat4(1.0f));
 
     glBindVertexArray(this->VAO);
 
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    //glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_LINES, 0, vertices.size());
 
     glBindVertexArray(0);
 }
