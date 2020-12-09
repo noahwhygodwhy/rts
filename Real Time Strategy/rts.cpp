@@ -56,10 +56,11 @@ unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEnt
 
 int main(void)
 {
-	//generateNavMeshVerts(".\\resources\\maps\\map1\\navMesh.svg", "testNavMeshOut.json");
 
-	//exit(0);
-
+	Triangle t = { vec2(15,39), vec2(15,1870), vec2(1864,3915) };
+	vec2 center = getCenter(t);
+	printf("center: %f, %f\n", center.x, center.y);
+	exit(0);
 	printf("###starting\n");
 	Renderer r = Renderer(1920, 1080);
 	printf("###initializing\n");

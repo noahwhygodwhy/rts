@@ -94,7 +94,7 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath)
     }*/
     vector<vec2> allPoints;
     srand(42);
-    for (int i = 0; i < 150; i++)
+    for (int i = 0; i < 25; i++)
     {
         int x = rand() % 1000;
         int y = rand() % 1000;
@@ -102,6 +102,11 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath)
     }
     vector<Triangle> triangles = delaunay(allPoints); //not guarenteed to be CCW
 
+    printf("size of triangles: %ul: \n", triangles.size());
+    for (Triangle& t : triangles)
+    {
+        t.print();
+    }
 
     for (Triangle& t : triangles)
     {

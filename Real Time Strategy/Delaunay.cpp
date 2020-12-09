@@ -206,7 +206,6 @@ vec2 getCenter(const Triangle& t)
     vec2 midBC = (t.points[1] + t.points[2]) / 2.0f;
 
     float slopeAB = ((t.points[0].y - t.points[1].y) / (t.points[0].x - t.points[1].x));
-    printf("slopeAB: %f\n", slopeAB);
     float tangentAB;
     //if the slope is infinity, the tangent is 0, else, calculate the tangent
     if (slopeAB == INFINITY || slopeAB == -INFINITY)
@@ -237,7 +236,6 @@ vec2 getCenter(const Triangle& t)
     }
 
     float slopeBC = ((t.points[1].y - t.points[2].y) / (t.points[1].x - t.points[2].x));
-    printf("slopeBC: %f\n", slopeBC);
     float tangentBC;
     //if the slope is infinity, the tangent is 0, else, calculate the tangent
     if (slopeBC == INFINITY || slopeBC == -INFINITY)
@@ -249,11 +247,13 @@ vec2 getCenter(const Triangle& t)
         tangentBC = -1 / slopeBC;
     }
 
+    //TODO: run it againand fix the missing values
+
     //if the tangent is infinity, the middle X is the middle of points
     //if it's 0, middle Y is the middle of points
     //else calculate the y intercept
     float yIntTanBC = NAN;
-    if (tangentAB == INFINITY || tangentAB == -INFINITY)
+    if (tangentBC == INFINITY || tangentBC == -INFINITY)
     {
 
         //tangentBC = 0;
@@ -271,6 +271,10 @@ vec2 getCenter(const Triangle& t)
 
     printf("middleX: %f\n", middleX);
     printf("middleY: %f\n", middleY);
+    printf("tangentAB: %f\n", tangentAB);
+    printf("tangentBC: %f\n", tangentBC);
+    printf("yIntTanAB: %f\n", yIntTanAB);
+    printf("yIntTanBC: %f\n", yIntTanBC);
 
     if (isnan(middleX) && isnan(middleY))
     {
@@ -281,12 +285,12 @@ vec2 getCenter(const Triangle& t)
     }
     else if (isnan(middleX))
     {
-        printf("both NAN\n");
+        printf("x NAN\n");
         middleX = (middleY - yIntTanAB) / tangentAB;
     }
     else if (isnan(middleY))
     {
-        printf("both NAN\n");
+        printf("y NAN\n");
         middleY = (tangentAB * middleX) + yIntTanAB;
     }
 
@@ -294,13 +298,26 @@ vec2 getCenter(const Triangle& t)
 }
 
 void fixIllegalTriangles(Triangle& tri, vector<Triangle>& tris, const vector<vec2>& points)
-{/*
-    for each triangle
-        if its adjancent to tri
-            find the center of the circle of tri
-            if the point they dont share is in the circle
-                flip the edge
-                run fixIllegalTriangeles for both*/
+{
+
+    /*
+        for each triangle
+            for each added point
+
+
+            
+
+    */
+
+
+    vec2 center = getCenter(tri);
+    for (vec2 p : points)
+    {
+        if (distance(p, center) < distance(tri.points[0], center)) //if it's in the circle
+        {
+
+        }
+    }
 
 
     //TODO: this part but with caffeine 
@@ -363,7 +380,7 @@ bool shareAPoint(Triangle& t, Triangle& superTriangle)
     return false;
 }
 
-vector<Triangle> delaunay(vector<vec2> pointsIn)
+/*vector<Triangle> delaunay(vector<vec2> pointsIn)
 {
     vector<Triangle> triangles;
     vec2 mins = vec2(INT64_MAX);
@@ -380,11 +397,16 @@ vector<Triangle> delaunay(vector<vec2> pointsIn)
         vec2(mins.x + 10 + ((maxs.x - mins.x) * 2), mins.y - 1) };
 
     triangles.push_back(superTriangle);
+    for (vec2 point : superTriangle.points)
+    {
+        pointsIn.push_back(point);
+    }
 
     //srand(time(nullptr));
     int i = 0;
     for (vec2 point : pointsIn)
     {
+        vector<pair<vec2, vec2>> edgeBuffer;
         printf("on point %i\n", i++);
         printf("starting with %llu triangles\n", triangles.size());
         vector<Triangle> containingTriangle = findContainer(triangles, point);
@@ -430,6 +452,111 @@ vector<Triangle> delaunay(vector<vec2> pointsIn)
         auto toErase = find(triangles.begin(), triangles.end(), t);
         triangles.erase(toErase);
     }
+
+    return triangles;
+}
+*/
+
+vector<Triangle> delaunay(vector<vec2> pointsIn)
+{
+    vector<Triangle> triangles;
+    vec2 mins = vec2(INT64_MAX);
+    vec2 maxs = vec2(INT64_MIN);
+    for (vec2 point : pointsIn)
+    {
+        mins = glm::min(mins, point);
+        maxs = glm::max(maxs, point);
+    }
+    printf("mins: %f, %f, maxes: %f, %f\n", mins.x, mins.y, maxs.x, maxs.y);
+    //super triangle
+    Triangle superTriangle = { mins - vec2(1),
+        vec2(mins.x - 1, mins.y + 10 + ((maxs.y - mins.y) * 2)),
+        vec2(mins.x + 10 + ((maxs.x - mins.x) * 2), mins.y - 1) };
+
+    triangles.push_back(superTriangle);
+    for (vec2 point : superTriangle.points)
+    {
+        pointsIn.push_back(point);
+    }
+
+    //srand(time(nullptr));
+    int c = 0;
+    for (vec2 point : pointsIn)
+    {
+        printf("point: %f,%f\n", point.x, point.y);
+        int c1 = 0;
+        printf("on point %i\n", c++);
+        vector<pair<vec2, vec2>> edgeBuffer;
+        for (Triangle& tri : triangles)
+        {
+            printf("on triangle %i\n", c1++);
+            tri.print("the triangle: ");
+            vec2 center = getCenter(tri);
+            printf("center: %f,%f\n", center.x, center.y);
+            float radius = distance(tri.points[0], center);
+            printf("radius: %f\n", radius);
+            if (distance(center, point) <= radius)
+            {
+                printf("point is in the triangle\n");
+                for (int i = 0; i < tri.points.size(); i++)
+                {
+                    edgeBuffer.push_back(pair(tri.points[i], tri.points[(i + 1) % tri.points.size()]));
+                }
+                auto toErase = find(triangles.begin(), triangles.end(), tri);
+                triangles.erase(toErase);
+
+            }
+            else
+            {
+                printf("point is not in the triangle\n");
+            }
+            printf("---------------------\n");
+        }
+        printf("generated %lu edges\n", edgeBuffer.size());
+        for (pair<vec2, vec2> p : edgeBuffer)
+        {
+            int howMany = count(edgeBuffer.begin(), edgeBuffer.end(), p);
+            for (int i = 0; i < howMany-1; i++)
+            {
+                auto toErase = find(edgeBuffer.begin(), edgeBuffer.end(), p);
+                edgeBuffer.erase(toErase);
+            }
+        }
+        for (pair<vec2, vec2> p : edgeBuffer)
+        {
+            triangles.push_back({ point, p.first, p.second });
+        }
+        
+    }
+
+
+    for (vec2 v : pointsIn)
+    {
+        for (vec2 no : superTriangle.points)
+        {
+            if (v == no)
+            {
+                auto toErase = find(pointsIn.begin(), pointsIn.end(), v);
+                pointsIn.erase(toErase);
+            }
+        }
+    }
+
+
+    vector<Triangle> toRemove;
+    for (Triangle& t : triangles)
+    {
+        if (shareAPoint(t, superTriangle))
+        {
+            toRemove.push_back(t);
+        }
+    }
+    for (Triangle& t : toRemove)
+    {
+        auto toErase = find(triangles.begin(), triangles.end(), t);
+        triangles.erase(toErase);
+    }
+    printf("returning %llu triangles\n", triangles.size());
 
     return triangles;
 }
