@@ -436,6 +436,80 @@ bool shareAPoint(Triangle& t, Triangle& superTriangle)
     return false;
 }
 
+vector<Triangle> delaunayTwo(vector<vec2> pointsIn)
+{
+    vector<Triangle> triangles;
+    vec2 mins = vec2(INT64_MAX);
+    vec2 maxs = vec2(INT64_MIN);
+    for (vec2 point : pointsIn)
+    {
+        mins = glm::min(mins, point);
+        maxs = glm::max(maxs, point);
+    }
+    printf("mins: %f, %f, maxes: %f, %f\n", mins.x, mins.y, maxs.x, maxs.y);
+    //super triangle
+    Triangle superTriangle = { mins - vec2(1),
+        vec2(mins.x - 1, mins.y + 10 + ((maxs.y - mins.y) * 2)),
+        vec2(mins.x + 10 + ((maxs.x - mins.x) * 2), mins.y - 1) };
+
+    triangles.push_back(superTriangle);
+    for (vec2 point : superTriangle.points)
+    {
+        pointsIn.push_back(point);
+    }
+
+    //srand(time(nullptr));
+    int i = 0;
+    vector<vec2> usedPoints;
+    for (vec2 point : pointsIn)
+    {
+        usedPoints.push_back(point);
+        printf("on point %i\n", i++);
+        printf("starting with %llu triangles\n", triangles.size());
+        vector<Triangle> containingTriangle = findContainer(triangles, point);
+        printf("this many triangles contain the point: %llu:\n", containingTriangle.size());
+
+        vector<Triangle> newTriangles = splitTriangle(containingTriangle, point);
+        printf("splitting into %llu triangles\n", newTriangles.size());
+
+
+        printf("erasing %llu triangles\n", containingTriangle.size());
+
+        for (Triangle t : containingTriangle)
+        {
+            auto toErase = find(triangles.begin(), triangles.end(), t);
+            triangles.erase(toErase);
+            //std::remove(triangles.begin(), triangles.end(), t);
+        }
+
+        printf("inserting %llu triangles\n", newTriangles.size());
+
+        triangles.insert(triangles.end(), newTriangles.begin(), newTriangles.end());
+        fixIllegalTriangles(triangles, usedPoints);
+        
+        //Then go through and flip all illegal triangles
+        //http://web.mit.edu/alexmv/Public/6.850-lectures/lecture09.pdf
+    }
+    printf("returning %llu triangles\n", triangles.size());
+
+
+
+    auto t = triangles.begin();
+    while (t != triangles.end())
+    {
+        if (shareAPoint(*t, superTriangle))
+        {
+            triangles.erase(t);
+        }
+        else
+        {
+            t++;
+        }
+    }
+    return triangles;
+}
+
+
 
 void addAPoint(vector<Triangle>& triangles, vec2 point)
 {
@@ -518,5 +592,141 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn)
             triIter++;
         }
     }
+    return triangles;
+}
+
+vector<Triangle> delaunayOne(vector<vec2> pointsIn)
+{
+    vector<Triangle> triangles;
+    vec2 mins = vec2(INT64_MAX);
+    vec2 maxs = vec2(INT64_MIN);
+    for (vec2 point : pointsIn)
+    {
+        mins = glm::min(mins, point);
+        maxs = glm::max(maxs, point);
+    }
+    printf("mins: %f, %f, maxes: %f, %f\n", mins.x, mins.y, maxs.x, maxs.y);
+    //super triangle
+    Triangle superTriangle = { mins - vec2(1),
+        vec2(mins.x - 1, mins.y + 10 + ((maxs.y - mins.y) * 2)),
+        vec2(mins.x + 10 + ((maxs.x - mins.x) * 2), mins.y - 1) };
+
+    triangles.push_back(superTriangle);
+    printf("Super triangle: \n");
+    for (vec2 point : superTriangle.points)
+    {
+        printf("%f,%f\n", point.x, point.y);
+        pointsIn.push_back(point);
+    }
+
+    int c = 0;
+    for (vec2 point : pointsIn)
+    {
+        printf("point: %f,%f\n", point.x, point.y);
+        int c1 = 0;
+        printf("on point %i\n", c++);
+        vector<Edge> edgeBuffer;
+        auto tri = triangles.begin();
+        while(tri != triangles.end())
+        {
+            printf("on triangle %i\n", c1++);
+            tri->print("the triangle: ");
+            vec2 center = getCenter(*tri);
+            printf("center: %f,%f\n", center.x, center.y);
+            float radius = distance(tri->points[0], center);
+            printf("radius: %f\n", radius);
+            if (distance(center, point) < radius)
+            {
+                printf("point is in the triangle\n");
+                for (int i = 0; i < tri->points.size(); i++)
+                {
+                    edgeBuffer.push_back({ tri->points[i], tri->points[(i + 1) % tri->points.size()] });
+                }
+                triangles.erase(tri);
+
+            }
+            else
+            {
+                tri++;
+                printf("point is not in the triangle\n");
+            }
+            printf("---------------------\n");
+        }
+        printf("generated %lu edges\n", edgeBuffer.size());
+
+
+        auto p = edgeBuffer.begin();
+        while(p != edgeBuffer.end())
+        {
+            int howMany = count(edgeBuffer.begin(), edgeBuffer.end(), *p);
+            if (howMany > 1)
+            {
+                
+                for (int i = 0; i < howMany; i++)
+                {
+                    auto toErase = find(edgeBuffer.begin(), edgeBuffer.end(), *p);
+                    edgeBuffer.erase(toErase);
+                }
+            }
+            else
+            {
+                p++;
+            }
+        }
+
+        for (Edge p : edgeBuffer)
+        {
+            triangles.push_back({ point, p.points[0], p.points[1] });
+        }
+        printf("now up to %lu triangles\n", triangles.size());
+        printf("=================================\n\n");
+        
+    }
+
+    /*printf("out of main process\n");
+    auto v = pointsIn.begin();
+    while (v != pointsIn.end())
+    {
+        for (vec2 no : superTriangle.points)
+        {
+            if (*v == no)
+            {
+                pointsIn.erase(v);
+            }
+        }
+    }*/
+
+    for (vec2 no : superTriangle.points)
+    {
+        auto v = pointsIn.begin();
+        while (v != pointsIn.end())
+        {
+            if (*v == no)
+            {
+                pointsIn.erase(v);
+            }
+            else
+            {
+                v++;
+            }
+        }
+    }
+
+
+    auto t = triangles.begin();
+    while (t != triangles.end())
+    {
+        if (shareAPoint(*t, superTriangle))
+        {
+            triangles.erase(t);
+        }
+        else
+        {
+            t++;
+        }
+    }
+
+    printf("returning %llu triangles\n", triangles.size());
+
     return triangles;
 }

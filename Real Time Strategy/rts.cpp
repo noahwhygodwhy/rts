@@ -57,10 +57,12 @@ unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEnt
 int main(void)
 {
 
-	Triangle t = { vec2(15,39), vec2(15,1870), vec2(1864,3915) };
-	vec2 center = getCenter(t);
-	printf("center: %f, %f\n", center.x, center.y);
-	exit(0);
+	//Triangle t = { vec2(15,55), vec2(1732,55), vec2(809,769) };
+	//vec2 center = getCenter(t);
+	//printf("center: %f, %f\n", center.x, center.y);
+	//exit(0);
+
+
 	printf("###starting\n");
 	Renderer r = Renderer(1920, 1080);
 	printf("###initializing\n");
@@ -69,7 +71,7 @@ int main(void)
 	printf("###initialized, adding things\n");
 	unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap = getEntityTextures(".\\resources\\entityTextures");
 
-	r.addEntity(new Entity(vec2(40,80), vec2(40, 80), 15, Controller(), entityTextureMapMap["basicEntity"]));
+	//r.addEntity(new Entity(vec2(40,80), vec2(40, 80), 15, Controller(), entityTextureMapMap["basicEntity"]));
 
 	/*for (int i = 0; i < 5; i++)
 	{
