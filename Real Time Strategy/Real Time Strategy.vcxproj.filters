@@ -87,6 +87,9 @@
     <ClCompile Include="EntityControllers.hpp">
       <Filter>Header Files\Controllers</Filter>
     </ClCompile>
+    <ClCompile Include="TriangleTree.cpp">
+      <Filter>Source Files\Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h">
@@ -146,6 +149,9 @@
     <ClInclude Include="tinyxml2.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="TriangleTree.hpp">
+      <Filter>Header Files\Map</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -154,6 +160,9 @@
     </None>
     <None Include="entity.vertShader.glsl">
       <Filter>Source Files\OGLS\shaders</Filter>
+    </None>
+    <None Include="Triangle.hpp">
+      <Filter>Header Files\Map</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -9,21 +9,6 @@ float sign(vec2 a, vec2 b, vec2 p)
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
 }
 
-int inTriangle(const Triangle& t, vec2 point)
-{
-    float x = sign(point, t.points[0], t.points[1]);
-    float y = sign(point, t.points[1], t.points[2]);
-    float z = sign(point, t.points[2], t.points[0]);
-    if (x == 0 || y == 0 || z == 0)
-    {
-        return -1;
-    }
-    bool neg = x < 0 || y < 0 || z < 0;
-    bool pos = x > 0 || y > 0 || z > 0;
-
-    return !(pos && neg); //not all of them, and not none of them
-}
-
 vector<Triangle> findContainer(const vector<Triangle>& triangles, vec2 point)
 {
     vector<Triangle> toReturn;
@@ -49,52 +34,6 @@ vector<Triangle> findContainer(const vector<Triangle>& triangles, vec2 point)
 }
 
 
-
-
-
-//TODO: This is wrong somehow, making bad triangles with misconfigured points
-/*
-###initialized, adding things
-on point 0
-starting with 1 triangles
-it's in 1 triangles
-this many triangles contain the point: 1:
-splitting 1 triangles
-s is -2716270.000000
-adding a triangle
-s is -856907.000000
-adding a triangle
-s is -66204.000000
-adding a triangle
-splitting into 3 triangles
-splitting into 3 triangles
-ending with 4 triangles
-on point 1
-starting with 4 triangles
-it's in 1 triangles
-this many triangles contain the point: 1:
-splitting 1 triangles
-s is -2112136.000000
-adding a triangle
-s is -922214.000000
-adding a triangle
-s is -605031.000000
-adding a triangle
-splitting into 3 triangles
-splitting into 3 triangles
-ending with 7 triangles
-ERROR IN checkMiddleEdge() in Delanuay.hpp
-triangle 1: (5.000000, 34.000000), (5.000000, 1873.000000), (5.000000, 34.000000)
-triangle 2: (5.000000, 34.000000), (5.000000, 1873.000000), (41.000000, 467.000000)
-unique points:
-41.000000, 467.000000
-shared points:
-5.000000, 34.000000
-5.000000, 1873.000000
-5.000000, 34.000000
-5.000000, 34.000000
-5.000000, 1873.000000
-*/
 vector<Triangle> splitTriangle(vector<Triangle> tris, vec2 p)
 {
     printf("splitting %i triangles with point %f,%f\n", tris.size(), p.x, p.y);
@@ -129,15 +68,6 @@ vector<Triangle> splitTriangle(vector<Triangle> tris, vec2 p)
     return newTriangles;
 }
 
-bool adjacent(const Triangle& a, const Triangle& b)
-{
-    int shared = 0;
-    for (int i = 0; i < 3; i++)
-    {
-        shared += a.points[i] == b.points[i] ? 1 : 0;
-    }
-    return (shared == 2);
-}
 
 float distance(const vec2& p1, const vec2& p2)
 {
@@ -145,7 +75,7 @@ float distance(const vec2& p1, const vec2& p2)
     float dy = p1.y - p2.y;
     return std::sqrt((dx * dx) + (dy * dy));
 }
-
+/*
 void checkMiddleEdge(Triangle& a, Triangle& b)
 {
     vector<vec2> points;
@@ -192,141 +122,9 @@ void checkMiddleEdge(Triangle& a, Triangle& b)
         a.points = { {sharedPoints[0], sharedPoints[1], points[0]} };
         b.points = { {sharedPoints[0], sharedPoints[1], points[1]} };
     }
-}
+}*/
 
 
-//TODO: what if the 3 points are inline
-vec2 getCenter(const Triangle& t)
-{
-    bool debug = false;
-
-    float middleX = NAN;
-    float middleY = NAN;
-
-    vec2 midAB = (t.points[0] + t.points[1]) / 2.0f;
-    vec2 midBC = (t.points[1] + t.points[2]) / 2.0f;
-    if (debug)
-    {
-        printf("A: %f,%f\n", t.points[0].x, t.points[0].y);
-        printf("B: %f,%f\n", t.points[1].x, t.points[1].y);
-        printf("C: %f,%f\n", t.points[2].x, t.points[2].y);
-    }
-    float slopeAB = ((t.points[0].y - t.points[1].y) / (t.points[0].x - t.points[1].x));
-    float tangentAB;
-    //if the slope is infinity, the tangent is 0, else, calculate the tangent
-    if (slopeAB == INFINITY || slopeAB == -INFINITY)
-    {
-        tangentAB = 0;
-    }
-    else
-    {
-        tangentAB = -1 / slopeAB;
-    }
-    if (debug)
-    {
-        printf("slopeAB: %f\n", slopeAB);
-        printf("tangentAB: %f\n", tangentAB);
-    }
-    //if the tangent is infinity, the middle X is the middle of points
-    //if it's 0, middle Y is the middle of points
-    //else calculate the y intercept
-    float yIntTanAB = NAN;
-    if (tangentAB == INFINITY || tangentAB == -INFINITY)
-    {
-        middleX = (t.points[0].x+t.points[1].x)/2;
-    }
-    else if (tangentAB == 0)
-    {
-        middleY = (t.points[0].y + t.points[1].y) / 2.0f;
-    }
-    else
-    {
-        yIntTanAB = midAB.y - (tangentAB * midAB.x);
-    }
-
-    float slopeBC = ((t.points[1].y - t.points[2].y) / (t.points[1].x - t.points[2].x));
-    float tangentBC;
-    //if the slope is infinity, the tangent is 0, else, calculate the tangent
-    if (slopeBC == INFINITY || slopeBC == -INFINITY)
-    {
-        tangentBC = 0;
-    }
-    else
-    {
-        tangentBC = -1 / slopeBC;
-    }
-    if (debug)
-    {
-        printf("slopeBC: %f\n", slopeBC);
-        printf("tangentBC: %f\n", tangentBC);
-    }
-
-    //TODO: run it againand fix the missing values
-
-    //if the tangent is infinity, the middle X is the middle of points
-    //if it's 0, middle Y is the middle of points
-    //else calculate the y intercept
-    float yIntTanBC = NAN;
-    if (tangentBC == INFINITY || tangentBC == -INFINITY)
-    {
-
-        middleX = (t.points[1].x + t.points[2].x)/2.0f;
-    }
-    else if (tangentBC == 0)
-    {
-        middleY = (t.points[1].y + t.points[2].y) / 2.0f;
-    }
-    else
-    {
-        yIntTanBC = midBC.y - (tangentBC * midBC.x);
-    }
-
-    if (debug)
-    {
-        printf("middleX: %f\n", middleX);
-        printf("middleY: %f\n", middleY);
-        printf("tangentAB: %f\n", tangentAB);
-        printf("tangentBC: %f\n", tangentBC);
-        printf("yIntTanAB: %f\n", yIntTanAB);
-        printf("yIntTanBC: %f\n", yIntTanBC);
-    }
-    if (isnan(middleX) && isnan(middleY))
-    {
-        if (debug)
-            printf("both NAN\n");
-        middleX = (yIntTanBC - yIntTanAB) / (tangentAB - tangentBC);
-        middleY = (tangentAB * middleX) + yIntTanAB;
-    }
-    else if (isnan(middleX))
-    { 
-        if(debug)
-            printf("x NAN\n");
-        if (isnan(yIntTanAB) || isnan(tangentAB))
-        {
-            middleX = (middleY - yIntTanBC) / tangentBC;
-        }
-        else
-        {
-            middleX = (middleY - yIntTanAB) / tangentAB;
-        }
-    }
-    else if (isnan(middleY))
-    {
-        if(debug)
-            printf("y NAN\n");
-        //middleY = (tangentAB * middleX) + yIntTanAB;
-        if (isnan(yIntTanAB) || isnan(tangentAB))
-        {
-            middleY = (tangentBC * middleX) + yIntTanBC;
-        }
-        else
-        {
-            middleY = (tangentAB * middleX) + yIntTanAB;
-        }
-    }
-
-    return vec2(middleX, middleY);
-}
 
 void fixIllegalTriangles(vector<Triangle>& tris, const vector<vec2>& usedPoints)
 {
@@ -533,39 +331,3 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 to
     }
     return triangles;
 }
-/*
-vector<Triangle> delaunay(const vector<vec2>& pointsIn)
-{
-    vector<Triangle> triangles;
-    vec2 mins = vec2(INT64_MAX);
-    vec2 maxs = vec2(INT64_MIN);
-    for (vec2 point : pointsIn)
-    {
-        mins = glm::min(mins, point);
-        maxs = glm::max(maxs, point);
-    }
-    Triangle superTriangle = { mins - vec2(1),
-        vec2(mins.x - 10, mins.y + 10 + ((maxs.y - mins.y) * 2)),
-        vec2(mins.x + 10 + ((maxs.x - mins.x) * 2), mins.y - 10) };
-
-    triangles.push_back(superTriangle);
-    
-    for (vec2 point : pointsIn)
-    {
-        addAPoint(triangles, point);
-    }
-    auto triIter = triangles.begin();
-    while (triIter != triangles.end())
-    {
-        if (shareAPoint(superTriangle, *triIter))
-        {
-            triangles.erase(triIter);
-        }
-        else
-        {
-            triIter++;
-        }
-    }
-    return triangles;
-}
-*/
