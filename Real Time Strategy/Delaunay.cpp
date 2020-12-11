@@ -1,13 +1,9 @@
 #include "Delaunay.hpp"
-
+#include "Triangle.hpp"
 
 using namespace std;
 using namespace glm;
 
-float sign(vec2 a, vec2 b, vec2 p)
-{
-    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
-}
 
 vector<Triangle> findContainer(const vector<Triangle>& triangles, vec2 point)
 {
@@ -75,55 +71,6 @@ float distance(const vec2& p1, const vec2& p2)
     float dy = p1.y - p2.y;
     return std::sqrt((dx * dx) + (dy * dy));
 }
-/*
-void checkMiddleEdge(Triangle& a, Triangle& b)
-{
-    vector<vec2> points;
-    points.insert(points.end(), a.points.begin(), a.points.end());
-    points.insert(points.end(), b.points.begin(), b.points.end());
-    vector<vec2> uniquePoints;
-    vector<vec2> sharedPoints;
-    for (vec2 v : points)
-    {
-        if (count(points.begin(), points.end(), v) == 1)
-        {
-            uniquePoints.push_back(v);
-        }
-        else
-        {
-            sharedPoints.push_back(v);
-        }
-    }
-
-
-    if (uniquePoints.size() != 2 || sharedPoints.size() != 4)
-    {
-
-        printf("ERROR IN checkMiddleEdge() in Delanuay.hpp\n");
-        a.print("triangle 1 ");
-        b.print("triangle 2");
-        printf("unique points:\n");
-        for (vec2 v : uniquePoints)
-        {
-            printf("%f, %f\n", v.x, v.y);
-        }
-        printf("shared points:\n");
-        for (vec2 v : sharedPoints)
-        {
-            printf("%f, %f\n", v.x, v.y);
-        }
-        exit(-1);
-    }
-    float curDistance = distance(sharedPoints[0], sharedPoints[1]);
-    float posDistance = distance(uniquePoints[0], uniquePoints[1]);
-    //if it's illegal, flip the edge.
-    if (posDistance < curDistance)
-    {
-        a.points = { {sharedPoints[0], sharedPoints[1], points[0]} };
-        b.points = { {sharedPoints[0], sharedPoints[1], points[1]} };
-    }
-}*/
-
 
 
 void fixIllegalTriangles(vector<Triangle>& tris, const vector<vec2>& usedPoints)
@@ -219,21 +166,6 @@ void fixIllegalTriangles(vector<Triangle>& tris, const vector<vec2>& usedPoints)
 }
 
 
-bool shareAPoint(Triangle& t, Triangle& superTriangle)
-{
-    for (vec2 a : t.points)
-    {
-        for (vec2 b : superTriangle.points)
-        {
-            if (a == b)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 
 void addAPoint(vector<Triangle>& triangles, vec2 point)
 {
@@ -259,7 +191,7 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
             {
                 if (!(ot == t))
                 {
-                    if (ot.hasEdge({ t.points[i], t.points[(i + 1) % t.points.size()] }))
+                    if (ot.hasEdge({ vec2(t.points[i]), vec2(t.points[(i + 1) % t.points.size()]) }))
                     {
                         shared = true;
                         break;

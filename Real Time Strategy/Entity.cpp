@@ -157,3 +157,4 @@ void Entity::setTarget(Entity* targetEntity)
 {
     this->targetType = TargetType::ENTITY;
     this->target = targetEntity;
+}

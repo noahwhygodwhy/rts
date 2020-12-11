@@ -154,6 +154,7 @@
     <ClCompile Include="SelectionBox.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="tinyxml2.cpp" />
+    <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="TriangleTree.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -90,6 +90,9 @@
     <ClCompile Include="TriangleTree.cpp">
       <Filter>Source Files\Map</Filter>
     </ClCompile>
+    <ClCompile Include="Triangle.cpp">
+      <Filter>Source Files\Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h">
