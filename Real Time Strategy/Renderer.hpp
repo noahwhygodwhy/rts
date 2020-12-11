@@ -24,12 +24,9 @@ public:
 	void addEntity(Entity* th);
 	void processInput(GLFWwindow* window, float deltaTime);
 	Camera cam;
-	vector<Entity*> things;
 	float screenX;
 	float screenY;
 	mat4 projMat;
-	SelectionBox sb;
-	Map map;
 private:
 	Shader shader;
 	GLFWwindow* window;

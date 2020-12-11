@@ -16,6 +16,14 @@ using namespace glm;
 
 static int ANIMATION_SLOWDOWN_FACTOR = 8;
 
+enum TargetType
+{
+	NONE,
+	LOCATION,
+	ENTITY
+};
+
+
 class Entity
 {
 public:
@@ -35,7 +43,7 @@ public:
 
 
 
-	void walkToLocation(vec2 position);
+	void walkToLocation(float deltaTime);
 
 	bool operator==(const Entity& other)const
 	{
@@ -53,6 +61,9 @@ private:
 	textureAttributes textureState;
 	int textureAnimationStep;
 	vector<Vertex> makeSquareVertices(float width, float height);
+	TargetType targetType = TargetType::NONE;
+	void* target = 0;
+
 };
 
 #endif

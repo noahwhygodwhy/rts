@@ -163,6 +163,6 @@ void fixIllegalTriangles(vector<Triangle>& tris, const vector<vec2>& points);
 
 bool shareAPoint(Triangle& t, Triangle& superTriangle);
 
-vector<Triangle> delaunay(const vector<vec2>& pointsIn);
+vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft = vec2(0), vec2 topRight = vec2(0));
 
 #endif

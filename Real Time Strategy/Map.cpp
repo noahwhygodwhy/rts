@@ -71,12 +71,15 @@ bool counterClockwise(Triangle t)
     return (t.points[1].x - t.points[0].x) * (t.points[2].y - t.points[0].y) - (t.points[2].x - t.points[0].x) * (t.points[1].y - t.points[0].y);
 }
 
-vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath)
+vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec2 dims)
 {
-    /*vector<Polygon> shapes;
+    printf("reading file %s\n", inFilePath.c_str());
+    vector<Polygon> shapes;
     tinyxml2::XMLDocument theFile;
     theFile.LoadFile(inFilePath.c_str());
+    printf("%p\n", &theFile);
     tinyxml2::XMLElement* g = theFile.FirstChildElement("svg")->FirstChildElement("g");
+    bool first = true;
     for (tinyxml2::XMLElement* ele = g->FirstChildElement(); ele; ele = ele->NextSiblingElement())
     {
         vector<string> pointStrings = splitOnSpaces(ele->FindAttribute("points")->Value());
@@ -85,16 +88,18 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath)
         {
             pointInts.push_back(stoi(s));
         }
-        shapes.push_back(Polygon(pointInts));
+        shapes.push_back(Polygon(pointInts, ele->FindAttribute("style")->Value()=="fill: none"));
     }
     vector<vec2> allPoints;
     for (Polygon x : shapes)
     {
         allPoints.insert(allPoints.end(), x.points.begin(), x.points.end());
-    }*/
+    }
+    printf("given dims: %f,%f\n", dims.x, dims.y);
+    /*dims = vec2(1000);
     vector<vec2> allPoints;
     srand(42);
-    for (int i = 0; i < 160; i++)
+    for (int i = 0; i < 66; i++)
     {
         int x = rand() % 1000;
         int y = rand() % 1000;
@@ -106,15 +111,42 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath)
     allPoints.push_back(vec2(16, 644));
     allPoints.push_back(vec2(175, 400));
     allPoints.push_back(vec2(15, 55));*/
-    vector<Triangle> triangles = delaunay(allPoints); //not guarenteed to be CCW
+    vector<Triangle> triangles = delaunay(allPoints, vec2(0), dims); //not guarenteed to be CCW
 
     printf("size of triangles: %lu: \n", triangles.size());
-    for (Triangle& t : triangles)
+
+    for (Polygon p : shapes)
     {
-        t.print();
+        if (!p.includeMe)
+        {
+            auto t = triangles.begin();
+            while (t != triangles.end())
+            {
+                int sharedPoints = 0;
+                for (vec2 a : p.points)
+                {
+                    for (vec2 b : t->points)
+                    {
+                        if (a == b)
+                        {
+                            sharedPoints++;
+                        }
+                    }
+                }
+                if (sharedPoints > 2)
+                {
+                    triangles.erase(t);
+                }
+                else
+                {
+                    t++;
+                }
+                
+            }
+        }
     }
 
-    for (Triangle& t : triangles)
+    for (Triangle& t : triangles) //TODO: not needed once you're not rendering the navmesh
     {
         if (!counterClockwise(t))
         {
@@ -136,7 +168,8 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath)
 
 Map::Map(string path, vec2 dims)
 {
-    vector<Triangle> triangles = generateNavMeshVerts("","");
+    this->navMesh = generateNavMeshVerts(path+"/navMesh.svg","outFile.json", dims);
+    /*
     this->vertices = vector<Vertex>();
     this->indices = vector<unsigned int>();
     int ind = 0;
@@ -147,24 +180,24 @@ Map::Map(string path, vec2 dims)
             this->vertices.push_back({ t.points[i], vec2(0) });
             this->vertices.push_back({ t.points[(i+1)%3], vec2(0) });
         }
-        /*
+        
         for (vec2 p : t.points)
         {
             this->indices.push_back(ind++);
 
             this->vertices.push_back({ p, vec2(0) });
-        }*/
-    }
+        }
+    }d
+    this->navMesh = makeNavMesh(path + "navMeshb.png"); */
     this->dims = dims;
-    this->texture = makeNavMesh(path + "navMeshb.png");
-    //this->texture = makeTexture(path + "navMesh.png");
-    /*this->vertices = {
+    this->texture = makeTexture(path + "/mapImage.png");
+    this->vertices = {
         {vec2(0, 0), vec2(0, 0)},   //bottom left
         {vec2(dims.x, 0), vec2(1, 0)},  //bottom right
         {vec2(0, dims.y), vec2(0, 1)}, //top left
         {vec2(dims.x, dims.y), vec2(1, 1)} //top right
-    };*/
-    //this->indices = { 0, 2, 1, 2, 3, 1 };
+    };
+    this->indices = { 0, 2, 1, 2, 3, 1 };
     setupBuffer();
     //this->texture = makeTexture(path + "mapImage.png");
     //this->navMesh = makeNavMesh(path + "navMesh.png");
@@ -197,8 +230,8 @@ void Map::draw(Shader& shader)
 
     glBindVertexArray(this->VAO);
 
-    //glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_LINES, 0, vertices.size());
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    //glDrawArrays(GL_LINES, 0, vertices.size());
 
     glBindVertexArray(0);
 }

@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
+
 static int idCounter = 0;
 vector<Vertex> Entity::makeSquareVertices(float width, float height)
 {
@@ -99,10 +100,29 @@ void Entity::draw(Shader& shader)
 void Entity::tick(float deltaTime)
 {
 
+    //TODO: Flocking? http://www.red3d.com/cwr/boids/
+    //todo: navmesh a* https://www.gamedev.net/tutorials/programming/artificial-intelligence/navigation-meshes-and-pathfinding-r4880/
+
+
     this->textureAnimationStep += 1;
     if (this->textureAnimationStep > (this->textures[textureState]->size()* ANIMATION_SLOWDOWN_FACTOR)-1)
     {
         this->textureAnimationStep = 0;
+    }
+
+
+    if (this->targetType != TargetType::NONE)
+    {
+        vec2 placeToBe;
+        if (this->targetType == TargetType::LOCATION)
+        {
+            placeToBe = *(vec2*)this->target;
+        }
+        if (this->targetType == TargetType::LOCATION)
+        {
+            placeToBe = ((Entity*)this->target)->location;
+        }
+
     }
 }
 
@@ -130,14 +150,10 @@ namespace std
 
 void Entity::setTarget(vec2 targetLocation)
 {
-
+    this->targetType = TargetType::LOCATION;
+    this->target = new vec2(targetLocation);
 }
 void Entity::setTarget(Entity* targetEntity)
 {
-
-}
-
-void Entity::walkToLocation(vec2 position)
-{
-
-}
+    this->targetType = TargetType::ENTITY;
+    this->target = targetEntity;

@@ -10,11 +10,11 @@ using namespace glm;
 class Polygon
 {
 public:
-	Polygon(vector<int> points);
+	Polygon(vector<int> points, bool includeMe);
 	~Polygon();
 	vector<vec2> points;
 	vector<pair<vec2, vec2>> edges;
-	bool innerFill;
+	bool includeMe;
 private:
 };
 

@@ -24,7 +24,7 @@ private:
 	vector<unsigned int> indices;
 	void setupBuffer();
 	Texture texture;
-	vector<vec3> navMesh;
+	vector<Triangle> navMesh;
 
 };
 

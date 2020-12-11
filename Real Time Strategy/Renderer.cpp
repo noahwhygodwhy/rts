@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include "Entity.hpp"
+#include "GlobalContext.hpp"
 //#include "UtilityFunctions.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -26,7 +27,7 @@ Renderer::Renderer(int x, int y)
 	screenX = x;
 	screenY = y;
 	window = glfwCreateWindow(x, y, "Title Goes here", NULL, NULL);
-	this->cam = Camera(vec2(0, 0), 500.0f, 1.0f);
+	this->cam = Camera(vec2(0, 0), 1000.0f, 1.0f);
 }
 
 Renderer::~Renderer()
@@ -88,9 +89,9 @@ static void mouseButtCallback(GLFWwindow* window, int button, int action, int mo
 		if (action == GLFW_RELEASE)
 		{
 			Entity* target = 0;
-			for (Entity* e : r->things)
+			for (Entity* e : GLBL::things)
 			{
-				if (r->sb.intersecting(e->location, e->location + e->dims, mousePos, mousePos))
+				if (GLBL::sb.intersecting(e->location, e->location + e->dims, mousePos, mousePos))
 				{
 					target = e;
 					break;
@@ -98,14 +99,14 @@ static void mouseButtCallback(GLFWwindow* window, int button, int action, int mo
 			}
 			if (target == 0)
 			{
-				for (Entity* e : r->sb.selected)
+				for (Entity* e : GLBL::sb.selected)
 				{
 					e->setTarget(mousePos);
 				}
 			}
 			else
 			{
-				for (Entity* e : r->sb.selected)
+				for (Entity* e : GLBL::sb.selected)
 				{
 					e->setTarget(target);
 				}
@@ -117,7 +118,7 @@ static void mouseButtCallback(GLFWwindow* window, int button, int action, int mo
 		if (action == GLFW_PRESS)
 		{
 			mouseTime = glfwGetTime();
-			r->sb.start(mousePos);
+			GLBL::sb.start(mousePos);
 			
 		}
 		if (action == GLFW_RELEASE)
@@ -125,12 +126,12 @@ static void mouseButtCallback(GLFWwindow* window, int button, int action, int mo
 			bool shift = glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS;
 			if (glfwGetTime() - mouseTime > 0.1f)
 			{
-				r->sb.stop(r->things, shift);
+				GLBL::sb.stop(GLBL::things, shift);
 			}
 			else
 			{
-				r->sb.stopPrematurely();
-				r->sb.detectClickSelection(r->things, mousePos, shift);
+				GLBL::sb.stopPrematurely();
+				GLBL::sb.detectClickSelection(GLBL::things, mousePos, shift);
 			}
 		}
 	}
@@ -146,10 +147,6 @@ static void scrollCallback(GLFWwindow* window, double xoff, double yoff)
 
 
 
-void Renderer::addEntity(Entity* th)
-{
-	things.push_back(th);
-}
 void frameBufferSizeCallback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -212,7 +209,8 @@ void Renderer::run()
 {
 	this->projMat = ortho(0.0f, screenX, screenY, 0.0f, -1.0f, 1.0f);
 	while (!glfwWindowShouldClose(this->window))
-	{	
+	{
+
 		vec2 mousePos = calculateMousePos(window);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -222,28 +220,33 @@ void Renderer::run()
 		lastFrame = currentFrame;
 
 		processInput(this->window, deltaTime);
+
 		shader.use();
+		
+		mat4 view = cam.getView();
+		shader.setMatFour("view", view);
 
-		this->map.draw(shader);
+		shader.setMatFour("projection", this->projMat);
 
-		if (sb.active)
-		{
-			this->sb.draw(shader);
-			this->sb.tick(this->things, mousePos);
-		}
 
-		for (Entity* t : things) //Everything else
+
+		for (Entity* t : GLBL::things) //Everything else
 		{
 			t->draw(shader);
 			t->tick(deltaTime);
 		}
 
+		GLBL::map.draw(shader);
+
+		if (GLBL::sb.active)
+		{
+			GLBL::sb.draw(shader);
+			GLBL::sb.tick(GLBL::things, mousePos);
+		}
 
 
-		mat4 view = cam.getView();
-		shader.setMatFour("view", view);
 
-		shader.setMatFour("projection", this->projMat);
+
 
 		glfwSwapBuffers(this->window);
 		glfwPollEvents();

@@ -485,6 +485,55 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
 }
 
 
+vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 topRight)
+{
+    vector<Triangle> triangles;
+    vec2 mins = vec2(INT64_MAX);
+    vec2 maxs = vec2(INT64_MIN);
+    for (vec2 point : pointsIn)
+    {
+        mins = glm::min(mins, point);
+        maxs = glm::max(maxs, point);
+    }
+
+    Triangle superTriangle = { mins - vec2(1),
+        vec2(mins.x - 10, mins.y + 10 + ((maxs.y - mins.y) * 2)),
+        vec2(mins.x + 10 + ((maxs.x - mins.x) * 2), mins.y - 10) };
+    if (bottomLeft == topRight)
+    {
+        triangles.push_back(superTriangle);
+    }
+    else
+    {
+        Triangle t1 = { bottomLeft, vec2(bottomLeft.x, topRight.y), topRight };
+        Triangle t2 = { bottomLeft, vec2(topRight.x, bottomLeft.y), topRight };
+        triangles.push_back(t1);
+        triangles.push_back(t2);
+    }
+
+    for (vec2 point : pointsIn)
+    {
+        addAPoint(triangles, point);
+    }
+
+    if (bottomLeft == topRight)
+    {
+        auto triIter = triangles.begin();
+        while (triIter != triangles.end())
+        {
+            if (shareAPoint(superTriangle, *triIter))
+            {
+                triangles.erase(triIter);
+            }
+            else
+            {
+                triIter++;
+            }
+        }
+    }
+    return triangles;
+}
+/*
 vector<Triangle> delaunay(const vector<vec2>& pointsIn)
 {
     vector<Triangle> triangles;
@@ -508,7 +557,6 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn)
     auto triIter = triangles.begin();
     while (triIter != triangles.end())
     {
-        
         if (shareAPoint(superTriangle, *triIter))
         {
             triangles.erase(triIter);
@@ -520,3 +568,4 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn)
     }
     return triangles;
 }
+*/

@@ -40,6 +40,9 @@
     <Filter Include="Source Files\Utility">
       <UniqueIdentifier>{b805cd10-d1d3-4f95-8222-864cec86a54a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Entity">
+      <UniqueIdentifier>{fc3e4fa0-3967-4776-a06b-3de8a2f7a19e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="rts.cpp">
@@ -81,13 +84,13 @@
     <ClCompile Include="Delaunay.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
+    <ClCompile Include="EntityControllers.hpp">
+      <Filter>Header Files\Controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="glad.h">
       <Filter>Header Files\OGLS</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.hpp">
       <Filter>Header Files\OGLS</Filter>
@@ -110,17 +113,8 @@
     <ClInclude Include="Controller.hpp">
       <Filter>Header Files\Controllers</Filter>
     </ClInclude>
-    <ClInclude Include="SelectionBox.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Map.hpp">
       <Filter>Header Files\Map</Filter>
-    </ClInclude>
-    <ClInclude Include="stb_image_write.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tinyxml2.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Polygon.hpp">
       <Filter>Header Files\Map</Filter>
@@ -135,6 +129,21 @@
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Delaunay.hpp">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalContext.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.hpp">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectionBox.hpp">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image_write.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml2.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
   </ItemGroup>

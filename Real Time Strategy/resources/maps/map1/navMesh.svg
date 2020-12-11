@@ -1,6 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="8000" height="8000" viewBox="0 0 8000 8000">
   <g id="Layer_2" data-name="Layer 2">
-    <polygon points="8000 1 0 0 0 8000 8000 8000 8000 1" style="fill: none"/>
+    <polygon points="
+	8000 0 
+	4000 0 
+	0 0 
+	0 4000 
+	0 8000 
+	4000 8000 
+	8000 8000 
+	8000 4000
+	8000 0" style="fill: none"/>
     <polygon points="2432 1622 1707 1077 1370 2246 2094 2789 2432 1622" style="fill: aqua"/>
     <polygon points="1567 4002 769 4000 771 4799 1569 4800 1567 4002" style="fill: aqua"/>
     <polygon points="2556 3979 1762 3892 1572 5624 2367 5716 2556 3979" style="fill: aqua"/>

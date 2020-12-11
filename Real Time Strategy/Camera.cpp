@@ -10,6 +10,10 @@ using namespace glm;
 
 static int asdfasdf = 0;
 
+const float MINZOOM = 0.1f;
+const float MAXZOOM = 5.0f;
+
+
 Camera::Camera(vec2 initPos, float mvspd, float zooooooom)
 {
 	this->position = initPos;
@@ -28,7 +32,7 @@ Camera::Camera()
 void Camera::zoomCall(int direction)
 {
 	this->zoom += ((float)direction) * 0.1f;
-	this->zoom = std::max(std::min(this->zoom, 5.0f), 0.5f);
+	this->zoom = std::max(std::min(this->zoom, MAXZOOM), MINZOOM);
 }
 
 mat4 Camera::getView()

@@ -8,6 +8,7 @@
 #include "Map.hpp"
 #include "Shader.hpp"
 #include "Delaunay.hpp"
+#include "GlobalContext.hpp"
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -69,9 +70,9 @@ int main(void)
 	r.initialize();
 
 	printf("###initialized, adding things\n");
-	unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap = getEntityTextures(".\\resources\\entityTextures");
+	GLBL::entityTextureMapMap = getEntityTextures(".\\resources\\entityTextures");
 
-	//r.addEntity(new Entity(vec2(40,80), vec2(40, 80), 15, Controller(), entityTextureMapMap["basicEntity"]));
+	GLBL::things.push_back(new Entity(vec2(120,240), vec2(120, 240), 15, Controller(), GLBL::entityTextureMapMap["basicEntity"]));
 
 	/*for (int i = 0; i < 5; i++)
 	{
@@ -82,8 +83,8 @@ int main(void)
 		}
 	}*/
 
-	r.map = Map(".\\resources\\maps\\map1\\", vec2(2000, 2000));
-	r.sb = SelectionBox(entityTextureMapMap["selection"]);
+	GLBL::map = Map(".\\resources\\maps\\map1\\", vec2(8000, 8000)); //TODO: need to scale the triangularization from image size to given dims
+	GLBL::sb = SelectionBox(GLBL::entityTextureMapMap["selection"]);
 
 	printf("###running\n");
 	r.run();
