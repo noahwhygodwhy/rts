@@ -4,6 +4,7 @@
 #include "tinyxml2.h"
 #include "Polygon.hpp"
 #include <array>
+#include "TriangleTree.hpp"
 using namespace glm;
 using namespace std;
 
@@ -168,27 +169,8 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
 
 Map::Map(string path, vec2 dims)
 {
-    this->navMesh = generateNavMeshVerts(path+"/navMesh.svg","outFile.json", dims);
-    /*
-    this->vertices = vector<Vertex>();
-    this->indices = vector<unsigned int>();
-    int ind = 0;
-    for (Triangle t : triangles)
-    {
-        for (int i = 0; i < 3; i++)
-        {
-            this->vertices.push_back({ t.points[i], vec2(0) });
-            this->vertices.push_back({ t.points[(i+1)%3], vec2(0) });
-        }
-        
-        for (vec2 p : t.points)
-        {
-            this->indices.push_back(ind++);
-
-            this->vertices.push_back({ p, vec2(0) });
-        }
-    }d
-    this->navMesh = makeNavMesh(path + "navMeshb.png"); */
+    this->navMesh = TriangleTree(generateNavMeshVerts(path+"/navMesh.svg","outFile.json", dims));
+    
     this->dims = dims;
     this->texture = makeTexture(path + "/mapImage.png");
     this->vertices = {

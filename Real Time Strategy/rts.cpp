@@ -58,6 +58,23 @@ unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEnt
 int main(void)
 {
 
+	float* f = new float();
+	*f = 5;
+	printf("f: %f\n", *f);
+
+	printf("f: %p\n", f);
+	void* x = (void*)f;
+
+	printf("x: %p\n", x);
+	//Triangle* t = 
+	Triangle* t = static_cast<Triangle*>(x);
+	printf("t: %p\n", t);
+	printf("%f\n", t->points[0].x);
+	printf("%f\n", t->points[0].y);
+	
+	exit(0);
+
+
 	//Triangle t = { vec2(15,55), vec2(1732,55), vec2(809,769) };
 	//vec2 center = getCenter(t);
 	//printf("center: %f, %f\n", center.x, center.y);
