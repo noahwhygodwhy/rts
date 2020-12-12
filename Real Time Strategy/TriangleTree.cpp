@@ -7,29 +7,54 @@ using namespace std;
 
 
 
-void* constructTree(vector<Triangle> tris, set<vec2> points, bool x)
+void* constructTree(vector<Triangle> tris, set<float> xcoords, set<float> ycoords, bool x)
 {
-	vec2 p = *points.begin();
-	vector<Triangle> sortedTris[3];
-	vector<Triangle> sortedPoints[3];
-
-	for (const Triangle& t : tris)
-	{
-		if (x ? t.getEnvelope().first.x < p.x : t.getEnvelope().first.y < p.y) //TODO: wrong side for comparison
-		{
-			sortedTris->push_back(t);
-		}
-		else if (x ? t.getEnvelope().second.x > p.x : t.getEnvelope().second.y > p.y)
-		{
-
-		}
-	}
-
-
 	if (tris.size() == 1)
 	{
 		return &tris[0];
 	}
+	axisNode toReturn;
+	toReturn.x = x;
+	float coord = x?*xcoords.begin():*ycoords.begin();
+	toReturn.coord = coord;
+
+	vector<Triangle> lesserTris;
+	vector<Triangle> greaterTris;
+	vector<Triangle> innerTris;
+
+	set<vec2> lesserPoints;
+	set<vec2> innerPoints;
+	set<vec2> greaterPoints;
+
+	for (const Triangle& t : tris)
+	{
+		if (x ? t.getEnvelope().second.x < coord : t.getEnvelope().second.y < coord)
+		{
+			lesserTris.push_back(t);
+		}
+		else if (x ? t.getEnvelope().first.x > coord : t.getEnvelope().first.y > coord)
+		{
+			greaterTris.push_back(t);
+		}
+		else
+		{
+			innerTris.push_back(t);
+		}
+	}
+	//TODO: possility of all things being in innerTris without tri's size being 1..?
+	
+	auto poi = points.begin();
+	poi++;
+	while (poi != points.end())
+	{
+
+	}
+	
+	toReturn.more = constructTree(greaterTris, greaterPoints, !x);
+	toReturn.less = constructTree(lesserTris, lesserPoints, !x);
+	toReturn.on = constructTree(innerTris, innerPoints, !x);
+
+
 	
 }
 
@@ -37,18 +62,17 @@ void* constructTree(vector<Triangle> tris, set<vec2> points, bool x)
 
 TriangleTree::TriangleTree(vector<Triangle> tIn)
 {
-	set<vec2> points;
+	set<float> xcoords;
+	set<float> ycoords;
 	for (Triangle t : tIn)
 	{
 		for (vec2 p : t.points)
 		{
-			points.insert(p);//no duplicates cause set
+			xcoords.insert(p.x);
+			ycoords.insert(p.y);
 		}
 	}
-	for (vec2 p : points)
-	{
-
-	}
+	constructTree(tIn, xcoords, ycoords, true);
 
 }
 
