@@ -3,6 +3,7 @@
 #define MAP_H
 
 #include "Delaunay.hpp"
+#include "TriangleTree.hpp"
 #include <string> 
 using namespace std;
 

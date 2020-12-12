@@ -169,8 +169,11 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
 
 Map::Map(string path, vec2 dims)
 {
-    this->navMesh = TriangleTree(generateNavMeshVerts(path+"/navMesh.svg","outFile.json", dims));
-    
+    vector<Triangle> navMeshTris = generateNavMeshVerts(path + "/navMesh.svg", "outFile.json", dims);
+    this->navMesh = TriangleTree(navMeshTris);
+    printf("made triangle tree\n");
+    //this->navMesh.getTriangle(vec2(1)).print("Encasing 1,1: ");
+
     this->dims = dims;
     this->texture = makeTexture(path + "/mapImage.png");
     this->vertices = {

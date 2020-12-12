@@ -49,7 +49,7 @@ axisNode* constructTree(const vector<Triangle>& tris, set<float> xCoords, set<fl
 		a->value = *lesserTris;
 		return a;
 	}
-	axisNodeBranch* toReturn;
+	axisNodeBranch* toReturn = new axisNodeBranch;
 	toReturn->leaf = false;
 	toReturn->x = x;
 	toReturn->coord = coord;
@@ -118,7 +118,7 @@ Triangle TriangleTree::getTriangle(vec2 p)
 {
 	axisNode* curr = this->head;
 	float coord = 0;
-	while (curr->leaf != true)
+	while (!curr->leaf)
 	{
 
 		axisNodeBranch* actualCurr = (axisNodeBranch*)curr;
