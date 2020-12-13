@@ -1,39 +1,10 @@
 #include "Triangle.hpp"
 
-float sign(vec2 a, vec2 b, vec2 p)
-{
-    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
-}
-
-int inTriangle(const Triangle& t, vec2 point)
-{
-    float x = sign(point, t.points[0], t.points[1]);
-    float y = sign(point, t.points[1], t.points[2]);
-    float z = sign(point, t.points[2], t.points[0]);
-    if (x == 0 || y == 0 || z == 0)
-    {
-        return -1;
-    }
-    bool neg = x < 0 || y < 0 || z < 0;
-    bool pos = x > 0 || y > 0 || z > 0;
-
-    return !(pos && neg); //not all of them, and not none of them
-}
-
-
-bool adjacent(const Triangle& a, const Triangle& b)
-{
-    int shared = 0;
-    for (int i = 0; i < 3; i++)
-    {
-        shared += a.points[i] == b.points[i] ? 1 : 0;
-    }
-    return (shared == 2);
-}
 
 //TODO: what if the 3 points are inline
-vec2 getCenter(const Triangle& t)
+vec2 Triangle::makeCenter()
 {
+    Triangle t = *this;
     float middleX = NAN;
     float middleY = NAN;
 
@@ -129,11 +100,116 @@ vec2 getCenter(const Triangle& t)
 }
 
 
-bool shareAPoint(Triangle& t, Triangle& superTriangle)
+
+Triangle::Triangle(vec2 a, vec2 b, vec2 c)
 {
-    for (vec2 a : t.points)
+    //make sure counter clockwise treatment isn't fucking up anything
+    this->points = { a, b, c };
+    edges[0] = { a, b };
+    edges[1] = { b, c };
+    edges[2] = { c, a };
+    this->center = makeCenter();
+
+    this->mins = glm::min(glm::min(points[0], points[1]), points[2]);
+    this->maxs = glm::max(glm::max(points[0], points[1]), points[2]);
+
+}
+
+Triangle::~Triangle()
+{
+}
+
+
+void Triangle::print(string prefix = "") const
+{
+    printf("%s (%f,%f), (%f,%f), (%f,%f)\n", prefix.c_str(), points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
+}
+bool Triangle::hasEdge(Edge e) const
+{
+    int shared = 0;
+    for (vec2 p : points)
     {
-        for (vec2 b : superTriangle.points)
+        for (vec2 v : e.points)
+        {
+            if (p == v)
+            {
+                shared += 1;
+            }
+        }
+    }
+    if (shared > 2)
+    {
+        printf("TRIANGLE HAS EDGE BROKE\n");
+        exit(0);
+    }
+    return shared == 2;
+}
+
+
+template<typename T>
+bool Triangle::operator==(const T& other) const
+{
+    try
+    {
+        const Triangle* otherTri = dynamic_cast<const Triangle*>(&other);
+        if (otherTri == 0)
+        {
+            return false;
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            if (this->points[i] != otherTri->points[i])
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    catch (exception e)
+    {
+        return false;
+    }
+    printf("END OF == OPERATOR BAD BAD BAD\n\n\n");
+    return false;
+}
+
+float Triangle::sign(vec2 a, vec2 b, vec2 p)
+{
+    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+}
+
+int Triangle::contains( vec2 point)
+{
+    float x = sign(point, points[0], points[1]);
+    float y = sign(point, points[1], points[2]);
+    float z = sign(point, points[2], points[0]);
+
+    if (x == 0 || y == 0 || z == 0)
+    {
+        return -1;
+    }
+    bool neg = x < 0 || y < 0 || z < 0;
+    bool pos = x > 0 || y > 0 || z > 0;
+
+    return !(pos && neg); //not all of them, and not none of them
+}
+
+
+bool Triangle::isAdjacent(const Triangle& other)
+{
+    int shared = 0;
+    for (int i = 0; i < 3; i++)
+    {
+        shared += this->points[i] == other.points[i] ? 1 : 0;
+    }
+    return (shared == 2);
+}
+
+bool Triangle::shareAPoint(const Triangle& other)
+{
+    for (vec2 a : this->points)
+    {
+        for (vec2 b : other.points)
         {
             if (a == b)
             {
