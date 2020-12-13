@@ -167,6 +167,7 @@
     <ClInclude Include="GLSLReader.hpp" />
     <ClInclude Include="khrplatform.h" />
     <ClInclude Include="Map.hpp" />
+    <ClInclude Include="NavigationMesh.hpp" />
     <ClInclude Include="Polygon.hpp" />
     <ClInclude Include="Renderer.hpp" />
     <ClInclude Include="SelectionBox.hpp" />
@@ -181,6 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="entity.FragShader.glsl" />
+    <None Include="NavigationMesh.cpp" />
     <None Include="packages.config" />
     <None Include="entity.vertShader.glsl" />
     <None Include="Triangle.hpp" />

@@ -3,7 +3,7 @@
 #define MAP_H
 
 #include "Delaunay.hpp"
-#include "TriangleTree.hpp"
+#include "NavigationMesh.hpp"
 #include <string> 
 using namespace std;
 
@@ -25,7 +25,7 @@ private:
 	vector<unsigned int> indices;
 	void setupBuffer();
 	Texture texture;
-	TriangleTree navMesh;
+	NavigationMesh navMesh;
 
 };
 
