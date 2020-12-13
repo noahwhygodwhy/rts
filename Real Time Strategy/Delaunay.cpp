@@ -10,7 +10,7 @@ vector<Triangle> findContainer(const vector<Triangle>& triangles, vec2 point)
     vector<Triangle> toReturn;
     for (const Triangle& t : triangles)
     {
-        int result = inTriangle(t, point);
+        int result = t.contains(point);
         printf("it's in %i triangles\n", result);
         if (result == 1)
         {
@@ -45,7 +45,7 @@ vector<Triangle> splitTriangle(vector<Triangle> tris, vec2 p)
         for (int i = 0; i < 3; i++)
         {
 
-            Triangle theNewOne = { t.points };
+            Triangle theNewOne = Triangle(t.points);
             theNewOne.points[i] = p;
 
             float s = sign(theNewOne.points[(i + 1) % 3], theNewOne.points[(i + 2) % 3], theNewOne.points[i]);
@@ -81,9 +81,8 @@ void fixIllegalTriangles(vector<Triangle>& tris, const vector<vec2>& usedPoints)
         auto triIter = tris.begin();
         while (triIter != tris.begin())
         {
-            vec2 center = getCenter(*triIter);
-            float radius = distance(center, triIter->points[0]);
-            if (distance(p, center) < radius)
+            float radius = distance(triIter->circleCenter, triIter->points[0]);
+            if (distance(p, triIter->circleCenter) < radius)
             {
                 tris.erase(triIter);
 
@@ -98,71 +97,6 @@ void fixIllegalTriangles(vector<Triangle>& tris, const vector<vec2>& usedPoints)
             }
         }
     }
-
-
-
-    /*
-        for each triangle
-            for each added point
-
-
-            
-
-    */
-
-
-    /*vec2 center = getCenter(tri);
-    for (vec2 p : points)
-    {
-        if (distance(p, center) < distance(tri.points[0], center)) //if it's in the circle
-        {
-
-        }
-    }*/
-    /*
-
-    //TODO: this part but with caffeine 
-    for (Triangle& t : tris)
-    {
-        if (!(t == tri))
-        {
-            if (adjacent(tri, t))
-            {
-                vec2 center = getCenter(tri);
-                float radius = distance(center, tri.points[0]);
-
-                vec2 tnotSharedPoint(0);
-                vec2 sharedPoint1(0);
-                vec2 sharedPoint2(0);
-                vec2 trinotSharedPoint(0);
-                for (vec2 x : t.points)
-                {
-                    if (count(tri.points.begin(), tri.points.end(), x) == 0)
-                    {
-                        tnotSharedPoint = x;
-                        break;
-                    }
-                }
-                for (vec2 x : tri.points)
-                {
-                    if (count(t.points.begin(), t.points.end(), x) == 0)
-                    {
-                        trinotSharedPoint = x;
-                        break;
-                    }
-                }
-                if (distance(center, tnotSharedPoint) < radius)
-                {
-                    Triangle a = { trinotSharedPoint, tnotSharedPoint, sharedPoint1 };
-                    Triangle b = { trinotSharedPoint, tnotSharedPoint, sharedPoint2 };
-                    t.points = a.points;
-                    tri.points = b.points;
-                    fixIllegalTriangles(tri, tris, points);
-                    fixIllegalTriangles(t, tris, points);
-                }
-            }
-        }
-    }*/
 }
 
 
@@ -174,9 +108,9 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
 
     for (const Triangle& t : triangles) //for each triangle in triangles
     {
-        vec2 center = getCenter(t);
+        vec2 center = t.circleCenter;
         float radius = distance(t.points[0], center);
-        if (distance(center, point) <= radius)
+        if (distance(t.circleCenter, point) <= radius)
         {
             badTriangles.push_back(t);
         }
@@ -251,7 +185,7 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 to
         auto triIter = triangles.begin();
         while (triIter != triangles.end())
         {
-            if (shareAPoint(superTriangle, *triIter))
+            if (triIter->shareAPoint(superTriangle))
             {
                 triangles.erase(triIter);
             }

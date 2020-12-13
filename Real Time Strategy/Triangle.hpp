@@ -73,12 +73,14 @@ namespace std {
 class Triangle
 {
 public:
+    Triangle(array<vec2, 3> points);
     Triangle(vec2 a = vec2(0), vec2 b = vec2(0), vec2 c = vec2(0));
     ~Triangle();
 
     array<vec2, 3> points;
     array<Edge, 3> edges;
-    vec2 center;
+    vec2 circleCenter;
+    vec2 geoCenter;
     vec2 mins;
     vec2 maxs;
 
@@ -87,13 +89,14 @@ public:
 
     template<typename T>
     bool operator==(const T& other) const;
-    int contains(vec2 point);
-    bool isAdjacent(const Triangle& other);
-    bool shareAPoint(const Triangle& other);
+    int contains(vec2 point) const;
+    bool isAdjacent(const Triangle& other) const;
+    bool shareAPoint(const Triangle& other) const;
 
 
 private:
-    vec2 makeCenter();
-    float sign(vec2 a, vec2 b, vec2 p);
+    vec2 makeCircleCenter();
 };
+
+float sign(vec2 a, vec2 b, vec2 p);
 #endif;

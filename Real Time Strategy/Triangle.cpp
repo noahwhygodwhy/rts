@@ -2,7 +2,7 @@
 
 
 //TODO: what if the 3 points are inline
-vec2 Triangle::makeCenter()
+vec2 Triangle::makeCircleCenter()
 {
     Triangle t = *this;
     float middleX = NAN;
@@ -101,6 +101,10 @@ vec2 Triangle::makeCenter()
 
 
 
+Triangle::Triangle(array<vec2, 3> points) : Triangle(points[0], points[1], points[2])
+{
+}
+
 Triangle::Triangle(vec2 a, vec2 b, vec2 c)
 {
     //make sure counter clockwise treatment isn't fucking up anything
@@ -108,7 +112,7 @@ Triangle::Triangle(vec2 a, vec2 b, vec2 c)
     edges[0] = { a, b };
     edges[1] = { b, c };
     edges[2] = { c, a };
-    this->center = makeCenter();
+    this->circleCenter = makeCircleCenter();
 
     this->mins = glm::min(glm::min(points[0], points[1]), points[2]);
     this->maxs = glm::max(glm::max(points[0], points[1]), points[2]);
@@ -120,7 +124,7 @@ Triangle::~Triangle()
 }
 
 
-void Triangle::print(string prefix = "") const
+void Triangle::print(string prefix) const
 {
     printf("%s (%f,%f), (%f,%f), (%f,%f)\n", prefix.c_str(), points[0].x, points[0].y, points[1].x, points[1].y, points[2].x, points[2].y);
 }
@@ -173,12 +177,12 @@ bool Triangle::operator==(const T& other) const
     return false;
 }
 
-float Triangle::sign(vec2 a, vec2 b, vec2 p)
+float sign(vec2 a, vec2 b, vec2 p)
 {
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
 }
 
-int Triangle::contains( vec2 point)
+int Triangle::contains( vec2 point) const
 {
     float x = sign(point, points[0], points[1]);
     float y = sign(point, points[1], points[2]);
@@ -195,7 +199,7 @@ int Triangle::contains( vec2 point)
 }
 
 
-bool Triangle::isAdjacent(const Triangle& other)
+bool Triangle::isAdjacent(const Triangle& other) const
 {
     int shared = 0;
     for (int i = 0; i < 3; i++)
@@ -205,7 +209,7 @@ bool Triangle::isAdjacent(const Triangle& other)
     return (shared == 2);
 }
 
-bool Triangle::shareAPoint(const Triangle& other)
+bool Triangle::shareAPoint(const Triangle& other) const
 {
     for (vec2 a : this->points)
     {

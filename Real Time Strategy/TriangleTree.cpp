@@ -28,11 +28,11 @@ axisNode* constructTree(const vector<Triangle>& tris, set<float> xCoords, set<fl
 
 	for (const Triangle& t : tris)
 	{
-		if (x ? t.getEnvelope().first.x < coord : t.getEnvelope().first.y < coord)
+		if (x ? t.mins.x < coord : t.mins.y < coord)
 		{
 			lesserTris->push_back(t);
 		}
-		if (x ? t.getEnvelope().second.x > coord : t.getEnvelope().second.y > coord)
+		if (x ? t.maxs.x > coord : t.maxs.y > coord)
 		{
 			greaterTris->push_back(t);
 		}
@@ -128,7 +128,7 @@ Triangle TriangleTree::getTriangle(vec2 p)
 	vector<Triangle> tris = ((axisNodeLeaf*)curr)->value;
 	for (const Triangle& t : tris)
 	{
-		if (inTriangle(t, p))
+		if (t.contains(p))
 		{
 			return t;
 		}

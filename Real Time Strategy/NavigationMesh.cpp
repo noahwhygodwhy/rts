@@ -14,7 +14,7 @@ unordered_map<Triangle, vector<Triangle>> constructAdjacencySet(vector<Triangle>
 		{
 			if (!(t == ot))
 			{
-				if (adjacent(t, ot))
+				if (t.isAdjacent(ot))
 				{
 					
 					adjacentTris.push_back(ot);
@@ -39,7 +39,6 @@ vector<vec2> NavigationMesh::getPath(vec2 p1, vec2 p2)
 
 NavigationMesh::NavigationMesh()
 {
-
 }
 
 NavigationMesh::~NavigationMesh()
