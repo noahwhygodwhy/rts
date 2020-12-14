@@ -5,7 +5,6 @@
 #include "Polygon.hpp"
 #include <array>
 #include "TriangleTree.hpp"
-#include "NavigationMesh.hpp"
 
 using namespace glm;
 using namespace std;

@@ -57,6 +57,8 @@ unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEnt
 
 int main(void)
 {
+	//NavigationMesh m();
+	exit(0);
 
 	/*float* f = new float();
 	*f = 5;

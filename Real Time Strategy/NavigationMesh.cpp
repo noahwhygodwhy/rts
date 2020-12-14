@@ -1,14 +1,15 @@
 
+#include "NavigationMesh.hpp"
+
 #include "Triangle.hpp"
+#include <glm/glm.hpp>
 #include <set>
 #include <unordered_map>
 #include <vector>
-#include "NavigationMesh.hpp"
-
 using namespace std;
 using namespace glm;
 
-/*unordered_map<Triangle, vector<Triangle>> constructAdjacencySet(vector<Triangle> tris)
+unordered_map<Triangle, vector<Triangle>> constructAdjacencySet(vector<Triangle> tris)
 {
 	unordered_map<Triangle, vector<Triangle>> toReturn;
 	for (const Triangle& t : tris)
@@ -29,13 +30,13 @@ using namespace glm;
 	}
 	return toReturn;
 }
-*/
-NavigationMesh::NavigationMesh(vector<Triangle> tris)
+
+/*NavigationMesh::NavigationMesh(vector<Triangle> tris)
 {
-	/*this->tris = tris;
+	this->tris = tris;
 	this->triTree = TriangleTree(tris);
-	this->adjacencySet = constructAdjacencySet(tris);*/
-}
+	this->adjacencySet = constructAdjacencySet(tris);
+}*/
 
 
 
@@ -46,7 +47,8 @@ NavigationMesh::NavigationMesh(vector<Triangle> tris)
 
 */
 
-vector<vec2> NavigationMesh::getPath(vec2 start, vec2 end)
+
+/*vector<vec2> NavigationMesh::getPath(vec2 start, vec2 end)
 {
 	/*
 	unordered_map<Triangle, float> hcost;
@@ -73,14 +75,6 @@ vector<vec2> NavigationMesh::getPath(vec2 start, vec2 end)
 	{
 
 	}
-	*/
+	
 
-}
-
-NavigationMesh::NavigationMesh()
-{
-}
-
-NavigationMesh::~NavigationMesh()
-{
-}
+}*/

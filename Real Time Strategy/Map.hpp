@@ -1,14 +1,14 @@
 #pragma once
-#ifndef MAP_H
-#define MAP_H
+#ifndef MY_MAP_H
+#define MY_MAP_H
 
+#include "NavMesh.hpp"
 #include "Delaunay.hpp"
 #include "UsefulStructs.hpp"
 #include "Shader.hpp"
 #include <vector>
 #include <string> 
 #include <glm/glm.hpp>
-#include "NavigationMesh.hpp"
 
 using namespace std;
 using namespace glm;
@@ -30,7 +30,7 @@ private:
 	vector<unsigned int> indices;
 	void setupBuffer();
 	Texture texture;
-	NavigationMesh navMesh;
+	NavMesh navMesh;
 
 };
 
