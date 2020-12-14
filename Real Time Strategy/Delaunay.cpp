@@ -1,11 +1,12 @@
 #include "Delaunay.hpp"
 #include "Triangle.hpp"
+#include "UsefulStructs.hpp"
 
 using namespace std;
 using namespace glm;
 
 
-vector<Triangle> findContainer(const vector<Triangle>& triangles, vec2 point)
+/*vector<Triangle> findContainer(const vector<Triangle>& triangles, vec2 point)
 {
     vector<Triangle> toReturn;
     for (const Triangle& t : triangles)
@@ -27,10 +28,10 @@ vector<Triangle> findContainer(const vector<Triangle>& triangles, vec2 point)
         }
     }
     return toReturn; //just in case
-}
+}*/
 
 
-vector<Triangle> splitTriangle(vector<Triangle> tris, vec2 p)
+/*vector<Triangle> splitTriangle(vector<Triangle> tris, vec2 p)
 {
     printf("splitting %i triangles with point %f,%f\n", tris.size(), p.x, p.y);
     vector<Triangle> newTriangles;
@@ -63,7 +64,7 @@ vector<Triangle> splitTriangle(vector<Triangle> tris, vec2 p)
     }
     return newTriangles;
 }
-
+*/
 
 float distance(const vec2& p1, const vec2& p2)
 {
@@ -72,7 +73,7 @@ float distance(const vec2& p1, const vec2& p2)
     return std::sqrt((dx * dx) + (dy * dy));
 }
 
-
+/*
 void fixIllegalTriangles(vector<Triangle>& tris, const vector<vec2>& usedPoints)
 {
 
@@ -97,7 +98,7 @@ void fixIllegalTriangles(vector<Triangle>& tris, const vector<vec2>& usedPoints)
             }
         }
     }
-}
+}*/
 
 
 

@@ -153,32 +153,7 @@ bool Triangle::hasEdge(Edge e) const
     return shared == 2;
 }
 
-template<typename T>
-bool Triangle::operator==(const T& other) const
-{
-    try
-    {
-        const Triangle* otherTri = dynamic_cast<const Triangle*>(&other);
-        if (otherTri == 0)
-        {
-            return false;
-        }
-        for (int i = 0; i < 3; i++)
-        {
-            if (t.points[i] != otherTri->points[i])
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-    catch (exception e)
-    {
-        return false;
-    }
-    printf("END OF == OPERATOR BAD BAD BAD\n\n\n");
-    return false;
-}
+
 
 
 //returns the distance of point p from the line containing points a and b

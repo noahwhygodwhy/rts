@@ -91,7 +91,32 @@ public:
     bool hasEdge(Edge e) const;
 
     template<typename T>
-    bool operator==(const T& other) const;
+    bool operator==(const T& other) const
+    {
+        try
+        {
+            const Triangle* otherTri = dynamic_cast<const Triangle*>(&other);
+            if (otherTri == 0)
+            {
+                return false;
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                if (this->points[i] != otherTri->points[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        catch (exception e)
+        {
+            return false;
+        }
+        printf("END OF == OPERATOR BAD BAD BAD\n\n\n");
+        return false;
+    }
+
     int contains(vec2 point) const;
     bool isAdjacent(const Triangle& other) const;
     bool shareAPoint(const Triangle& other) const;

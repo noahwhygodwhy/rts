@@ -5,6 +5,8 @@
 #include "Polygon.hpp"
 #include <array>
 #include "TriangleTree.hpp"
+#include "NavigationMesh.hpp"
+
 using namespace glm;
 using namespace std;
 
@@ -170,7 +172,7 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
 Map::Map(string path, vec2 dims)
 {
     vector<Triangle> navMeshTris = generateNavMeshVerts(path + "/navMesh.svg", "outFile.json", dims);
-    this->navMesh = NavigationMesh(navMeshTris);
+    //this->navMesh = NavigationMesh(navMeshTris);
     printf("made triangle tree\n");
     //this->navMesh.getTriangle(vec2(1)).print("Encasing 1,1: ");
 

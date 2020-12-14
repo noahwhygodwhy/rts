@@ -3,10 +3,15 @@
 #define MAP_H
 
 #include "Delaunay.hpp"
-#include "NavigationMesh.hpp"
+#include "UsefulStructs.hpp"
+#include "Shader.hpp"
+#include <vector>
 #include <string> 
-using namespace std;
+#include <glm/glm.hpp>
+#include "NavigationMesh.hpp"
 
+using namespace std;
+using namespace glm;
 
 
 class Map

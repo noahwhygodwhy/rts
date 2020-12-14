@@ -1,9 +1,14 @@
-#include "NavigationMesh.hpp"
+
 #include "Triangle.hpp"
 #include <set>
 #include <unordered_map>
+#include <vector>
+#include "NavigationMesh.hpp"
 
-unordered_map<Triangle, vector<Triangle>> constructAdjacencySet(vector<Triangle> tris)
+using namespace std;
+using namespace glm;
+
+/*unordered_map<Triangle, vector<Triangle>> constructAdjacencySet(vector<Triangle> tris)
 {
 	unordered_map<Triangle, vector<Triangle>> toReturn;
 	for (const Triangle& t : tris)
@@ -24,13 +29,14 @@ unordered_map<Triangle, vector<Triangle>> constructAdjacencySet(vector<Triangle>
 	}
 	return toReturn;
 }
-
+*/
 NavigationMesh::NavigationMesh(vector<Triangle> tris)
 {
-	this->tris = tris;
+	/*this->tris = tris;
 	this->triTree = TriangleTree(tris);
-	this->adjacencySet = constructAdjacencySet(tris);
+	this->adjacencySet = constructAdjacencySet(tris);*/
 }
+
 
 
 /*
