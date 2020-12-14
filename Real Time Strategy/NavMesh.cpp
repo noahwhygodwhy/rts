@@ -59,6 +59,10 @@ NavMesh::~NavMesh()
 
 
 
+
+
+
+
 vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 {
 	
@@ -77,18 +81,48 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 	Triangle startTri = this->triTree.getTriangle(start);
 	gcost[startTri] = 0;
 	fcost[startTri] = 0;
+	Triangle endTri = this->triTree.getTriangle(end);
 
 	unordered_map<vec2, vec2> cameFrom;
 
-	priority_queue<aStarNode, vector<aStarNode>> open;
+
+
+	/*struct cmpByStringLength
+	{
+		bool operator()(const Triangle& a, const Triangle& b) const
+		{
+			fcost[a] > fcost[b];
+		}
+	};*/
+	auto test = [&](Triangle a, Triangle b) -> bool
+	{
+		return fcost[a] > fcost[b];
+	};
+	//decltype([](Triangle lhs, Triangle rhs) { return false; })
+	priority_queue <Triangle, vector<Triangle>, decltype(test)> open;
+
+
 	//priority_queue<vec2> open;
-	open.push({ 0, 0, 0, startTri });
+	open.push(startTri);
 	
 	while (!open.empty())
 	{
-		aStarNode curr = open.top();
+		Triangle curr = open.top();
 		open.pop();
+		if (curr == endTri)
+		{
+			//todo: reconstruct path
+			break;
+			return;//idk
+		}
+		for (Triangle* neighbor : this->adjacencySet[curr])
+		{
+			float tentativeG = gcost[curr] + getCost(curr, neighbor);
+			if (tentativeG < gcost[*neighbor])
+			{
 
+			}
+		}
 
 
 	}
