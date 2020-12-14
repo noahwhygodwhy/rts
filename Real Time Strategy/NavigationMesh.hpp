@@ -7,13 +7,6 @@
 using namespace std;
 using namespace glm;
 
-
-/*struct adjacencyNode
-{
-	Triangle* tri;
-	vector<adjacencyNode> neighbors;
-};*/
-
 class NavigationMesh
 {
 public:
@@ -22,7 +15,7 @@ public:
 	~NavigationMesh();
 	vector<vec2> getPath(vec2 p1, vec2 p2);
 private:
-
+	vector<Triangle> tris;
 	TriangleTree triTree;
 	unordered_map<Triangle, vector<Triangle>> adjacencySet;
 };

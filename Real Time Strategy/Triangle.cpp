@@ -1,6 +1,9 @@
 #include "Triangle.hpp"
 
 
+using namespace std;
+using namespace glm;
+
 //TODO: what if the 3 points are inline
 vec2 Triangle::makeCircleCenter()
 {
@@ -121,6 +124,7 @@ Triangle::Triangle(vec2 a, vec2 b, vec2 c)
 
 Triangle::~Triangle()
 {
+
 }
 
 
@@ -149,7 +153,6 @@ bool Triangle::hasEdge(Edge e) const
     return shared == 2;
 }
 
-
 template<typename T>
 bool Triangle::operator==(const T& other) const
 {
@@ -162,7 +165,7 @@ bool Triangle::operator==(const T& other) const
         }
         for (int i = 0; i < 3; i++)
         {
-            if (this->points[i] != otherTri->points[i])
+            if (t.points[i] != otherTri->points[i])
             {
                 return false;
             }
@@ -177,16 +180,18 @@ bool Triangle::operator==(const T& other) const
     return false;
 }
 
+
+//returns the distance of point p from the line containing points a and b
 float sign(vec2 a, vec2 b, vec2 p)
 {
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
 }
 
-int Triangle::contains( vec2 point) const
+int Triangle::contains(vec2 point) const
 {
-    float x = sign(point, points[0], points[1]);
-    float y = sign(point, points[1], points[2]);
-    float z = sign(point, points[2], points[0]);
+    float x = sign(point, this->points[0], this->points[1]);
+    float y = sign(point, this->points[1], this->points[2]);
+    float z = sign(point, this->points[2], this->points[0]);
 
     if (x == 0 || y == 0 || z == 0)
     {

@@ -114,6 +114,7 @@ TriangleTree::~TriangleTree()
 {
 }
 
+
 Triangle TriangleTree::getTriangle(vec2 p)
 {
 	axisNode* curr = this->head;

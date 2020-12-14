@@ -10,6 +10,9 @@
 using namespace std;
 using namespace glm;
 
+
+struct Edge;
+
 struct Edge
 {
     array<vec2, 2> points;
@@ -92,6 +95,35 @@ public:
     int contains(vec2 point) const;
     bool isAdjacent(const Triangle& other) const;
     bool shareAPoint(const Triangle& other) const;
+    /*size_t operator()(const Triangle& tri)
+    {
+        hash<float> fh;
+
+        size_t value = 0;
+
+        for (vec2 p : tri.points)
+        {
+            value = value ^ fh(p.x) & fh(p.y);
+        }
+
+        return value;
+    }*/
+    /*
+    struct HashFunction{
+        inline size_t operator()(const Triangle& x) const
+        {
+            hash<float> fh;
+
+            size_t value = 0;
+
+            for (vec2 p : x.points)
+            {
+                value = value ^ fh(p.x) & fh(p.y);
+            }
+
+            return value;
+        }
+    };*/
 
 
 private:
@@ -99,4 +131,106 @@ private:
 };
 
 float sign(vec2 a, vec2 b, vec2 p);
+
+
+
+namespace std {
+    /*template<typename T>
+    bool operator==(const Triangle& t, const T& other)
+    {
+        try
+        {
+            const Triangle* otherTri = dynamic_cast<const Triangle*>(&other);
+            if (otherTri == 0)
+            {
+                return false;
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                if (t.points[i] != otherTri->points[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        catch (exception e)
+        {
+            return false;
+        }
+        printf("END OF == OPERATOR BAD BAD BAD\n\n\n");
+        return false;
+    }
+    template<typename T>
+    bool operator==(const T& other, const Triangle& t)
+    {
+        try
+        {
+            const Triangle* otherTri = dynamic_cast<const Triangle*>(&other);
+            if (otherTri == 0)
+            {
+                return false;
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                if (t.points[i] != otherTri->points[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        catch (exception e)
+        {
+            return false;
+        }
+        printf("END OF == OPERATOR BAD BAD BAD\n\n\n");
+        return false;
+    }
+
+    bool operator==(const Triangle& t, const Triangle& other)
+    {
+        try
+        {
+            const Triangle* otherTri = dynamic_cast<const Triangle*>(&other);
+            if (otherTri == 0)
+            {
+                return false;
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                if (t.points[i] != otherTri->points[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        catch (exception e)
+        {
+            return false;
+        }
+        printf("END OF == OPERATOR BAD BAD BAD\n\n\n");
+        return false;
+    }*/
+
+
+    template<>
+    struct hash<Triangle> {
+        size_t operator()(const Triangle& x) const
+        {
+            hash<float> fh;
+
+            size_t value = 0;
+
+            for (vec2 p : x.points)
+            {
+                value = value ^ fh(p.x) & fh(p.y);
+            }
+
+            return value;
+        }
+    };
+}
+
 #endif;

@@ -1,8 +1,7 @@
 #include "NavigationMesh.hpp"
 #include "Triangle.hpp"
-
-
-
+#include <set>
+#include <unordered_map>
 
 unordered_map<Triangle, vector<Triangle>> constructAdjacencySet(vector<Triangle> tris)
 {
@@ -28,13 +27,48 @@ unordered_map<Triangle, vector<Triangle>> constructAdjacencySet(vector<Triangle>
 
 NavigationMesh::NavigationMesh(vector<Triangle> tris)
 {
+	this->tris = tris;
 	this->triTree = TriangleTree(tris);
 	this->adjacencySet = constructAdjacencySet(tris);
 }
 
-vector<vec2> NavigationMesh::getPath(vec2 p1, vec2 p2)
+
+/*
+	g-cost:	the sum of the distances between the path points so far
+	h-cost: the distance between goal and the closest point from the triangle we're considering to the goal
+	f-cost: g+h
+
+*/
+
+vector<vec2> NavigationMesh::getPath(vec2 start, vec2 end)
 {
-	//TODO: https://community.monogame.net/t/a-based-pathfinding-using-triangular-navigation-meshes-in-c/11318
+	/*
+	unordered_map<Triangle, float> hcost;
+	unordered_map<Triangle, float> gcost;
+	unordered_map<Triangle, float> fcost; 
+
+	for (const Triangle& t : this->tris)
+	{
+		gcost[t] = INFINITY;
+	}
+	for (const Triangle& t : this->tris)
+	{
+		fcost[t] = INFINITY;
+	}
+	Triangle startTri = this->triTree.getTriangle(start);
+	gcost[startTri] = 0;
+	fcost[startTri] = 0;
+
+	unordered_map<vec2, vec2> cameFrom;
+	set<vec2> open;
+	open.insert(start);
+
+	while (!open.empty())
+	{
+
+	}
+	*/
+
 }
 
 NavigationMesh::NavigationMesh()
