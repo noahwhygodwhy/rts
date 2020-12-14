@@ -10,6 +10,15 @@
 #include "Delaunay.hpp"
 #include "GlobalContext.hpp"
 
+
+
+
+#include <queue>
+#include <random>
+
+
+
+
 using namespace std;
 namespace fs = std::filesystem;
 
@@ -57,6 +66,18 @@ unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEnt
 
 int main(void)
 {
+
+	priority_queue<int, vector<int>, greater<int>> open;
+	
+	for (int i = 0; i < 20; i++)
+	{
+		open.push(rand() % 20);
+	}
+	while (!open.empty())
+	{
+		cout << open.top() << endl;
+		open.pop();
+	}
 	//NavigationMesh m();
 	exit(0);
 

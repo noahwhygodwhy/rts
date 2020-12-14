@@ -23,7 +23,6 @@ public:
 
 	vec2 dims;
 	~Map();
-
 private:
 	unsigned int VAO, VBO, EBO;
 	vector<Vertex> vertices;

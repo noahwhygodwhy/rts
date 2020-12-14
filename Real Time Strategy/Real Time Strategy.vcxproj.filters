@@ -158,9 +158,6 @@
     <ClInclude Include="TriangleTree.hpp">
       <Filter>Header Files\Map</Filter>
     </ClInclude>
-    <ClInclude Include="NavigationMesh.hpp">
-      <Filter>Header Files\Map</Filter>
-    </ClInclude>
     <ClInclude Include="NavMesh.hpp">
       <Filter>Header Files\Map</Filter>
     </ClInclude>
@@ -175,9 +172,6 @@
     </None>
     <None Include="Triangle.hpp">
       <Filter>Header Files\Map</Filter>
-    </None>
-    <None Include="NavigationMesh.cpp">
-      <Filter>Source Files\Map</Filter>
     </None>
   </ItemGroup>
 </Project>
