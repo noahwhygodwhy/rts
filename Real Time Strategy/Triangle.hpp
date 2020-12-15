@@ -23,8 +23,16 @@ struct Edge
     }
 
 
+
+
     template<typename T>
-    bool operator==(const T& other)
+    bool operator<(const T& other) const
+    {
+        return false;//lol how is an edge lesser than another edge
+    }
+
+    template<typename T>
+    bool operator==(const T& other) const
     {
         try
         {
@@ -120,6 +128,7 @@ public:
     int contains(vec2 point) const;
     bool isAdjacent(const Triangle& other) const;
     bool shareAPoint(const Triangle& other) const;
+    vec2 closestPoint(const vec2& p) const;
     /*size_t operator()(const Triangle& tri)
     {
         hash<float> fh;
@@ -153,6 +162,7 @@ public:
 
 private:
     vec2 makeCircleCenter();
+    vec2 centroid();
 };
 
 float sign(vec2 a, vec2 b, vec2 p);

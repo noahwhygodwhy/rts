@@ -12,7 +12,7 @@
 
 
 
-
+#include <set>
 #include <queue>
 #include <random>
 
@@ -66,6 +66,12 @@ unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEnt
 
 int main(void)
 {
+
+
+	unordered_set<Edge>* fedge = new unordered_set<Edge>();
+	fedge->insert({ vec2(0, 0), vec2(5, 1) });
+
+	exit(0);
 
 	priority_queue<int, vector<int>, greater<int>> open;
 	

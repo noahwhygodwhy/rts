@@ -102,7 +102,12 @@ vec2 Triangle::makeCircleCenter()
     return vec2(middleX, middleY);
 }
 
-
+//returns the centroid of a triangle (the center point)
+vec2 Triangle::centroid()
+{
+    Triangle t = *this;
+    return vec2(((t.points[0].x + t.points[1].x + t.points[2].x) / 3), ((t.points[0].y + t.points[1].y + t.points[2].y) / 3));
+}
 
 Triangle::Triangle(array<vec2, 3> points) : Triangle(points[0], points[1], points[2])
 {
@@ -116,7 +121,7 @@ Triangle::Triangle(vec2 a, vec2 b, vec2 c)
     edges[1] = { b, c };
     edges[2] = { c, a };
     this->circleCenter = makeCircleCenter();
-
+    this->geoCenter = centroid();
     this->mins = glm::min(glm::min(points[0], points[1]), points[2]);
     this->maxs = glm::max(glm::max(points[0], points[1]), points[2]);
 
@@ -155,6 +160,56 @@ bool Triangle::hasEdge(Edge e) const
 
 
 
+vec2 Triangle::closestPoint(const vec2& p) const
+{
+    if (this->contains(p))
+    {
+        return vec2(p);
+    }
+
+    float s1 = sign(this->points[0], this->points[1], p);
+    float s2 = sign(this->points[1], this->points[2], p);
+    float s3 = sign(this->points[2], this->points[0], p);
+
+
+    vec2 A;
+    vec2 B;
+
+    float theMin = std::min(s1, std::min(s2, s3));
+
+    if (theMin == s1)
+    {
+        A = this->points[0];
+        B = this->points[1];
+    }
+    else if (theMin == s2)
+    {
+        A = this->points[1];
+        B = this->points[2];
+    }
+    else
+    {
+        A = this->points[2];
+        B = this->points[0];
+    }
+
+    vec2 v = (B - A);
+    float l = glm::dot((p - A), v) / glm::dot(v, v);
+    vec2 s = vec2(0);
+    if (l <= 0)
+    {
+        s = A;
+    }
+    else if (l >=1)
+    {
+        s = B;
+    }
+    else
+    {
+        s = A + (l * v);
+    }
+    return s;
+}
 
 //returns the distance of point p from the line containing points a and b
 float sign(vec2 a, vec2 b, vec2 p)

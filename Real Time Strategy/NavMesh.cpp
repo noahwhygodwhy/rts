@@ -58,14 +58,56 @@ NavMesh::~NavMesh()
 */
 
 
+vec2 closestCorner(const Triangle& t, const vec2& p)
+{
+	vec2 d1 = p - t.points[0];
+	vec2 d2 = p - t.points[1];
+	vec2 d3 = p - t.points[2];
+
+	float m1 = glm::length(d1);
+	float m2 = glm::length(d2);
+	float m3 = glm::length(d3);
+
+	float min = std::min(m1, std::min(m2, m3));
+	if (min == m1)
+	{
+		return vec2(t.points[0]);
+	}
+	if (min == m2)
+	{
+		return vec2(t.points[1]);
+	}
+	return vec2(t.points[2]);
+	
+}
 
 
 
+
+float getGCost(const Triangle& curr, const Triangle& neighbor, vec2* closestPoint)
+{
+	//TODO:
+}
+float getHCost(const Triangle& curr, vec2 end)
+{
+	return distance(curr.closestPoint(end), end);
+}
+
+bool counterClockwise(vec2 a, vec2 b, vec2 c)
+{
+	return (b.x - a.x) * (c.y - a.y) > (c.x - a.x) * (b.y - a.y);
+}
+
+//does not account for colinear lines, but we don't care
+bool linesIntersect(vec2 a, vec2 b, vec2 c, vec2 d)
+{
+	return counterClockwise(a, c, d) != counterClockwise(b, c, d) && counterClockwise(a, b, c) != counterClockwise(a, b, d);
+}
 
 
 vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 {
-	
+	/**/
 	//unordered_map<Triangle, float> hcost;
 	unordered_map<Triangle, float> gcost;
 	unordered_map<Triangle, float> fcost;
@@ -86,46 +128,42 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 	unordered_map<vec2, vec2> cameFrom;
 
 
-
-	/*struct cmpByStringLength
-	{
-		bool operator()(const Triangle& a, const Triangle& b) const
-		{
-			fcost[a] > fcost[b];
-		}
-	};*/
-	auto test = [&](Triangle a, Triangle b) -> bool
+	auto comparerer = [&fcost](Triangle a, Triangle b)
 	{
 		return fcost[a] > fcost[b];
 	};
-	//decltype([](Triangle lhs, Triangle rhs) { return false; })
-	priority_queue <Triangle, vector<Triangle>, decltype(test)> open;
+	priority_queue <Triangle, vector<Triangle>, decltype(comparerer)> open(comparerer);
 
+	vector<Triangle> openContents;
 
-	//priority_queue<vec2> open;
 	open.push(startTri);
-	
+	openContents.push_back(startTri);
 	while (!open.empty())
 	{
 		Triangle curr = open.top();
 		open.pop();
+		openContents.erase(find(openContents.begin(), openContents.end(), curr));
 		if (curr == endTri)
 		{
-			//todo: reconstruct path
-			break;
-			return;//idk
+			//return reconstruct(start, end, cameFrom);//todo:
 		}
 		for (Triangle* neighbor : this->adjacencySet[curr])
 		{
-			float tentativeG = gcost[curr] + getCost(curr, neighbor);
+			vec2 pointOnNeighbor;
+			float tentativeG = gcost[curr] + getGCost(curr, *neighbor, &pointOnNeighbor);
 			if (tentativeG < gcost[*neighbor])
 			{
+				cameFrom[pointOnNeighbor] = curr.geoCenter; //maybe not right
+				gcost[*neighbor] = tentativeG;
+				fcost[*neighbor] = gcost[*neighbor] + getHCost(*neighbor, end);
+				if (std::count(openContents.begin(), openContents.end(), *neighbor) == 0)
+				{
+					openContents.push_back(*neighbor);
+					open.push(*neighbor);
+				}
 
 			}
 		}
-
-
 	}
-
-
+	return vector<vec2>();//failure to find a path returns an empty vector
 }

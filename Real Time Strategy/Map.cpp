@@ -5,7 +5,7 @@
 #include "Polygon.hpp"
 #include <array>
 #include "TriangleTree.hpp"
-
+#include <set>
 using namespace glm;
 using namespace std;
 
@@ -70,11 +70,14 @@ Texture makeNavMesh(string filePath)
 
 bool counterClockwise(Triangle t)
 {
-    return (t.points[1].x - t.points[0].x) * (t.points[2].y - t.points[0].y) - (t.points[2].x - t.points[0].x) * (t.points[1].y - t.points[0].y);
+    return (t.points[1].x - t.points[0].x) * (t.points[2].y - t.points[0].y) > (t.points[2].x - t.points[0].x) * (t.points[1].y - t.points[0].y);
 }
 
-vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec2 dims)
+vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec2 dims)//, set<Edge>* forbiddenEdges)
 {
+    //set<Edge>* fedge = new set<Edge>();
+
+
     printf("reading file %s\n", inFilePath.c_str());
     vector<Polygon> shapes;
     tinyxml2::XMLDocument theFile;
@@ -124,19 +127,20 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
             auto t = triangles.begin();
             while (t != triangles.end())
             {
-                int sharedPoints = 0;
+                vector<vec2> sharedPoints;
                 for (vec2 a : p.points)
                 {
                     for (vec2 b : t->points)
                     {
                         if (a == b)
                         {
-                            sharedPoints++;
+                            sharedPoints.push_back(b);
                         }
                     }
                 }
-                if (sharedPoints > 2)
+                if (sharedPoints.size() > 2)
                 {
+                    //push back forbidden edge here
                     triangles.erase(t);
                 }
                 else
