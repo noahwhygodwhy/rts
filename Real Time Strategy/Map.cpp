@@ -5,7 +5,7 @@
 #include "Polygon.hpp"
 #include <array>
 #include "TriangleTree.hpp"
-#include <set>
+#include <unordered_set>
 using namespace glm;
 using namespace std;
 
@@ -73,10 +73,8 @@ bool counterClockwise(Triangle t)
     return (t.points[1].x - t.points[0].x) * (t.points[2].y - t.points[0].y) > (t.points[2].x - t.points[0].x) * (t.points[1].y - t.points[0].y);
 }
 
-vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec2 dims)//, set<Edge>* forbiddenEdges)
+vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec2 dims, unordered_set<Edge>* fedge)
 {
-    //set<Edge>* fedge = new set<Edge>();
-
 
     printf("reading file %s\n", inFilePath.c_str());
     vector<Polygon> shapes;
@@ -141,6 +139,8 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
                 if (sharedPoints.size() > 2)
                 {
                     //push back forbidden edge here
+                    fedge->insert({ sharedPoints[0], sharedPoints[1] });
+                    fedge->insert({ sharedPoints[1], sharedPoints[2] });
                     triangles.erase(t);
                 }
                 else
@@ -174,8 +174,9 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
 
 Map::Map(string path, vec2 dims)
 {
-    vector<Triangle> navMeshTris = generateNavMeshVerts(path + "/navMesh.svg", "outFile.json", dims);
-    //this->navMesh = NavigationMesh(navMeshTris);
+    unordered_set<Edge>* fedges = new unordered_set<Edge>();
+    vector<Triangle> navMeshTris = generateNavMeshVerts(path + "/navMesh.svg", "outFile.json", dims, fedges);
+    this->navMesh = NavMesh(navMeshTris, fedges);
     printf("made triangle tree\n");
     //this->navMesh.getTriangle(vec2(1)).print("Encasing 1,1: ");
 

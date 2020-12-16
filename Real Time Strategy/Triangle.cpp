@@ -234,6 +234,25 @@ int Triangle::contains(vec2 point) const
 }
 
 
+
+
+Edge* Triangle::getAdjacentEdge(const Triangle& other) const
+{
+    for (const Edge& e1 : this->edges)
+    {
+        for (const Edge& e2 : other.edges)
+        {
+            if (e1 == e2)
+            {
+                return new Edge(e1);
+            }
+        }
+    }
+    return 0; //just incase they have no adjacent edge
+}
+
+
+
 bool Triangle::isAdjacent(const Triangle& other) const
 {
     int shared = 0;

@@ -129,6 +129,7 @@ public:
     bool isAdjacent(const Triangle& other) const;
     bool shareAPoint(const Triangle& other) const;
     vec2 closestPoint(const vec2& p) const;
+    Edge* getAdjacentEdge(const Triangle& other) const;
     /*size_t operator()(const Triangle& tri)
     {
         hash<float> fh;

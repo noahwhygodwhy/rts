@@ -3,6 +3,7 @@
 #include <set>
 #include <queue>
 
+
 using namespace std;
 using namespace glm;
 
@@ -33,11 +34,12 @@ unordered_map<Triangle, vector<Triangle*>> constructAdjacencySet(vector<Triangle
 	return toReturn;
 }
 
-NavMesh::NavMesh(vector<Triangle> tris)
+NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge>* fedges)
 {
 	this->tris = tris;
 	this->triTree = TriangleTree(tris);
 	this->adjacencySet = constructAdjacencySet(tris);
+	this->fedges = fedges;
 }
 
 NavMesh::NavMesh()
@@ -84,13 +86,29 @@ vec2 closestCorner(const Triangle& t, const vec2& p)
 
 
 
-float getGCost(const Triangle& curr, const Triangle& neighbor, vec2* closestPoint)
+float getGCost(const Triangle& parent, const Triangle& tri, vec2* closestPoint, vec2 end, vec2 start, const unordered_map<Triangle, float>& gcost)
 {
+
+	float g1 = 0.0f;//TODO: distance between startand nearest point on ENTRY EDGE(? ) of curr
+	float g2 = distance(start, end) - getHCost(tri, end);//distance(start, end) - curr.hcost
+	float g3 = gcost.at(parent) + (getHCost(parent, end) - getHCost(tri, end));//parent.gcost + (parent.h - curr.h)
+	float g4 = gcost.at(parent);//parent.gcost + (nearest point on parent entry edge, and nearest point of curr)//ooh this one seems good
+
+
+
+
+
+	return std::max(std::max(g1, g2), std::max(g3, g4));
+
 	//TODO:
+	//distance between startand nearest point on ENTRY EDGE(? ) of curr
+	//distance(start, end) - curr.hcost
+	//parent.gcost + (parent.h - curr.h)
+	//parent.gcost + (nearest point on parent entry edge, and nearest point of curr)//ooh this one seems good
 }
-float getHCost(const Triangle& curr, vec2 end)
+float getHCost(const Triangle& tri, vec2 end)
 {
-	return distance(curr.closestPoint(end), end);
+	return distance(tri.closestPoint(end), end);
 }
 
 bool counterClockwise(vec2 a, vec2 b, vec2 c)
@@ -101,8 +119,13 @@ bool counterClockwise(vec2 a, vec2 b, vec2 c)
 //does not account for colinear lines, but we don't care
 bool linesIntersect(vec2 a, vec2 b, vec2 c, vec2 d)
 {
+	if (a == c || a == d || b == c || b == d) //cause we're ok with tips touching
+	{
+		return false;
+	}
 	return counterClockwise(a, c, d) != counterClockwise(b, c, d) && counterClockwise(a, b, c) != counterClockwise(a, b, d);
 }
+
 
 
 vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
@@ -145,15 +168,16 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 		openContents.erase(find(openContents.begin(), openContents.end(), curr));
 		if (curr == endTri)
 		{
+
 			//return reconstruct(start, end, cameFrom);//todo:
 		}
 		for (Triangle* neighbor : this->adjacencySet[curr])
 		{
-			vec2 pointOnNeighbor;
-			float tentativeG = gcost[curr] + getGCost(curr, *neighbor, &pointOnNeighbor);
+			vec2 pointOnNeighbor; //TODO: need to calculate this
+			float tentativeG = gcost[curr] + getGCost(curr, *neighbor, &pointOnNeighbor, start, end, gcost);
 			if (tentativeG < gcost[*neighbor])
 			{
-				cameFrom[pointOnNeighbor] = curr.geoCenter; //maybe not right
+				cameFrom[pointOnNeighbor] = curr.geoCenter; //~~maybe~~definetly not right
 				gcost[*neighbor] = tentativeG;
 				fcost[*neighbor] = gcost[*neighbor] + getHCost(*neighbor, end);
 				if (std::count(openContents.begin(), openContents.end(), *neighbor) == 0)
