@@ -146,6 +146,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityControllers.hpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="GlobalContext.cpp" />
     <ClCompile Include="GLSLReader.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="NavMesh.cpp" />

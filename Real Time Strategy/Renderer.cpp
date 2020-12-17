@@ -86,7 +86,7 @@ static void mouseButtCallback(GLFWwindow* window, int button, int action, int mo
 {
 	Renderer* r = (Renderer*)glfwGetWindowUserPointer(window);
 	vec2 mousePos = calculateMousePos(window);
-
+	
 	if (button == GLFW_MOUSE_BUTTON_RIGHT)
 	{
 		if (action == GLFW_RELEASE)
@@ -139,7 +139,6 @@ static void mouseButtCallback(GLFWwindow* window, int button, int action, int mo
 		}
 	}
 
-	//divide position by true window dimension, and multiply it by the range visible, then add the min of the range visible
 }
 static void scrollCallback(GLFWwindow* window, double xoff, double yoff)
 {
@@ -247,6 +246,7 @@ void drawPath(const Shader& shader, vector<vec2> path)
 void Renderer::run()
 {
 	this->projMat = ortho(0.0f, screenX, screenY, 0.0f, -1.0f, 1.0f);
+	printf("number of things: %i\n", GLBL::things.size());
 	while (!glfwWindowShouldClose(this->window))
 	{
 
@@ -258,12 +258,12 @@ void Renderer::run()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		if (currentFrame > lastSecond + 1)
+		/*if (currentFrame > lastSecond + 1)
 		{
 			lastSecond = currentFrame;
 			vector<vec2> path = GLBL::map.getPath(vec2(1), mousePos);
 			drawPath(shader, path);
-		}
+		}*/
 		processInput(this->window, deltaTime);
 
 		shader.use();
@@ -282,12 +282,12 @@ void Renderer::run()
 		}
 
 		GLBL::map.draw(shader);
-
+		/*
 		if (GLBL::sb.active)
 		{
 			GLBL::sb.draw(shader);
 			GLBL::sb.tick(GLBL::things, mousePos);
-		}
+		}*/
 
 
 
@@ -319,6 +319,7 @@ Texture makeTexture(string filepath)
 	{
 		int width, height, nrChannels;
 		unsigned char* data = imageToBytes(filepath, &width, &height, &nrChannels);
+
 
 		unsigned int texture;
 		//printf("%p\n", &texture);

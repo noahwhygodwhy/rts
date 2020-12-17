@@ -82,6 +82,9 @@ void SelectionBox::draw(Shader& shader)
     glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
 
 
+
+
+
     glBindTexture(GL_TEXTURE_2D, textures[this->textureState]->at(this->textureAnimationStep / SELECTION_ANIMATION_SLOWDOWN_FACTOR).id);
 
     shader.setMatFour("transform", transform);

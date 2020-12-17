@@ -4,6 +4,8 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "Triangle.hpp"
+#include "Shader.hpp"
+#include "UsefulStructs.hpp"
 
 using namespace std;
 using namespace glm;
@@ -48,12 +50,17 @@ struct axisNodeBranch : axisNode
 class TriangleTree
 {
 public:
-	TriangleTree(vector<Triangle> tIn);
+	TriangleTree(vector<Triangle> tIn, int width = 0, int height = 0);
 	TriangleTree();
 	~TriangleTree();
 	Triangle getTriangle(vec2 p);
+	void setupBuffers(int width, int height);
+	void draw(const Shader& shader);
+
 private:
 	axisNode* head;
+	unsigned int VAO;
+	vector<Vertex> vertices;
 
 };
 

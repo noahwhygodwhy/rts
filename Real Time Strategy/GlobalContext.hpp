@@ -9,13 +9,13 @@
 using namespace std;
 using namespace glm;
 
-//EVERYTHING must be static
 namespace GLBL
 {
-	static Map map;
-	static SelectionBox sb;
-	static vector<Entity*> things;
-	static unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap;
+	extern Map map;
+	extern SelectionBox sb;
+	extern vector<Entity*> things;
+	extern unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> entityTextureMapMap;
+
 }
 
-#endif;
+#endif

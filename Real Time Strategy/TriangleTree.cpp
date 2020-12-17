@@ -1,6 +1,10 @@
 #include "TriangleTree.hpp"
 #include <set>
 #include "Triangle.hpp"
+#include "Shader.hpp"
+#include "UsefulStructs.hpp"
+#include "glad.h"
+#include <glm/glm.hpp>
 
 using namespace glm;
 using namespace std;
@@ -41,12 +45,14 @@ axisNode* constructTree(const vector<Triangle>& tris, set<float> xCoords, set<fl
 	{
 		axisNodeLeaf* a = new axisNodeLeaf;
 		a->value = *greaterTris;
+		a->leaf = true;
 		return a;
 	}
 	if (greaterTris->size() == 0)
 	{
 		axisNodeLeaf* a = new axisNodeLeaf;
 		a->value = *lesserTris;
+		a->leaf = true;
 		return a;
 	}
 	axisNodeBranch* toReturn = new axisNodeBranch;
@@ -91,10 +97,11 @@ axisNode* constructTree(const vector<Triangle>& tris, set<float> xCoords, set<fl
 
 
 
-TriangleTree::TriangleTree(vector<Triangle> tIn)
+TriangleTree::TriangleTree(vector<Triangle> tIn, int width, int height)
 {
 	set<float> xcoords;
 	set<float> ycoords;
+
 	for (Triangle t : tIn)
 	{
 		for (vec2 p : t.points)
@@ -104,6 +111,7 @@ TriangleTree::TriangleTree(vector<Triangle> tIn)
 		}
 	}
 	this->head = constructTree(tIn, xcoords, ycoords, true);
+	setupBuffers(width, height);
 }
 TriangleTree::TriangleTree()
 {
@@ -117,13 +125,15 @@ TriangleTree::~TriangleTree()
 
 Triangle TriangleTree::getTriangle(vec2 p)
 {
+	printf("getting triangle for point %f,%f\n", p.x, p.y);
 	axisNode* curr = this->head;
 	float coord = 0;
 	while (!curr->leaf)
 	{
-
 		axisNodeBranch* actualCurr = (axisNodeBranch*)curr;
+		printf("On axis: %s\n", actualCurr->x ? "x" : "y");
 		float coord = actualCurr->x ? p.x : p.y;
+		printf("distinguishing on %f\n", actualCurr->coord);
 		curr = (axisNode*)((coord > actualCurr->coord )? actualCurr->more : actualCurr->less);
 	}
 	vector<Triangle> tris = ((axisNodeLeaf*)curr)->value;
@@ -135,4 +145,69 @@ Triangle TriangleTree::getTriangle(vec2 p)
 		}
 	}
 	return { vec2(0), vec2(0), vec2(0) };
+}
+
+
+
+vector<Vertex> makeVerts(axisNode* node, int width, int height)
+{
+	vector<Vertex> vertices;
+	//axisNode* node = this->head;
+	float coord = 0;
+	if (!node->leaf)
+	{
+		axisNodeBranch* actualCurr = (axisNodeBranch*)node;
+		if (actualCurr->x)
+		{
+			vertices.push_back({ vec2(actualCurr->coord, 0), vec2(0)});
+			vertices.push_back({ vec2(actualCurr->coord, height), vec2(0) });
+		}
+		else
+		{
+			vertices.push_back({ vec2(0, actualCurr->coord), vec2(0) });
+			vertices.push_back({ vec2(width, actualCurr->coord), vec2(0) });
+		}
+		vector<Vertex> more = makeVerts(actualCurr->more, width, height);
+		vector<Vertex> less = makeVerts(actualCurr->more, width, height);
+		vertices.insert(vertices.end(), more.begin(), more.end());
+		vertices.insert(vertices.end(), less.begin(), less.end());
+	}
+	return vertices;
+}
+
+
+
+void TriangleTree::setupBuffers(int width, int height)
+{
+
+	vector<Vertex> vertices = makeVerts(this->head, width, height);
+
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+	glBindVertexArray(0);
+}
+
+void TriangleTree::draw(const Shader& shader)
+{
+
+
+
+	shader.setBool("outline", false);
+	shader.setBool("ignoreAlpha", true);
+	shader.setVecThree("tintRatio", vec3(1.0f, 1.0f, 1.0f));
+	shader.setVecThree("tint", vec3(1.0f, 0.0f, 0.0f));
+
+	shader.setMatFour("transform", mat4(1));
+	glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_LINES, 0, vertices.size());
+
 }

@@ -2,6 +2,8 @@
 #include <unordered_map>
 #include <set>
 #include <queue>
+#include "glad.h"
+#include <glm/glm.hpp>
 
 
 using namespace std;
@@ -34,12 +36,13 @@ unordered_map<Triangle, vector<Triangle*>> constructAdjacencySet(vector<Triangle
 	return toReturn;
 }
 
-NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges)
+NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, int width, int height)
 {
 	this->tris = tris;
 	this->triTree = TriangleTree(tris);
 	this->adjacencySet = constructAdjacencySet(tris);
 	this->fedges = fedges;
+	setupBuffers();
 }
 
 NavMesh::NavMesh()
@@ -207,4 +210,54 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 		}
 	}
 	return vector<vec2>();//failure to find a path returns an empty vector
+}
+
+vector<Vertex> trisToLineVerts(const vector<Triangle>& tris)
+{
+	vector<Vertex> verts;
+	for (const Triangle& t : tris)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			verts.push_back({ t.points[i], vec2(0) });
+			verts.push_back({ t.points[(i+1)%3], vec2(0) });
+		}
+	}
+	return verts;
+}
+
+
+void NavMesh::setupBuffers()
+{
+	this->vertices = trisToLineVerts(this->tris);
+
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+
+	printf("here4\n");
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+	glBindVertexArray(0);
+}
+
+void NavMesh::draw(const Shader& shader)
+{
+
+
+	shader.setBool("outline", false);
+	shader.setBool("ignoreAlpha", true);
+	shader.setVecThree("tintRatio", vec3(1.0f, 1.0f, 1.0f));
+	shader.setVecThree("tint", vec3(0.0f, 1.0f, 0.0f));
+
+	shader.setMatFour("transform", mat4(1));
+	glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_LINES, 0, this->vertices.size());
+
+
+	this->triTree.draw(shader, width, height);
 }

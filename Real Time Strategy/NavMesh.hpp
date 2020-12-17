@@ -7,6 +7,8 @@
 #include "Triangle.hpp"
 #include <unordered_map>
 #include <unordered_set>
+#include "Shader.hpp"
+#include "UsefulStructs.hpp"
 
 using namespace std;
 using namespace glm;
@@ -84,16 +86,19 @@ class NavMesh
 {
 public:
 	NavMesh();
-	NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges);
+    NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, int width = 0, int height = 0);
 	~NavMesh();
 	vector<vec2> getPath(vec2 start, vec2 end);
-
+    void draw(const Shader& shader);
+    
 private:
-
+    void setupBuffers();
+    unsigned int VAO;
 	vector<Triangle> tris;
 	TriangleTree triTree;
 	unordered_map<Triangle, vector<Triangle*>> adjacencySet;
     unordered_set<Edge> fedges;
+    vector<Vertex> vertices;
 };
 
 

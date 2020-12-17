@@ -174,14 +174,16 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
 
 Map::Map(string path, vec2 dims)
 {
+    printf("path: %s\n", path.c_str());
     unordered_set<Edge> fedges = unordered_set<Edge>();
-    vector<Triangle> navMeshTris = generateNavMeshVerts(path + "/navMesh.svg", "outFile.json", dims, &fedges);
-    this->navMesh = NavMesh(navMeshTris, fedges);
+    vector<Triangle> navMeshTris = generateNavMeshVerts(path + "navMesh.svg", "outFile.json", dims, &fedges);
+    this->navMesh = NavMesh(navMeshTris, fedges, dims.x, dims.y);
     printf("made triangle tree\n");
     //this->navMesh.getTriangle(vec2(1)).print("Encasing 1,1: ");
 
     this->dims = dims;
-    this->texture = makeTexture(path + "/mapImage.png");
+    this->texture = makeTexture(path + "mapImage.png");
+
     this->vertices = {
         {vec2(0, 0), vec2(0, 0)},   //bottom left
         {vec2(dims.x, 0), vec2(1, 0)},  //bottom right
@@ -218,18 +220,23 @@ void Map::draw(Shader& shader)
 
     shader.setBool("ignoreAlpha", false);
     shader.setVecThree("tintRatio", vec3(0.0f));
-    //float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-    //float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-    //float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
     shader.setVecThree("tint", vec3(1.0f));
     shader.setMatFour("transform", mat4(1.0f));
 
     glBindVertexArray(this->VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
 
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     //glDrawArrays(GL_LINES, 0, vertices.size());
 
     glBindVertexArray(0);
+
+
+
+    //TODO:
+    this->navMesh.draw(shader);
 }
 
 void Map::setupBuffer()
@@ -244,6 +251,7 @@ void Map::setupBuffer()
 
     glBindVertexArray(this->VAO);
     glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+
 
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 

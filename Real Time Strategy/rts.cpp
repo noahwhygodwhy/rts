@@ -75,17 +75,15 @@ int main(void)
 	printf("###initialized, adding things\n");
 	GLBL::entityTextureMapMap = getEntityTextures(".\\resources\\entityTextures");
 
-	GLBL::things.push_back(new Entity(vec2(120,240), vec2(120, 240), 15, Controller(), GLBL::entityTextureMapMap["basicEntity"]));
+	/*GLBL::things.push_back(new Entity(vec2(120,240), vec2(120, 240), 15, Controller(), GLBL::entityTextureMapMap["basicEntity"]));
 
-	/*for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		for (int j = 0; j < 5; j++)
 		{
-			Entity* e = new Entity(vec2(i*40, j*80), vec2(40, 80), 15, Controller(), entityTextureMapMap["basicEntity"]);
-			r.addEntity(e);
+			GLBL::things.push_back(new Entity(vec2(i*40, j*80), vec2(40, 80), 15, Controller(), GLBL::entityTextureMapMap["basicEntity"]));
 		}
 	}*/
-
 	GLBL::map = Map(".\\resources\\maps\\map1\\", vec2(8000, 8000)); //TODO: need to scale the triangularization from image size to given dims
 	GLBL::sb = SelectionBox(GLBL::entityTextureMapMap["selection"]);
 
