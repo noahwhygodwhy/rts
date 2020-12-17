@@ -116,6 +116,7 @@ TriangleTree::TriangleTree(vector<Triangle> tIn, int width, int height)
 TriangleTree::TriangleTree()
 {
 	this->head = new axisNode;
+	this->head->leaf = true;
 }
 
 TriangleTree::~TriangleTree()
@@ -180,11 +181,21 @@ vector<Vertex> makeVerts(axisNode* node, int width, int height)
 void TriangleTree::setupBuffers(int width, int height)
 {
 
-	vector<Vertex> vertices = makeVerts(this->head, width, height);
+	this->vertices = makeVerts(this->head, width, height);//returning 0 vertices lol
 
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	printf("there are %i vertices in the triangle tree\n", this->vertices.size());
+	for (Vertex v : this->vertices)
+	{
+		printf("%f, %f\n", v.position.x, v.position.y);
+	}
+
+
+	glGenVertexArrays(1, &this->VAO);
+	glGenBuffers(1, &this->VBO);//why bad tho
+
+	glBindVertexArray(this->VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
@@ -199,6 +210,7 @@ void TriangleTree::draw(const Shader& shader)
 {
 
 
+	glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
 
 	shader.setBool("outline", false);
 	shader.setBool("ignoreAlpha", true);
@@ -206,8 +218,10 @@ void TriangleTree::draw(const Shader& shader)
 	shader.setVecThree("tint", vec3(1.0f, 0.0f, 0.0f));
 
 	shader.setMatFour("transform", mat4(1));
-	glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
-	glBindVertexArray(VAO);
-	glDrawArrays(GL_LINES, 0, vertices.size());
 
+	glBindVertexArray(this->VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+	glDrawArrays(GL_LINES, 0, this->vertices.size());
+
+	glBindVertexArray(0);
 }

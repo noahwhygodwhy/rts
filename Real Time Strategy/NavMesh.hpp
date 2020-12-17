@@ -93,7 +93,7 @@ public:
     
 private:
     void setupBuffers();
-    unsigned int VAO;
+    unsigned int VBO, VAO;
 	vector<Triangle> tris;
 	TriangleTree triTree;
 	unordered_map<Triangle, vector<Triangle*>> adjacencySet;

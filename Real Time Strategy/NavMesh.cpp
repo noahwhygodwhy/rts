@@ -4,7 +4,7 @@
 #include <queue>
 #include "glad.h"
 #include <glm/glm.hpp>
-
+#include <glm/gtc/matrix_transform.hpp>
 
 using namespace std;
 using namespace glm;
@@ -47,6 +47,11 @@ NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, int width, i
 
 NavMesh::NavMesh()
 {
+	this->tris = vector<Triangle>();
+	this->triTree = TriangleTree(this->tris);
+	this->adjacencySet = constructAdjacencySet(this->tris);
+	this->fedges = unordered_set<Edge>();
+	//setupBuffers();
 }
 
 NavMesh::~NavMesh()
@@ -231,33 +236,45 @@ void NavMesh::setupBuffers()
 {
 	this->vertices = trisToLineVerts(this->tris);
 
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	/*for (Vertex v : this->vertices)
+	{
+		printf("%f, %f\n", v.position.x, v.position.y);
+	}
+
+	printf("nav mesh buffering %i vertices\n", vertices.size());*/
+
+	glGenVertexArrays(1, &this->VAO);
+	glGenBuffers(1, &this->VBO);
+
+	glBindVertexArray(this->VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
-	printf("here4\n");
-	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
 }
 
 void NavMesh::draw(const Shader& shader)
 {
+	this->triTree.draw(shader);
 
+	glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
 
 	shader.setBool("outline", false);
 	shader.setBool("ignoreAlpha", true);
-	shader.setVecThree("tintRatio", vec3(1.0f, 1.0f, 1.0f));
-	shader.setVecThree("tint", vec3(0.0f, 1.0f, 0.0f));
+	shader.setVecThree("tintRatio", vec3(1.0f));
+	shader.setVecThree("tint", vec3(1.0f, 0.0f, 1.0f));
 
 	shader.setMatFour("transform", mat4(1));
-	glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
-	glBindVertexArray(VAO);
+
+	glBindVertexArray(this->VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
 	glDrawArrays(GL_LINES, 0, this->vertices.size());
 
-
-	this->triTree.draw(shader, width, height);
+	glBindVertexArray(0);
 }

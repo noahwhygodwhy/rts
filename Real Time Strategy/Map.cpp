@@ -209,6 +209,9 @@ vector<vec2> Map::getPath(vec2 start, vec2 end)
 
 void Map::draw(Shader& shader)
 {
+    this->navMesh.draw(shader);
+
+
     glActiveTexture(GL_TEXTURE0);
 
     glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
@@ -236,7 +239,6 @@ void Map::draw(Shader& shader)
 
 
     //TODO:
-    this->navMesh.draw(shader);
 }
 
 void Map::setupBuffer()

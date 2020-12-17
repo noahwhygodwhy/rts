@@ -59,7 +59,7 @@ public:
 
 private:
 	axisNode* head;
-	unsigned int VAO;
+	unsigned int VAO, VBO;
 	vector<Vertex> vertices;
 
 };

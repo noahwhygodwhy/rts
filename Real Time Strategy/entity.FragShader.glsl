@@ -63,7 +63,7 @@ void main()
         }
     
     }
-    if (color.a == 0)
+    if (color.a == 0 && localTint != vec3(1))
     {
         
         discard;
@@ -78,5 +78,6 @@ void main()
     }
 
     FragColor = color;
+    //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }
 
