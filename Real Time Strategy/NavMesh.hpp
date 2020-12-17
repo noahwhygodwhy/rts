@@ -84,7 +84,7 @@ class NavMesh
 {
 public:
 	NavMesh();
-	NavMesh(vector<Triangle> tris, unordered_set<Edge>* fedges);
+	NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges);
 	~NavMesh();
 	vector<vec2> getPath(vec2 start, vec2 end);
 
@@ -93,7 +93,7 @@ private:
 	vector<Triangle> tris;
 	TriangleTree triTree;
 	unordered_map<Triangle, vector<Triangle*>> adjacencySet;
-    unordered_set<Edge>* fedges;
+    unordered_set<Edge> fedges;
 };
 
 

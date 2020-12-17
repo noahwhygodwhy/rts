@@ -34,7 +34,7 @@ unordered_map<Triangle, vector<Triangle*>> constructAdjacencySet(vector<Triangle
 	return toReturn;
 }
 
-NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge>* fedges)
+NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges)
 {
 	this->tris = tris;
 	this->triTree = TriangleTree(tris);
@@ -84,9 +84,13 @@ vec2 closestCorner(const Triangle& t, const vec2& p)
 }
 
 
+float getHCost(const Triangle& tri, vec2 end)
+{
+	return distance(tri.closestPoint(end), end);
+}
 
 
-float getGCost(const Triangle& parent, const Triangle& tri, vec2* closestPoint, vec2 end, vec2 start, const unordered_map<Triangle, float>& gcost)
+float getGCost(const Triangle& parent, const Triangle& tri, vec2 end, vec2 start, const unordered_map<Triangle, float>& gcost)
 {
 
 	float g1 = 0.0f;//TODO: distance between startand nearest point on ENTRY EDGE(? ) of curr
@@ -106,10 +110,6 @@ float getGCost(const Triangle& parent, const Triangle& tri, vec2* closestPoint, 
 	//parent.gcost + (parent.h - curr.h)
 	//parent.gcost + (nearest point on parent entry edge, and nearest point of curr)//ooh this one seems good
 }
-float getHCost(const Triangle& tri, vec2 end)
-{
-	return distance(tri.closestPoint(end), end);
-}
 
 bool counterClockwise(vec2 a, vec2 b, vec2 c)
 {
@@ -127,6 +127,23 @@ bool linesIntersect(vec2 a, vec2 b, vec2 c, vec2 d)
 }
 
 
+
+vector<vec2> reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec2>& cameFrom, const unordered_set<Edge>& fedges)
+{
+	vector<vec2> nodes;
+	try
+	{
+		vec2 curr = cameFrom.at(end);
+		while (true)
+		{
+			nodes.push_back(curr);
+		}
+	}
+	catch (exception e)
+	{
+	}
+	return nodes;
+}
 
 vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 {
@@ -168,16 +185,16 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 		openContents.erase(find(openContents.begin(), openContents.end(), curr));
 		if (curr == endTri)
 		{
-
+			return reconstructPath(start, end, cameFrom, fedges);
 			//return reconstruct(start, end, cameFrom);//todo:
 		}
 		for (Triangle* neighbor : this->adjacencySet[curr])
 		{
-			vec2 pointOnNeighbor; //TODO: need to calculate this
-			float tentativeG = gcost[curr] + getGCost(curr, *neighbor, &pointOnNeighbor, start, end, gcost);
+			vec2 cameFromPoint = curr.geoCenter; //TODO: need to calculate this https://raygun.com/blog/game-development-triangulated-spaces-part-2/
+			float tentativeG = gcost[curr] + getGCost(curr, *neighbor, start, end, gcost);
 			if (tentativeG < gcost[*neighbor])
 			{
-				cameFrom[pointOnNeighbor] = curr.geoCenter; //~~maybe~~definetly not right
+				cameFrom[cameFromPoint] = curr.geoCenter; //~~maybe~~definetly not right
 				gcost[*neighbor] = tentativeG;
 				fcost[*neighbor] = gcost[*neighbor] + getHCost(*neighbor, end);
 				if (std::count(openContents.begin(), openContents.end(), *neighbor) == 0)

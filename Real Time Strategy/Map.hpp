@@ -20,7 +20,7 @@ public:
 	Map(string path, vec2 dims);
 	Map() {}
 	void draw(Shader& shader);
-
+	vector<vec2> getPath(vec2 start, vec2 end);
 	vec2 dims;
 	~Map();
 private:

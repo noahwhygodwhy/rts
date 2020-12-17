@@ -67,49 +67,6 @@ unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEnt
 int main(void)
 {
 
-
-	unordered_set<Edge>* fedge = new unordered_set<Edge>();
-	fedge->insert({ vec2(0, 0), vec2(5, 1) });
-
-	exit(0);
-
-	priority_queue<int, vector<int>, greater<int>> open;
-	
-	for (int i = 0; i < 20; i++)
-	{
-		open.push(rand() % 20);
-	}
-	while (!open.empty())
-	{
-		cout << open.top() << endl;
-		open.pop();
-	}
-	//NavigationMesh m();
-	exit(0);
-
-	/*float* f = new float();
-	*f = 5;
-	printf("f: %f\n", *f);
-
-	printf("f: %p\n", f);
-	void* x = (void*)f;
-
-	printf("x: %p\n", x);
-	//Triangle* t = 
-	Triangle* t = static_cast<Triangle*>(x);
-	printf("t: %p\n", t);
-	printf("%f\n", t->points[0].x);
-	printf("%f\n", t->points[0].y);
-	
-	exit(0);*/
-
-
-	//Triangle t = { vec2(15,55), vec2(1732,55), vec2(809,769) };
-	//vec2 center = getCenter(t);
-	//printf("center: %f, %f\n", center.x, center.y);
-	//exit(0);
-
-
 	printf("###starting\n");
 	Renderer r = Renderer(1920, 1080);
 	printf("###initializing\n");

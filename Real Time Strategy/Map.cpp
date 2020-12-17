@@ -174,8 +174,8 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
 
 Map::Map(string path, vec2 dims)
 {
-    unordered_set<Edge>* fedges = new unordered_set<Edge>();
-    vector<Triangle> navMeshTris = generateNavMeshVerts(path + "/navMesh.svg", "outFile.json", dims, fedges);
+    unordered_set<Edge> fedges = unordered_set<Edge>();
+    vector<Triangle> navMeshTris = generateNavMeshVerts(path + "/navMesh.svg", "outFile.json", dims, &fedges);
     this->navMesh = NavMesh(navMeshTris, fedges);
     printf("made triangle tree\n");
     //this->navMesh.getTriangle(vec2(1)).print("Encasing 1,1: ");
@@ -199,6 +199,11 @@ Map::~Map()
 
 }
 
+
+vector<vec2> Map::getPath(vec2 start, vec2 end)
+{
+    return this->navMesh.getPath(start, end);
+}
 
 void Map::draw(Shader& shader)
 {

@@ -17,6 +17,9 @@ static unordered_map<string, unsigned int> loadedTextures;
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
 
+int lastSecond = 0;
+vec2 toPoint = vec2(0, 0);
+
 float mouseTime;
 
 Renderer::Renderer(int x, int y)
@@ -205,6 +208,42 @@ bool Renderer::initialize()
 
 	return true;
 }
+
+
+
+void drawPath(const Shader& shader, vector<vec2> path)
+{
+	vector<Vertex> vertices;
+	for (int i = 0; i < path.size() - 1; i++)
+	{
+		vertices.push_back({ path[i], vec2(0) });
+		vertices.push_back({ path[i+1], vec2(0) });
+	}
+
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+	shader.setBool("outline", false);
+	shader.setBool("ignoreAlpha", true);
+	shader.setVecThree("tintRatio", vec3(1.0f, 1.0f, 1.0f));
+	shader.setVecThree("tint", vec3(1.0f, 0.0f, 0.0f));
+
+	shader.setMatFour("transform", mat4(1));
+	glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_LINES, 0, vertices.size());
+
+}
+
+
+
 void Renderer::run()
 {
 	this->projMat = ortho(0.0f, screenX, screenY, 0.0f, -1.0f, 1.0f);
@@ -219,6 +258,12 @@ void Renderer::run()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		if (currentFrame > lastSecond + 1)
+		{
+			lastSecond = currentFrame;
+			vector<vec2> path = GLBL::map.getPath(vec2(1), mousePos);
+			drawPath(shader, path);
+		}
 		processInput(this->window, deltaTime);
 
 		shader.use();
