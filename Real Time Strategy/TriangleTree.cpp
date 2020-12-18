@@ -36,20 +36,22 @@ axisNode* constructTree(const vector<Triangle>& tris, set<float> xCoords, set<fl
 			greaterTris->push_back(t);
 		}
 	}
-	if (lesserTris->size() == 0)
+
+
+	if (lesserTris->size() == 0 || greaterTris->size() == 0)
 	{
+		set<float> newXCoords = xCoords;
+		set<float> newYCoords = yCoords;
+		if (x)
+		{
+			newXCoords.erase(std::find(newXCoords.begin(), newXCoords.end(), coord));
+		}
+		else
+		{
+			newYCoords.erase(std::find(newYCoords.begin(), newYCoords.end(), coord));
+		}
+		return constructTree(tris, newXCoords, newYCoords, x);
 		//todo: return a construct a tree without that xcoord, also the not empty case needs to remove the used up coord too
-		axisNodeLeaf* a = new axisNodeLeaf;
-		a->value = *greaterTris;
-		a->leaf = true;
-		return a;
-	}
-	if (greaterTris->size() == 0)
-	{
-		axisNodeLeaf* a = new axisNodeLeaf;
-		a->value = *lesserTris;
-		a->leaf = true;
-		return a;
 	}
 	axisNodeBranch* toReturn = new axisNodeBranch;
 	toReturn->leaf = false;
@@ -60,13 +62,16 @@ axisNode* constructTree(const vector<Triangle>& tris, set<float> xCoords, set<fl
 	{
 		for (float f : xCoords)
 		{
-			if (f > coord)
+			if (f != coord)
 			{
-				greaterCoords.insert(f);
-			}
-			else
-			{
-				lesserCoords.insert(f);
+				if (f > coord)
+				{
+					greaterCoords.insert(f);
+				}
+				else
+				{
+					lesserCoords.insert(f);
+				}
 			}
 		}
 		toReturn->more = constructTree(*greaterTris, greaterCoords, yCoords, !x);
@@ -76,13 +81,16 @@ axisNode* constructTree(const vector<Triangle>& tris, set<float> xCoords, set<fl
 	{
 		for (float f : yCoords)
 		{
-			if (f > coord)
+			if (f != coord)
 			{
-				greaterCoords.insert(f);
-			}
-			else
-			{
-				lesserCoords.insert(f);
+				if (f > coord)
+				{
+					greaterCoords.insert(f);
+				}
+				else
+				{
+					lesserCoords.insert(f);
+				}
 			}
 		}
 		toReturn->more = constructTree(*greaterTris, xCoords, greaterCoords, !x);
