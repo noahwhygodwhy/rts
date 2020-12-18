@@ -38,7 +38,6 @@ axisNode* constructTree(const vector<Triangle>& tris, set<float> xCoords, set<fl
 	}
 	if (lesserTris->size() == 0)
 	{
-		//todo: return a construct a tree without that xcoord, also the not empty case needs to remove the used up coord too
 		axisNodeLeaf* a = new axisNodeLeaf;
 		a->value = *greaterTris;
 		a->leaf = true;

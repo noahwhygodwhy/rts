@@ -48,7 +48,7 @@ NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, int width, i
 NavMesh::NavMesh()
 {
 	this->tris = vector<Triangle>();
-	this->triTree = TriangleTree(this->tris);
+	this->triTree = TriangleTree();
 	this->adjacencySet = constructAdjacencySet(this->tris);
 	this->fedges = unordered_set<Edge>();
 	//setupBuffers();
