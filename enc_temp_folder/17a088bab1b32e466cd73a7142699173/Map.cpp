@@ -231,7 +231,7 @@ void Map::draw(Shader& shader)
     glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
 
-    //glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     //glDrawArrays(GL_LINES, 0, vertices.size());
 
     glBindVertexArray(0);

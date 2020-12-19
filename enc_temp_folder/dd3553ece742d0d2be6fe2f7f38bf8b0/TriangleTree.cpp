@@ -24,9 +24,9 @@ axisNode* constructTree(const vector<Triangle>& tris, unordered_set<float> xCoor
 {
 
 
-	//printf("tris: %i\n", tris.size());
-	//printf("construct tree layer %i\n", layer);
-	/*printf("xcoords(%i): ", xCoords.size());
+	printf("tris: %i\n", tris.size());
+	printf("construct tree layer %i\n", layer);
+	printf("xcoords(%i): ", xCoords.size());
 	for (float f : xCoords)
 	{
 		printf("%f, ", f);
@@ -37,7 +37,7 @@ axisNode* constructTree(const vector<Triangle>& tris, unordered_set<float> xCoor
 	{
 		printf("%f, ", f);
 	}
-	printf("\n");*/
+	printf("\n");
 	vector<Triangle>* lesserTris = new vector<Triangle>();
 	vector<Triangle>* greaterTris = new vector<Triangle>();
 
@@ -63,9 +63,9 @@ axisNode* constructTree(const vector<Triangle>& tris, unordered_set<float> xCoor
 
 
 	float coord = x ? *xCoords.begin() : *yCoords.begin();
-	//printf("xcoords: %i\n", xCoords.size());
-	//printf("ycoords: %i\n", yCoords.size());
-	//printf("coord is %f%s\n", coord, x ? "x" : "y");
+	printf("xcoords: %i\n", xCoords.size());
+	printf("ycoords: %i\n", yCoords.size());
+	printf("coord is %f%s\n", coord, x ? "x" : "y");
 
 	for (const Triangle& t : tris)
 	{
@@ -83,7 +83,7 @@ axisNode* constructTree(const vector<Triangle>& tris, unordered_set<float> xCoor
 
 	if (lesserTris->size() == 0 && greaterTris->size() == 0)
 	{
-		//printf("both empty");
+		printf("both empty");
 		axisNodeLeaf* toReturn = new axisNodeLeaf;
 		toReturn->leaf = true;
 		toReturn->value = tris;
@@ -92,7 +92,7 @@ axisNode* constructTree(const vector<Triangle>& tris, unordered_set<float> xCoor
 
 	if (lesserTris->size() == 0 || greaterTris->size() == 0)
 	{
-		//printf("coord doesn't distinguish\n");
+		printf("coord doesn't distinguish\n");
 		unordered_set<float> newXCoords = xCoords;
 		unordered_set<float> newYCoords = yCoords;
 		if (x)

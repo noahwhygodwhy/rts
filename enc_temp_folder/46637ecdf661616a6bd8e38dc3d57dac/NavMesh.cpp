@@ -274,7 +274,7 @@ void NavMesh::draw(const Shader& shader)
 
 	glBindVertexArray(this->VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-	//glDrawArrays(GL_LINES, 0, this->vertices.size());
+	glDrawArrays(GL_LINES, 0, this->vertices.size());
 
 	glBindVertexArray(0);
 }
