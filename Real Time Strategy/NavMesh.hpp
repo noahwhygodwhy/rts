@@ -96,7 +96,7 @@ private:
     unsigned int VBO, VAO;
 	vector<Triangle> tris;
 	TriangleTree triTree;
-	unordered_map<Triangle, vector<Triangle*>> adjacencySet;
+	unordered_map<Triangle, vector<Triangle>> adjacencySet;
     unordered_set<Edge> fedges;
     vector<Vertex> vertices;
 };

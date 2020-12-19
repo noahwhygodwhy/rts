@@ -14,20 +14,20 @@ using namespace glm;
 
 
 
-unordered_map<Triangle, vector<Triangle*>> constructAdjacencySet(vector<Triangle> tris)
+unordered_map<Triangle, vector<Triangle>> constructAdjacencySet(vector<Triangle> tris)
 {
-	unordered_map<Triangle, vector<Triangle*>> toReturn;
+	unordered_map<Triangle, vector<Triangle>> toReturn;
 	for (const Triangle& t : tris)
 	{
 		t.print("finding adjancet tris for ");
-		vector<Triangle*> adjacentTris;
+		vector<Triangle> adjacentTris;
 		for (Triangle& ot : tris)
 		{
 			//ot.print();
 			if (t.isAdjacent(ot))
 			{
-				printf("### adj\n");
-				adjacentTris.push_back(&ot);
+				//printf("### adj\n");
+				adjacentTris.push_back(ot);
 			}
 			else
 			{
@@ -42,6 +42,12 @@ unordered_map<Triangle, vector<Triangle*>> constructAdjacencySet(vector<Triangle
 NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, int width, int height)
 {
 	this->tris = tris;
+	printf("Navmesh triangles:\n");
+	for (const Triangle& t : this->tris)
+	{
+		t.print();
+	}
+	printf("end of navmesh triangles\n");
 	this->triTree = TriangleTree(tris, width, height);
 	this->adjacencySet = constructAdjacencySet(this->tris);
 	this->fedges = fedges;
@@ -141,7 +147,15 @@ bool linesIntersect(vec2 a, vec2 b, vec2 c, vec2 d)
 
 vector<vec2> reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec2>& cameFrom, const unordered_set<Edge>& fedges)
 {
-	printf("%f, %f\n", end.x, end.y);
+
+	printf("start %f, %f\n", start.x, start.y);
+	printf("end %f, %f\n", end.x, end.y);
+	printf("there are %i nodes\n", cameFrom.size());
+	for (pair<vec2, vec2> x : cameFrom)
+	{
+		printf("%f,%f came from %f, %f\n", x.first.x, x.first.y, x.second.y, x.second.y);
+	}
+	//printf("%f, %f\n", end.x, end.y);
 	vector<vec2> nodes;
 	try
 	{
@@ -156,6 +170,7 @@ vector<vec2> reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec
 	{
 		printf("exception\n");
 	}
+
 	return nodes;
 }
 
@@ -163,6 +178,12 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 {
 	printf("getting path from %f,%f to %f,%f\n", start.x, start.y, end.x, end.y);
 
+	printf("Navmesh triangles:\n");
+	for (const Triangle& t : this->tris)
+	{
+		t.print();
+	}
+	printf("end of navmesh triangles\n");
 	/**/
 	//unordered_map<Triangle, float> hcost;
 	unordered_map<Triangle, float> gcost;
@@ -204,30 +225,31 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 		openContents.erase(find(openContents.begin(), openContents.end(), curr));
 		if (curr == endTri)
 		{
+			cameFrom[end] = curr.geoCenter;
 			printf("reconstructing\n");
 			return reconstructPath(start, end, cameFrom, fedges);
 			//return reconstruct(start, end, cameFrom);//todo:
 		}
 		printf("has %i neighbors\n", this->adjacencySet[curr].size());
-		for (Triangle* neighbor : this->adjacencySet[curr])
+		for (Triangle neighbor : this->adjacencySet.at(curr))
 		{
-			neighbor->print("neighbor: ");
+			neighbor.print("neighbor: ");
 			vec2 cameFromPoint = curr.geoCenter; //TODO: need to calculate this https://raygun.com/blog/game-development-triangulated-spaces-part-2/
-			float tentativeG = gcost[curr] + getGCost(curr, *neighbor, start, end, gcost);
+			float tentativeG = gcost[curr] + getGCost(curr, neighbor, start, end, gcost);
 			printf("tentative g: %f\n", tentativeG);
-			printf("neighbor g: %f\n", gcost[*neighbor]);
-			if (tentativeG < gcost[*neighbor])
+			printf("neighbor g: %f\n", gcost[neighbor]);
+			if (tentativeG < gcost[neighbor])
 			{
 				printf("cheaper\n");
 				cameFrom[cameFromPoint] = curr.geoCenter; //~~maybe~~definetly not right
-				gcost[*neighbor] = tentativeG;
-				fcost[*neighbor] = gcost[*neighbor] + getHCost(*neighbor, end);
-				printf("does it exist in open yet? %i\n", std::count(openContents.begin(), openContents.end(), *neighbor));
-				if (std::count(openContents.begin(), openContents.end(), *neighbor) == 0)
+				gcost[neighbor] = tentativeG;
+				fcost[neighbor] = gcost[neighbor] + getHCost(neighbor, end);
+				printf("does it exist in open yet? %i\n", std::count(openContents.begin(), openContents.end(), neighbor));
+				if (std::count(openContents.begin(), openContents.end(), neighbor) == 0)
 				{
 					printf("pushing into open\n");
-					openContents.push_back(*neighbor);
-					open.push(*neighbor);
+					openContents.push_back(neighbor);
+					open.push(neighbor);
 				}
 
 			}
