@@ -255,6 +255,10 @@ Edge* Triangle::getAdjacentEdge(const Triangle& other) const
 
 bool Triangle::isAdjacent(const Triangle& other) const
 {
+    if (*this == other)
+    {
+        return false;
+    }
     int shared = 0;
     for (int i = 0; i < 3; i++)
     {

@@ -243,7 +243,7 @@ void drawPath(const Shader& shader, vector<vec2> path)
 	}
 	else
 	{
-		exit(0);
+		//exit(0);
 	}
 }
 
@@ -267,7 +267,7 @@ void Renderer::run()
 		if (currentFrame > lastSecond + 1)
 		{
 			lastSecond = currentFrame;
-			vector<vec2> path = GLBL::map.getPath(vec2(1), mousePos);
+			vector<vec2> path = GLBL::map.getPath(vec2(100, 5), vec2(5, 100));
 			printf("size of path: %i\n", path.size());
 			drawPath(shader, path);
 		}

@@ -153,17 +153,20 @@ vector<vec2> reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec
 	printf("there are %i nodes\n", cameFrom.size());
 	for (pair<vec2, vec2> x : cameFrom)
 	{
-		printf("%f,%f came from %f, %f\n", x.first.x, x.first.y, x.second.y, x.second.y);
+		printf("%f,%f came from %f, %f\n", x.first.x, x.first.y, x.second.x, x.second.y);
 	}
 	//printf("%f, %f\n", end.x, end.y);
 	vector<vec2> nodes;
 	try
 	{
+		//vec2 curr = cameFrom.at(end);
+		//printf("%f, %f\n", curr.x, curr.y);
 		vec2 curr = cameFrom.at(end);
-		printf("%f, %f\n", curr.x, curr.y);
-		while (true)
+		while (false)
 		{
+			printf("curr: %f,%f\n", curr.x, curr.y);
 			nodes.push_back(curr);
+			curr = cameFrom.at(end);
 		}
 	}
 	catch (exception e)
@@ -220,7 +223,7 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 	while (!open.empty())
 	{
 		Triangle curr = open.top();
-		curr.print("curr: ");
+		curr.print("======curr: ");
 		open.pop();
 		openContents.erase(find(openContents.begin(), openContents.end(), curr));
 		if (curr == endTri)
