@@ -110,7 +110,7 @@ axisNode* constructTree(const vector<Triangle>& tris, unordered_set<float> xCoor
 	toReturn->leaf = false;
 	toReturn->x = x;
 	toReturn->coord = coord;
-
+	printf("################ returning \"normal\" node with coord %f\n", coord);
 	if (x)
 	{
 		for (float f : xCoords)
@@ -210,33 +210,32 @@ Triangle TriangleTree::getTriangle(vec2 p)
 
 
 
-vector<Vertex> makeVerts(axisNode* node, int width, int height)
+unordered_set<pair<Vertex, Vertex>> makeVerts(axisNode* node, int width, int height)
 {
-	vector<Vertex> vertices;
+	unordered_set<pair<Vertex, Vertex>> vertices;
 	float coord = 0;
 	if (!node->leaf)
 	{
-		printf("node is not leaf\n");
+		//printf("node is not leaf\n");
 		axisNodeBranch* actualCurr = (axisNodeBranch*)node;
 		if (actualCurr->x)
 		{
-			vertices.push_back({ vec2(actualCurr->coord, 0), vec2(0)});
-			vertices.push_back({ vec2(actualCurr->coord, height), vec2(0) });
+			vertices.insert(pair<Vertex, Vertex>({ vec2(actualCurr->coord, 0), vec2(0)}, { vec2(actualCurr->coord, height), vec2(0) }));
 		}
 		else
 		{
-			vertices.push_back({ vec2(0, actualCurr->coord), vec2(0) });
-			vertices.push_back({ vec2(width, actualCurr->coord), vec2(0) });
+			vertices.insert(pair<Vertex, Vertex>({ vec2(0, actualCurr->coord), vec2(0) }, { vec2(width, actualCurr->coord), vec2(0) }));
 		}
-		vector<Vertex> more = makeVerts(actualCurr->more, width, height);
-		vector<Vertex> less = makeVerts(actualCurr->more, width, height);
-		printf("more: %i, less: %i\n", more.size(), less.size());
-		vertices.insert(vertices.end(), more.begin(), more.end());
-		vertices.insert(vertices.end(), less.begin(), less.end());
+		unordered_set<pair<Vertex, Vertex>> more = makeVerts(actualCurr->more, width, height);
+		unordered_set<pair<Vertex, Vertex>> less = makeVerts(actualCurr->more, width, height);
+		//printf("more: %i, less: %i\n", more.size(), less.size());
+
+		vertices.insert(more.begin(), more.end());
+		vertices.insert(less.begin(), less.end());
 	}
 	else
 	{
-		printf("node is not leaf\n");
+		//printf("node is not leaf\n");
 	}
 
 	return vertices;
@@ -247,12 +246,20 @@ vector<Vertex> makeVerts(axisNode* node, int width, int height)
 void TriangleTree::setupBuffers(int width, int height)
 {
 
-	printf("making tt verts\n");
-	this->vertices = makeVerts(this->head, width, height);//returning 0 vertices lol
-
-	this->vertices.push_back({ vec2(0), vec2(0) });
+	//printf("making tt verts\n");
+	unordered_set<pair<Vertex, Vertex>> vPairs = makeVerts(this->head, width, height);
+	for (pair<Vertex, Vertex> v : vPairs)
+	{
+		this->vertices.push_back(v.first);
+		this->vertices.push_back(v.second);
+	}
+	printf("verts:%i\n", vertices.size());
+	/*this->vertices.push_back({ vec2(0), vec2(0) });
+	this->vertices.push_back({ vec2(0,500), vec2(0) });
 	this->vertices.push_back({ vec2(0,500), vec2(0) });
 	this->vertices.push_back({ vec2(500,0), vec2(0) });
+	this->vertices.push_back({ vec2(500,0), vec2(0) });
+	this->vertices.push_back({ vec2(0), vec2(0) });*/
 
 	printf("there are %i vertices in the triangle tree\n", this->vertices.size());
 	for (Vertex v : this->vertices)
@@ -261,11 +268,11 @@ void TriangleTree::setupBuffers(int width, int height)
 	}
 
 
-	printf("here1\n");
+	//printf("here1\n");
 	glGenVertexArrays(1, &this->VAO);
-	printf("here2\n");
+	//printf("here2\n");
 	glGenBuffers(1, &this->VBO);
-	printf("here3\n");
+	//printf("here3\n");
 
 	glBindVertexArray(this->VAO);
 
@@ -295,7 +302,8 @@ void TriangleTree::draw(const Shader& shader)
 
 	glBindVertexArray(this->VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-	glDrawArrays(GL_TRIANGLES, 0, this->vertices.size());
+	glLineWidth(4.0f);
+	glDrawArrays(GL_LINES, 0, this->vertices.size());
 
 	glBindVertexArray(0);
 }

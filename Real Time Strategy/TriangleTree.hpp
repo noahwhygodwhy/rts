@@ -11,6 +11,49 @@ using namespace std;
 using namespace glm;
 
 
+
+
+
+
+namespace std
+{
+	template <>
+	struct hash<Vertex>
+	{
+		size_t operator()(const Vertex k) const
+		{
+			hash<float> fh;
+			return fh(k.position.x) ^ (fh(k.position.y) << 1) ^ (fh(k.texCoords.x) << 2) ^ (fh(k.texCoords.y) << 3);
+		}
+	};
+
+}
+namespace std
+{
+	template <>
+	struct hash<pair<Vertex, Vertex>>
+	{
+		size_t operator()(const pair<Vertex, Vertex> k) const
+		{
+			hash<Vertex> vh;
+			return vh(k.first) ^ (vh(k.second) << 1);
+		}
+	};
+
+	/*template <>
+	struct hash<pair<Vertex, Vertex>>
+	{
+		size_t operator()(const pair<Vertex, Vertex> k) const
+		{
+			hash<Vertex> vh;
+			return vh(k.first) ^ (vh(k.second) << 1);
+		}
+	};*/
+}
+
+
+
+
 /*class axisNode
 {
 	axisNode()
@@ -41,7 +84,7 @@ struct axisNodeLeaf : axisNode
 struct axisNodeBranch : axisNode
 {
 	bool x;
-	int coord;
+	float coord;
 	axisNode* more;
 	axisNode* less;
 };

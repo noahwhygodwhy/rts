@@ -18,6 +18,11 @@ struct textureAttributes
 struct Vertex {
 	vec2 position;
 	vec2 texCoords;
+
+	bool operator==(const Vertex& other)const
+	{
+		return this->position == other.position && this->texCoords == other.texCoords;
+	}
 };
 
 struct Texture {

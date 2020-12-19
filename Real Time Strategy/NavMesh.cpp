@@ -39,7 +39,7 @@ unordered_map<Triangle, vector<Triangle*>> constructAdjacencySet(vector<Triangle
 NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, int width, int height)
 {
 	this->tris = tris;
-	this->triTree = TriangleTree(tris);
+	this->triTree = TriangleTree(tris, width, height);
 	this->adjacencySet = constructAdjacencySet(tris);
 	this->fedges = fedges;
 	setupBuffers();
@@ -261,7 +261,7 @@ void NavMesh::setupBuffers()
 
 void NavMesh::draw(const Shader& shader)
 {
-	this->triTree.draw(shader);
+	//this->triTree.draw(shader);
 
 	glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
 
@@ -274,7 +274,7 @@ void NavMesh::draw(const Shader& shader)
 
 	glBindVertexArray(this->VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-	//glDrawArrays(GL_LINES, 0, this->vertices.size());
+	glDrawArrays(GL_LINES, 0, this->vertices.size());
 
 	glBindVertexArray(0);
 }

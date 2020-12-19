@@ -6,101 +6,12 @@ using namespace std;
 using namespace glm;
 
 
-/*vector<Triangle> findContainer(const vector<Triangle>& triangles, vec2 point)
-{
-    vector<Triangle> toReturn;
-    for (const Triangle& t : triangles)
-    {
-        int result = t.contains(point);
-        printf("it's in %i triangles\n", result);
-        if (result == 1)
-        {
-            toReturn.push_back(t);
-            return toReturn;
-        }
-        else if (result == -1)
-        {
-            toReturn.push_back(t);
-            if (toReturn.size() == 2)
-            {
-                return toReturn;
-            }
-        }
-    }
-    return toReturn; //just in case
-}*/
-
-
-/*vector<Triangle> splitTriangle(vector<Triangle> tris, vec2 p)
-{
-    printf("splitting %i triangles with point %f,%f\n", tris.size(), p.x, p.y);
-    vector<Triangle> newTriangles;
-
-
-
-    for (const Triangle& t : tris)
-    {
-
-        t.print("splitting");
-
-        for (int i = 0; i < 3; i++)
-        {
-
-            Triangle theNewOne = Triangle(t.points);
-            theNewOne.points[i] = p;
-
-            float s = sign(theNewOne.points[(i + 1) % 3], theNewOne.points[(i + 2) % 3], theNewOne.points[i]);
-            printf("s is %f\n", s);
-            if (s != 0)
-            {
-                theNewOne.print("adding a triangle");
-                newTriangles.push_back(theNewOne);
-            }
-            else
-            {
-                printf("not adding a triangle\n");
-            }
-        }
-    }
-    return newTriangles;
-}
-*/
-
 float distance(const vec2& p1, const vec2& p2)
 {
     float dx = p1.x - p2.x;
     float dy = p1.y - p2.y;
     return std::sqrt((dx * dx) + (dy * dy));
 }
-
-/*
-void fixIllegalTriangles(vector<Triangle>& tris, const vector<vec2>& usedPoints)
-{
-
-    for (vec2 p : usedPoints)
-    {
-        auto triIter = tris.begin();
-        while (triIter != tris.begin())
-        {
-            float radius = distance(triIter->circleCenter, triIter->points[0]);
-            if (distance(p, triIter->circleCenter) < radius)
-            {
-                tris.erase(triIter);
-
-                for (int i = 0; i < triIter->points.size(); i++)
-                {
-                    tris.push_back({ p, triIter->points[i], triIter->points[(i + 1) % triIter->points.size()] });
-                }
-            }
-            else
-            {
-                triIter++;
-            }
-        }
-    }
-}*/
-
-
 
 void addAPoint(vector<Triangle>& triangles, vec2 point)
 {
@@ -150,7 +61,7 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
 }
 
 
-vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 topRight)
+vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 topRight, const vector<Edge>& requiredEdges)
 {
     vector<Triangle> triangles;
     vec2 mins = vec2(INT64_MAX);
