@@ -13,7 +13,7 @@ float distance(const vec2& p1, const vec2& p2)
     return std::sqrt((dx * dx) + (dy * dy));
 }
 
-void addAPoint(vector<Triangle>& triangles, vec2 point)
+void addAPoint(vector<Triangle>& triangles, vec2 point, const vector<Edge>& requiredEdges)
 {
 
     vector<Triangle> badTriangles;
@@ -89,7 +89,7 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 to
 
     for (vec2 point : pointsIn)
     {
-        addAPoint(triangles, point);
+        addAPoint(triangles, point, requiredEdges);
     }
 
     if (bottomLeft == topRight)

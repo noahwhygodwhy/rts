@@ -19,16 +19,19 @@ unordered_map<Triangle, vector<Triangle*>> constructAdjacencySet(vector<Triangle
 	unordered_map<Triangle, vector<Triangle*>> toReturn;
 	for (const Triangle& t : tris)
 	{
+		t.print("finding adjancet tris for ");
 		vector<Triangle*> adjacentTris;
 		for (Triangle& ot : tris)
 		{
-			if (!(t == ot))
+			//ot.print();
+			if (t.isAdjacent(ot))
 			{
-				if (t.isAdjacent(ot))
-				{
-
-					adjacentTris.push_back(&ot);
-				}
+				printf("### adj\n");
+				adjacentTris.push_back(&ot);
+			}
+			else
+			{
+				//printf("not adj\n");
 			}
 		}
 		toReturn[t] = adjacentTris;
@@ -40,7 +43,7 @@ NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, int width, i
 {
 	this->tris = tris;
 	this->triTree = TriangleTree(tris, width, height);
-	this->adjacencySet = constructAdjacencySet(tris);
+	this->adjacencySet = constructAdjacencySet(this->tris);
 	this->fedges = fedges;
 	setupBuffers();
 }
@@ -138,10 +141,12 @@ bool linesIntersect(vec2 a, vec2 b, vec2 c, vec2 d)
 
 vector<vec2> reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec2>& cameFrom, const unordered_set<Edge>& fedges)
 {
+	printf("%f, %f\n", end.x, end.y);
 	vector<vec2> nodes;
 	try
 	{
 		vec2 curr = cameFrom.at(end);
+		printf("%f, %f\n", curr.x, curr.y);
 		while (true)
 		{
 			nodes.push_back(curr);
@@ -149,12 +154,15 @@ vector<vec2> reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec
 	}
 	catch (exception e)
 	{
+		printf("exception\n");
 	}
 	return nodes;
 }
 
 vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 {
+	printf("getting path from %f,%f to %f,%f\n", start.x, start.y, end.x, end.y);
+
 	/**/
 	//unordered_map<Triangle, float> hcost;
 	unordered_map<Triangle, float> gcost;
@@ -169,6 +177,8 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 		fcost[t] = INFINITY;
 	}
 	Triangle startTri = this->triTree.getTriangle(start);
+	startTri.print("Start Tri:");
+	printf("center of startTri: %f,%f\n", startTri.geoCenter.x, startTri.geoCenter.y);
 	gcost[startTri] = 0;
 	fcost[startTri] = 0;
 	Triangle endTri = this->triTree.getTriangle(end);
@@ -189,31 +199,45 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 	while (!open.empty())
 	{
 		Triangle curr = open.top();
+		curr.print("curr: ");
 		open.pop();
 		openContents.erase(find(openContents.begin(), openContents.end(), curr));
 		if (curr == endTri)
 		{
+			printf("reconstructing\n");
 			return reconstructPath(start, end, cameFrom, fedges);
 			//return reconstruct(start, end, cameFrom);//todo:
 		}
+		printf("has %i neighbors\n", this->adjacencySet[curr].size());
 		for (Triangle* neighbor : this->adjacencySet[curr])
 		{
+			neighbor->print("neighbor: ");
 			vec2 cameFromPoint = curr.geoCenter; //TODO: need to calculate this https://raygun.com/blog/game-development-triangulated-spaces-part-2/
 			float tentativeG = gcost[curr] + getGCost(curr, *neighbor, start, end, gcost);
+			printf("tentative g: %f\n", tentativeG);
+			printf("neighbor g: %f\n", gcost[*neighbor]);
 			if (tentativeG < gcost[*neighbor])
 			{
+				printf("cheaper\n");
 				cameFrom[cameFromPoint] = curr.geoCenter; //~~maybe~~definetly not right
 				gcost[*neighbor] = tentativeG;
 				fcost[*neighbor] = gcost[*neighbor] + getHCost(*neighbor, end);
+				printf("does it exist in open yet? %i\n", std::count(openContents.begin(), openContents.end(), *neighbor));
 				if (std::count(openContents.begin(), openContents.end(), *neighbor) == 0)
 				{
+					printf("pushing into open\n");
 					openContents.push_back(*neighbor);
 					open.push(*neighbor);
 				}
 
 			}
+			else
+			{
+				printf("expensive\n");
+			}
 		}
 	}
+	printf("failure to find a path\n");
 	return vector<vec2>();//failure to find a path returns an empty vector
 }
 
@@ -261,7 +285,7 @@ void NavMesh::setupBuffers()
 
 void NavMesh::draw(const Shader& shader)
 {
-	//this->triTree.draw(shader);
+	this->triTree.draw(shader);
 
 	glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
 

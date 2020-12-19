@@ -258,7 +258,15 @@ bool Triangle::isAdjacent(const Triangle& other) const
     int shared = 0;
     for (int i = 0; i < 3; i++)
     {
-        shared += this->points[i] == other.points[i] ? 1 : 0;
+        for (int j = 0; j < 3; j++)
+        {
+            shared += this->points[i] == other.points[j] ? 1 : 0;
+        }
+    }
+    if (shared > 3)
+    {
+        printf("SHARED > 3\n");
+        exit(0);
     }
     return (shared == 2);
 }

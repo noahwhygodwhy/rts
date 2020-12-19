@@ -67,6 +67,20 @@ unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEnt
 int main(void)
 {
 
+	Triangle a{ vec2(4785.0f, 2983.0f), vec2(6309.0f, 2983.0f), vec2(6307.0, 4187.0f) };
+	Triangle b{ vec2(4402.0f, 3601.0f), vec2(4785.0f, 2983.0f), vec2(6307.0, 4187.0f) };
+	if (b.isAdjacent(a))
+	{
+		printf("adj\n");
+	}
+	else
+	{
+		printf("not adjacent\n");
+	}
+
+
+	//exit(0);
+
 	printf("###starting\n");
 	Renderer r = Renderer(1920, 1080);
 	printf("###initializing\n");

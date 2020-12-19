@@ -110,7 +110,7 @@ axisNode* constructTree(const vector<Triangle>& tris, unordered_set<float> xCoor
 	toReturn->leaf = false;
 	toReturn->x = x;
 	toReturn->coord = coord;
-	printf("################ returning \"normal\" node with coord %f\n", coord);
+	//printf("################ returning \"normal\" node with coord %f\n", coord);
 	if (x)
 	{
 		for (float f : xCoords)
@@ -186,15 +186,15 @@ TriangleTree::~TriangleTree()
 
 Triangle TriangleTree::getTriangle(vec2 p)
 {
-	printf("getting triangle for point %f,%f\n", p.x, p.y);
+	//printf("getting triangle for point %f,%f\n", p.x, p.y);
 	axisNode* curr = this->head;
 	float coord = 0;
 	while (!curr->leaf)
 	{
 		axisNodeBranch* actualCurr = (axisNodeBranch*)curr;
-		printf("On axis: %s\n", actualCurr->x ? "x" : "y");
+		//printf("On axis: %s\n", actualCurr->x ? "x" : "y");
 		float coord = actualCurr->x ? p.x : p.y;
-		printf("distinguishing on %f\n", actualCurr->coord);
+		//printf("distinguishing on %f\n", actualCurr->coord);
 		curr = (axisNode*)((coord > actualCurr->coord )? actualCurr->more : actualCurr->less);
 	}
 	vector<Triangle> tris = ((axisNodeLeaf*)curr)->value;
@@ -253,7 +253,7 @@ void TriangleTree::setupBuffers(int width, int height)
 		this->vertices.push_back(v.first);
 		this->vertices.push_back(v.second);
 	}
-	printf("verts:%i\n", vertices.size());
+	//printf("verts:%i\n", vertices.size());
 	/*this->vertices.push_back({ vec2(0), vec2(0) });
 	this->vertices.push_back({ vec2(0,500), vec2(0) });
 	this->vertices.push_back({ vec2(0,500), vec2(0) });
@@ -261,10 +261,10 @@ void TriangleTree::setupBuffers(int width, int height)
 	this->vertices.push_back({ vec2(500,0), vec2(0) });
 	this->vertices.push_back({ vec2(0), vec2(0) });*/
 
-	printf("there are %i vertices in the triangle tree\n", this->vertices.size());
+	//printf("there are %i vertices in the triangle tree\n", this->vertices.size());
 	for (Vertex v : this->vertices)
 	{
-		printf("%f, %f\n", v.position.x, v.position.y);
+		//printf("%f, %f\n", v.position.x, v.position.y);
 	}
 
 
