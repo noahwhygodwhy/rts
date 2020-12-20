@@ -99,11 +99,6 @@ private:
 	unordered_map<Triangle, vector<Triangle>> adjacencySet;
     unordered_set<Edge> fedges;
     vector<Vertex> vertices;
-
-
-    vector<vec2> reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec2>& cameFrom, const unordered_set<Edge>& fedges);
-
-
 };
 
 

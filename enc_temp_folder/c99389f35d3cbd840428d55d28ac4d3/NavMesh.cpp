@@ -148,7 +148,7 @@ bool linesIntersect(vec2 a, vec2 b, vec2 c, vec2 d)
 
 
 
-vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec2>& cameFrom, const unordered_set<Edge>& fedges)
+vector<vec2> reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec2>& cameFrom, const unordered_set<Edge>& fedges)
 {
 
 	printf("start %f, %f\n", start.x, start.y);
@@ -156,7 +156,7 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 	printf("there are %i nodes\n", cameFrom.size());
 	for (pair<vec2, vec2> x : cameFrom)
 	{
-		printf("%f,%f came from %f, %f (", x.first.x, x.first.y, x.second.x, x.second.y);
+		printf("%f,%f came from %f, %f\n", x.first.x, x.first.y, x.second.x, x.second.y);
 	}
 	//printf("%f, %f\n", end.x, end.y);
 	vector<vec2> nodes;
