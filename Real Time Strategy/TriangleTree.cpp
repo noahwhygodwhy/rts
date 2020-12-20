@@ -10,16 +10,6 @@
 using namespace glm;
 using namespace std;
 
-
-
-
-
-
-
-
-
-
-
 axisNode* constructTree(const vector<Triangle>& tris, unordered_set<float> xCoords, unordered_set<float> yCoords, bool x, int layer=0)
 {
 

@@ -12,7 +12,7 @@
 
 static unordered_map<string, unsigned int> loadedTextures;
 
-
+static vector<vec2> path;
 
 float deltaTime = 0.0f;	// Time between current frame and last frame
 float lastFrame = 0.0f; // Time of last frame
@@ -120,6 +120,7 @@ static void mouseButtCallback(GLFWwindow* window, int button, int action, int mo
 	{
 		if (action == GLFW_PRESS)
 		{
+			path = GLBL::map.getPath(vec2(1, 1), mousePos);
 			mouseTime = glfwGetTime();
 			GLBL::sb.start(mousePos);
 			
@@ -234,17 +235,21 @@ void drawPath(const Shader& shader, vector<vec2> path)
 		shader.setBool("outline", false);
 		shader.setBool("ignoreAlpha", true);
 		shader.setVecThree("tintRatio", vec3(1.0f, 1.0f, 1.0f));
-		shader.setVecThree("tint", vec3(1.0f, 0.0f, 0.0f));
+		shader.setVecThree("tint", vec3(0.0f, 0.2f, 1.0f));
 
 		shader.setMatFour("transform", mat4(1));
 		glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
 		glBindVertexArray(VAO);
+		glLineWidth(4.0f);
 		glDrawArrays(GL_LINES, 0, vertices.size());
+		glLineWidth(2.0f);
+
 	}
-	else
+	/*else
 	{
-		//exit(0);
-	}
+		printf("PATH IS EMPTY UH OH");
+		exit(0);
+	}*/
 }
 
 
@@ -264,13 +269,16 @@ void Renderer::run()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+
+		drawPath(shader, path);
+		/*
 		if (currentFrame > lastSecond + 1)
 		{
 			lastSecond = currentFrame;
-			vector<vec2> path = GLBL::map.getPath(vec2(100, 5), vec2(5, 100));
+			vector<vec2> path = GLBL::map.getPath(vec2(1, 1), mousePos);
 			printf("size of path: %i\n", path.size());
-			drawPath(shader, path);
-		}
+		
+		}*/
 		processInput(this->window, deltaTime);
 
 		shader.use();

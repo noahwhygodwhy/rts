@@ -156,7 +156,8 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 	printf("there are %i nodes\n", cameFrom.size());
 	for (pair<vec2, vec2> x : cameFrom)
 	{
-		printf("%f,%f came from %f, %f (", x.first.x, x.first.y, x.second.x, x.second.y);
+		printf("%f,%f came from %f, %f\n", x.first.x, x.first.y, x.second.x, x.second.y);
+		//this->triTree.getTriangle(x.second).print();
 	}
 	//printf("%f, %f\n", end.x, end.y);
 	vector<vec2> nodes;
@@ -165,18 +166,17 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 		//vec2 curr = cameFrom.at(end);
 		//printf("%f, %f\n", curr.x, curr.y);
 		vec2 curr = cameFrom.at(end);
-		while (false)
+		while (true)
 		{
 			printf("curr: %f,%f\n", curr.x, curr.y);
 			nodes.push_back(curr);
-			curr = cameFrom.at(end);
+			curr = cameFrom.at(curr);
 		}
 	}
 	catch (exception e)
 	{
 		printf("exception\n");
 	}
-
 	return nodes;
 }
 
@@ -248,7 +248,7 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 			if (tentativeG < gcost[neighbor])
 			{
 				printf("cheaper\n");
-				cameFrom[cameFromPoint] = curr.geoCenter; //~~maybe~~definetly not right
+				cameFrom[neighbor.geoCenter] = curr.geoCenter; //~~maybe~~definetly not right
 				gcost[neighbor] = tentativeG;
 				fcost[neighbor] = gcost[neighbor] + getHCost(neighbor, end);
 				printf("does it exist in open yet? %i\n", std::count(openContents.begin(), openContents.end(), neighbor));
@@ -314,7 +314,7 @@ void NavMesh::setupBuffers()
 
 void NavMesh::draw(const Shader& shader)
 {
-	this->triTree.draw(shader);
+	//this->triTree.draw(shader);
 
 	glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
 
