@@ -6,6 +6,7 @@
 #include <array>
 #include "TriangleTree.hpp"
 #include <unordered_set>
+#include <queue>
 using namespace glm;
 using namespace std;
 
@@ -16,11 +17,11 @@ vector<string> splitOnSpaces(string s)
     stringstream toSplit(s);
     string segment;
     vector<string> toReturn;
-    while (getline(toSplit, segment, ' '))
-    {
-        toReturn.push_back(segment);
-    }
-    return toReturn;
+while (getline(toSplit, segment, ' '))
+{
+    toReturn.push_back(segment);
+}
+return toReturn;
 }
 
 
@@ -44,7 +45,7 @@ Texture makeNavMesh(string filePath)
 
     t.type = "diffuse";
     t.path = filePath;
-    
+
     unsigned int texture;
     //printf("%p\n", &texture);
     glGenTextures(1, &texture);
@@ -64,7 +65,7 @@ Texture makeNavMesh(string filePath)
     t.id = texture;
     t.dims = vec2(width, height);
     t.channels = NUM_CHANNELS;
-    
+
     return t;
 }
 
@@ -73,9 +74,33 @@ bool counterClockwise(Triangle t)
     return (t.points[1].x - t.points[0].x) * (t.points[2].y - t.points[0].y) > (t.points[2].x - t.points[0].x) * (t.points[1].y - t.points[0].y);
 }
 
+
+
+bool checkForFedges(const vector<Edge>& fedges, const vector<Triangle>& triangles) //expensive as fuck, but only done at map creation
+{
+    bool allContained = true;
+    for (const Edge& f : fedges)
+    {
+        bool contained = false;
+        for (const Triangle& tri : triangles)
+        {
+            for (const Edge e : tri.edges)
+            {
+                if (f == e)
+                {
+                    contained = true;
+                }
+            }
+        }
+        allContained = allContained && contained;
+    }
+    printf("all contained: %s\n", allContained ? "true" : "false");
+    return allContained;
+}
+
 vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec2 dims, unordered_set<Edge>* fedge)
 {
-
+    string s;
     printf("reading file %s\n", inFilePath.c_str());
     vector<Polygon> shapes;
     tinyxml2::XMLDocument theFile;
@@ -91,7 +116,8 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
         {
             pointInts.push_back(stoi(s));
         }
-        shapes.push_back(Polygon(pointInts, ele->FindAttribute("style")->Value()=="fill: none"));
+        string fillNone = "fill: none";
+        shapes.push_back(Polygon(pointInts, ele->FindAttribute("style")->Value() == fillNone));
     }
     vector<vec2> allPoints;
     for (Polygon x : shapes)
@@ -99,21 +125,7 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
         allPoints.insert(allPoints.end(), x.points.begin(), x.points.end());
     }
     printf("given dims: %f,%f\n", dims.x, dims.y);
-    /*dims = vec2(1000);
-    vector<vec2> allPoints;
-    srand(42);
-    for (int i = 0; i < 66; i++)
-    {
-        int x = rand() % 1000;
-        int y = rand() % 1000;
-        allPoints.push_back(vec2(x, y));
-        printf("point %i: %i,%i\n",i, x, y);
-    }
-    /*allPoints.push_back(vec2(175, 400));
-    allPoints.push_back(vec2(83, 879));
-    allPoints.push_back(vec2(16, 644));
-    allPoints.push_back(vec2(175, 400));
-    allPoints.push_back(vec2(15, 55));*/
+
     vector<Triangle> triangles = delaunay(allPoints, vec2(0), dims); //not guarenteed to be CCW
 
     printf("size of triangles: %lu: \n", triangles.size());
@@ -139,6 +151,8 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
                 if (sharedPoints.size() > 2)
                 {
                     //push back forbidden edge here
+                    (Edge{ sharedPoints[0], sharedPoints[1] }).print("fedge 1:");
+                    (Edge{ sharedPoints[1], sharedPoints[2] }).print("fedge 2:");
                     fedge->insert({ sharedPoints[0], sharedPoints[1] });
                     fedge->insert({ sharedPoints[1], sharedPoints[2] });
                     triangles.erase(t);
@@ -147,10 +161,137 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
                 {
                     t++;
                 }
-                
+
             }
         }
     }
+    printf("size of triangles after removing fedges: %lu: \n", triangles.size());
+
+    addAPoint(triangles, vec2(3000, 1500));
+
+
+    printf("size of triangles after adding random point: %lu: \n", triangles.size());
+
+
+
+    vector<Edge> fedgesToRemove;
+    vector<Edge> fedgesToAdd;
+    auto fIter = fedge->begin();
+    while (fIter != fedge->end())
+    {
+        printf("\n\n\n");
+        Edge curr = *fIter;
+        vector<Edge> required;
+        required.push_back(curr);
+        printf("size of tringles %i\n", triangles.size());
+        curr.print("curr: ");
+        while (!checkForFedges(required, triangles))
+        {
+            fedgesToRemove.push_back(curr);
+
+            printf("=====\nrequired:\n");
+            for (const Edge& fe : required)
+            {
+                fe.print();
+            }
+
+
+            auto toErase = std::find(required.begin(), required.end(), curr);
+            if (toErase != required.end())
+            {
+                required.erase(toErase);
+            }
+
+
+            vec2 mid = (curr.points[0] + curr.points[1]) / 2.0f;
+            printf("adding the point %f, %f\n", mid.x, mid.y);
+            addAPoint(triangles, mid);
+            printf("size of tringles %i\n", triangles.size());
+            Edge ab = { curr.points[0], mid };
+            Edge bc = { mid, curr.points[1] };
+            required.push_back(ab);
+            required.push_back(bc);
+        }
+        
+        for (const Edge& e : required)
+        {
+            fedgesToAdd.push_back(e);
+        }
+        fIter++;
+    }
+
+
+    for (const Edge& e : fedgesToRemove)
+    {
+        auto toRemove = std::find(fedge->begin(), fedge->end(), e);
+        if (toRemove != fedge->end())
+        {
+            fedge->erase(toRemove);
+        }
+    }
+
+    for (const Edge& e : fedgesToAdd)
+    {
+        fedge->insert(e);
+    }
+
+
+
+
+
+    /*
+    auto fIter = fedge->begin();
+    while (fIter != fedge->end())
+    {
+        (*fIter).print("checkinf for fedge ");
+        bool notIncluded = false;
+        queue<Edge> q;
+        vector<Edge> required;
+        q.push(*fIter);
+        required.push_back(*fIter);
+        int i = 0;
+        while (!checkForFedges(required, triangles) && i < 128)
+        {
+            i++;
+            notIncluded = true;
+            Edge curr = q.front();
+            //curr.print("curr: ");
+            q.pop();
+            required.erase(std::find(required.begin(), required.end(), curr));
+            vec2 mid = (curr.points[0] + curr.points[1]) / 2.0f;
+            addAPoint(triangles, mid);
+            Edge ab = { curr.points[0], mid };
+            Edge bc = { mid, curr.points[1]};
+            //ab.print("ab:");
+            //bc.print("bc:");
+            q.push(ab);
+            q.push(bc);
+            required.push_back(ab);
+            required.push_back(bc);
+        }
+        if (notIncluded)
+        {
+            printf("it's not included\n");
+            fedge->erase(fIter);//TODO: this needs to happen, but in the right way, probably adding them all to a vector, and then going through and finding/erasing each individually
+            for (auto x : required)
+            {
+                fedge->insert(x);
+            }
+        }
+        if (!notIncluded || i > 127)
+        {
+            printf("it's included\n");
+            fIter++;
+        }
+        else
+        {
+            for (int k = 0; k < required.size(); k++)
+            {
+                fIter++;
+            }
+        }
+    }*/
+
 
     for (Triangle& t : triangles) //TODO: not needed once you're not rendering the navmesh
     {

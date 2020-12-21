@@ -13,6 +13,11 @@ using namespace glm;
 
 float distance(const vec2& p1, const vec2& p2);
 
-vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft = vec2(0), vec2 topRight = vec2(0), const vector<Edge>& requiredEdges = vector<Edge>());
+
+
+void addAPoint(vector<Triangle>& triangles, vec2 point);
+
+
+vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft = vec2(0), vec2 topRight = vec2(0));
 
 #endif

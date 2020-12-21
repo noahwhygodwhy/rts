@@ -24,6 +24,7 @@ struct Edge
     {
         printf("%s (%f,%f), (%f,%f)\n", prefix.c_str(), points[0].x, points[0].y, points[1].x, points[1].y);
     }
+
     bool intersects(const Edge& other) const
     {
         vec2 a = this->points[0];

@@ -13,9 +13,9 @@ float distance(const vec2& p1, const vec2& p2)
     return std::sqrt((dx * dx) + (dy * dy));
 }
 
-void addAPoint(vector<Triangle>& triangles, vec2 point, const vector<Edge>& requiredEdges)
+void addAPoint(vector<Triangle>& triangles, vec2 point)
 {
-
+    printf("add a point, %f,%f\n", point.x, point.y);
     vector<Triangle> badTriangles;
 
     for (const Triangle& t : triangles) //for each triangle in triangles
@@ -27,6 +27,7 @@ void addAPoint(vector<Triangle>& triangles, vec2 point, const vector<Edge>& requ
             badTriangles.push_back(t);
         }
     }
+    printf("results in %i bad triangles\n", badTriangles.size());
     vector<Edge> polygon;
     for (const Triangle& t : badTriangles)//for each triangle in bad triangles
     {
@@ -61,7 +62,7 @@ void addAPoint(vector<Triangle>& triangles, vec2 point, const vector<Edge>& requ
 }
 
 
-vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 topRight, const vector<Edge>& requiredEdges)
+vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 topRight)
 {
     vector<Triangle> triangles;
     vec2 mins = vec2(INT64_MAX);
@@ -89,7 +90,7 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 to
 
     for (vec2 point : pointsIn)
     {
-        addAPoint(triangles, point, requiredEdges);
+        addAPoint(triangles, point);
     }
 
     if (bottomLeft == topRight)
