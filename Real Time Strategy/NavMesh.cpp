@@ -193,18 +193,25 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 		while (nodeIter != nodes.end() - 2)
 		{
 			Edge ac = { *nodeIter, *(nodeIter+2) };
-			bool acIntersect = false;
+			Edge ab = { *nodeIter, *(nodeIter + 1) };
+			Edge bc = { *(nodeIter+1), *(nodeIter + 2) };
+			//bool acIntersect = false;
+			bool shouldErase = true;
 			for (Edge f : this->fedges) //maybe too expensive
 			{
-				acIntersect = ac.intersects(f) || acIntersect;
-				if(acIntersect)
+				//acIntersect = ac.intersects(f) || acIntersect;
+				if (ac.intersects(f))
 				{
+					shouldErase = false;
 					Edge ad = { *nodeIter, f.points[0] };
 					Edge dc = { *(nodeIter+2), f.points[0] };
 					if (!intersectsListOfEdges(ad, fedges) && !intersectsListOfEdges(dc, fedges))
 					{
-						*(nodeIter + 1) = f.points[0];
-						break;
+						if (ad.length() + dc.length() < ab.length() + bc.length())
+						{
+							*(nodeIter + 1) = f.points[0];
+							break;
+						}
 					}
 					else
 					{
@@ -212,13 +219,16 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 						Edge ec = { *(nodeIter + 2), f.points[1] };
 						if (!intersectsListOfEdges(ae, fedges) && !intersectsListOfEdges(ec, fedges))
 						{
-							*(nodeIter + 1) = f.points[1];
-							break;
+							if (ae.length() + ec.length() < ab.length() + bc.length())
+							{
+								*(nodeIter + 1) = f.points[1];
+								break;
+							}
 						}
 					}
 				}
 			}
-			if (!acIntersect)
+			if (shouldErase)
 			{
 				nodes.erase(nodeIter+1);
 			}

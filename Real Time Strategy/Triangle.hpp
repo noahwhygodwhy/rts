@@ -37,6 +37,10 @@ struct Edge
         }
         return counterClockwise(a, c, d) != counterClockwise(b, c, d) && counterClockwise(a, b, c) != counterClockwise(a, b, d);
     }
+    float length() const
+    {
+        return distance(this->points[0], this->points[1]);
+    }
 
 
 
