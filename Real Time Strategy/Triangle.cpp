@@ -289,3 +289,10 @@ bool Triangle::shareAPoint(const Triangle& other) const
     }
     return false;
 }
+
+
+
+bool counterClockwise(vec2 a, vec2 b, vec2 c)
+{
+    return (b.x - a.x) * (c.y - a.y) > (c.x - a.x) * (b.y - a.y);
+}

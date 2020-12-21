@@ -6,10 +6,13 @@
 #include <array>
 #include <glm/glm.hpp>
 #include <string>
+//#include "NavMesh.hpp"
 
 using namespace std;
 using namespace glm;
 
+
+bool counterClockwise(vec2 a, vec2 b, vec2 c);
 
 struct Edge;
 
@@ -21,7 +24,19 @@ struct Edge
     {
         printf("%s (%f,%f), (%f,%f)\n", prefix.c_str(), points[0].x, points[0].y, points[1].x, points[1].y);
     }
+    bool intersects(const Edge& other) const
+    {
+        vec2 a = this->points[0];
+        vec2 b = this->points[1];
+        vec2 c = other.points[0];
+        vec2 d = other.points[1];
 
+        if (a == c || a == d || b == c || b == d) //cause we're ok with tips touching
+        {
+            return false;
+        }
+        return counterClockwise(a, c, d) != counterClockwise(b, c, d) && counterClockwise(a, b, c) != counterClockwise(a, b, d);
+    }
 
 
 
@@ -130,6 +145,7 @@ public:
     bool shareAPoint(const Triangle& other) const;
     vec2 closestPoint(const vec2& p) const;
     Edge* getAdjacentEdge(const Triangle& other) const;
+
     /*size_t operator()(const Triangle& tri)
     {
         hash<float> fh;
@@ -268,5 +284,6 @@ namespace std {
         }
     };
 }
+
 
 #endif;

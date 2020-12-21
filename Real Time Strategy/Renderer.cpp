@@ -222,9 +222,13 @@ void drawPath(const Shader& shader, vector<vec2> path)
 			vertices.push_back({ path[i + 1], vec2(0) });
 		}
 
-		unsigned int VAO;
+		unsigned int VAO, VBO;
 		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+
 		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
@@ -239,10 +243,14 @@ void drawPath(const Shader& shader, vector<vec2> path)
 
 		shader.setMatFour("transform", mat4(1));
 		glClearColor(0.529f, 0.808f, 0.922f, 1.0f);
+
 		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glLineWidth(4.0f);
 		glDrawArrays(GL_LINES, 0, vertices.size());
 		glLineWidth(2.0f);
+
+		glBindVertexArray(0);
 
 	}
 	/*else
@@ -270,7 +278,6 @@ void Renderer::run()
 		lastFrame = currentFrame;
 
 
-		drawPath(shader, path);
 		/*
 		if (currentFrame > lastSecond + 1)
 		{
@@ -290,6 +297,7 @@ void Renderer::run()
 
 
 
+		drawPath(shader, path);
 		for (Entity* t : GLBL::things) //Everything else
 		{
 			t->draw(shader);
