@@ -207,11 +207,11 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 					Edge dc = { *(nodeIter+2), f.points[0] };
 					if (!intersectsListOfEdges(ad, fedges) && !intersectsListOfEdges(dc, fedges))
 					{
-						if (ad.length() + dc.length() < ab.length() + bc.length())
-						{
+						//if (ad.length() + dc.length() < ab.length() + bc.length())
+						//{
 							*(nodeIter + 1) = f.points[0];
 							break;
-						}
+						//}
 					}
 					else
 					{
@@ -219,11 +219,11 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 						Edge ec = { *(nodeIter + 2), f.points[1] };
 						if (!intersectsListOfEdges(ae, fedges) && !intersectsListOfEdges(ec, fedges))
 						{
-							if (ae.length() + ec.length() < ab.length() + bc.length())
-							{
+							//if (ae.length() + ec.length() < ab.length() + bc.length())
+							//{
 								*(nodeIter + 1) = f.points[1];
 								break;
-							}
+							//}
 						}
 					}
 				}
@@ -348,11 +348,27 @@ vector<Vertex> trisToLineVerts(const vector<Triangle>& tris)
 	}
 	return verts;
 }
-
+vector<Vertex> fedgesToLineVerts(const unordered_set<Edge>& edges)
+{
+	vector<Vertex> verts;
+	for (const Edge& e : edges)
+	{
+		verts.push_back({ e.points[0], vec2(0) });
+		verts.push_back({ e.points[1], vec2(0) });
+	}
+	return verts;
+}
 
 void NavMesh::setupBuffers()
 {
+	printf("number of fedges 2 %i\n", this->fedges.size());
 	this->vertices = trisToLineVerts(this->tris);
+	this->numTriVertices = vertices.size();
+	vector<Vertex> fedgeVertiecs = fedgesToLineVerts(this->fedges);;
+	this->vertices.insert(this->vertices.end(), fedgeVertiecs.begin(), fedgeVertiecs.end());
+	this->numFedgeVertices = fedgeVertiecs.size();
+
+	printf("%i\n", this->numFedgeVertices);
 
 	/*for (Vertex v : this->vertices)
 	{
@@ -363,10 +379,9 @@ void NavMesh::setupBuffers()
 
 	glGenVertexArrays(1, &this->VAO);
 	glGenBuffers(1, &this->VBO);
-
 	glBindVertexArray(this->VAO);
-
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
@@ -392,7 +407,16 @@ void NavMesh::draw(const Shader& shader)
 
 	glBindVertexArray(this->VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-	glDrawArrays(GL_LINES, 0, this->vertices.size());
+
+	glLineWidth(3.0f);
+	shader.setVecThree("tint", vec3(1.0f, 0.0f, 0.0f));
+	glDrawArrays(GL_LINES, this->numTriVertices, this->numFedgeVertices);
+
+	shader.setVecThree("tint", vec3(1.0f, 0.0f, 1.0f));
+	glLineWidth(1.5f);
+	glDrawArrays(GL_LINES, 0, this->numTriVertices);
+
+
 
 	glBindVertexArray(0);
 }

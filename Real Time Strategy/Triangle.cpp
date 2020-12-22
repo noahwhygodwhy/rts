@@ -269,6 +269,7 @@ bool Triangle::isAdjacent(const Triangle& other) const
     }
     if (shared > 3)
     {
+        return false;
         printf("SHARED > 3\n");
         exit(0);
     }

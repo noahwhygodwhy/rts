@@ -15,19 +15,21 @@ float distance(const vec2& p1, const vec2& p2)
 
 void addAPoint(vector<Triangle>& triangles, vec2 point)
 {
-    printf("add a point, %f,%f\n", point.x, point.y);
+    //printf("add a point, %f,%f\n", point.x, point.y);
     vector<Triangle> badTriangles;
 
     for (const Triangle& t : triangles) //for each triangle in triangles
     {
         vec2 center = t.circleCenter;
+        //t.print();
+        //printf("center: %f,%f\n", t.circleCenter.x, t.circleCenter.y);
         float radius = distance(t.points[0], center);
         if (distance(t.circleCenter, point) <= radius)
         {
             badTriangles.push_back(t);
         }
     }
-    printf("results in %i bad triangles\n", badTriangles.size());
+    //printf("results in %i bad triangles\n", badTriangles.size());
     vector<Edge> polygon;
     for (const Triangle& t : badTriangles)//for each triangle in bad triangles
     {
@@ -38,7 +40,7 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
             {
                 if (!(ot == t))
                 {
-                    if (ot.hasEdge({ vec2(t.points[i]), vec2(t.points[(i + 1) % t.points.size()]) }))
+                    if (ot.hasEdge({ vec2(t.points[i]), vec2(t.points[(i + 1) % 3]) }))
                     {
                         shared = true;
                         break;
@@ -47,7 +49,7 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
             }
             if (!shared)
             {
-                polygon.push_back({ t.points[i], t.points[(i + 1) % t.points.size()] });
+                polygon.push_back({ t.points[i], t.points[(i + 1) % 3] });
             }
         }
     }
@@ -73,40 +75,57 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 to
         maxs = glm::max(maxs, point);
     }
 
-    Triangle superTriangle = { mins - vec2(1),
-        vec2(mins.x - 10, mins.y + 10 + ((maxs.y - mins.y) * 2)),
-        vec2(mins.x + 10 + ((maxs.x - mins.x) * 2), mins.y - 10) };
+    /*Triangle superTriangle = { mins - vec2(10),
+        vec2(mins.x - 100, mins.y + 10 + ((maxs.y - mins.y) * 2)),
+        vec2(mins.x + 100 + ((maxs.x - mins.x) * 2), mins.y - 10) };*/
+    Triangle t1;
+    Triangle t2;
+    //Triangle t1 = { bottomLeft, vec2(bottomLeft.x-1, topRight.y+1), topRight+ vec2(1) };
+    //Triangle t2 = { bottomLeft, vec2(topRight.x+1, bottomLeft.y-1), topRight + vec2(1)};
+    //Triangle t1 = { bottomLeft, vec2(bottomLeft.x - 1, topRight.y + 1), topRight + vec2(1) };
+    //Triangle t2 = { bottomLeft, vec2(topRight.x + 1, bottomLeft.y - 1), topRight + vec2(1) };
+
+    //triangles.push_back(superTriangle);
     if (bottomLeft == topRight)
     {
-        triangles.push_back(superTriangle);
+        t1 = { mins - vec2(1), vec2(mins.x - 1, maxs.y + 1), vec2(maxs.x + 1, mins.y - 1) };
+        t2 = { maxs + vec2(1), vec2(mins.x - 1, maxs.y + 1), vec2(maxs.x + 1, mins.y - 1) };
     }
     else
     {
-        Triangle t1 = { bottomLeft, vec2(bottomLeft.x, topRight.y), topRight };
-        Triangle t2 = { bottomLeft, vec2(topRight.x, bottomLeft.y), topRight };
-        triangles.push_back(t1);
-        triangles.push_back(t2);
+        t1 = { bottomLeft, vec2(bottomLeft.x-1, topRight.y+1), topRight+ vec2(1) };
+        t2 = { bottomLeft, vec2(topRight.x+1, bottomLeft.y-1), topRight + vec2(1)};
     }
 
+    triangles.push_back(t1);
+    triangles.push_back(t2);
+
+
+
+
+    
     for (vec2 point : pointsIn)
     {
         addAPoint(triangles, point);
     }
-
-    if (bottomLeft == topRight)
+    /*
+    auto triIter = triangles.begin();
+    while (triIter != triangles.end())
     {
-        auto triIter = triangles.begin();
-        while (triIter != triangles.end())
+        if (triIter->shareAPoint(t1))
         {
-            if (triIter->shareAPoint(superTriangle))
-            {
-                triangles.erase(triIter);
-            }
-            else
-            {
-                triIter++;
-            }
+            triangles.erase(triIter);
         }
-    }
+        else if (triIter->shareAPoint(t2))
+        {
+            triangles.erase(triIter);
+        }
+        else
+        {
+            triIter++;
+        }
+    }*/
+
+    
     return triangles;
 }

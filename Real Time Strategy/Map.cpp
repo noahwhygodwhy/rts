@@ -130,32 +130,35 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
 
     printf("size of triangles: %lu: \n", triangles.size());
 
+
     for (Polygon p : shapes)
     {
-        if (!p.includeMe)
+        auto t = triangles.begin();
+        while (t != triangles.end())
         {
-            auto t = triangles.begin();
-            while (t != triangles.end())
+            vector<vec2> sharedPoints;
+            for (vec2 a : p.points)
             {
-                vector<vec2> sharedPoints;
-                for (vec2 a : p.points)
+                for (vec2 b : t->points)
                 {
-                    for (vec2 b : t->points)
+                    if (a == b)
                     {
-                        if (a == b)
-                        {
-                            sharedPoints.push_back(b);
-                        }
+                        sharedPoints.push_back(b);
                     }
                 }
-                if (sharedPoints.size() > 2)
+            }
+            if (sharedPoints.size() > 2)
+            {
+                //push back forbidden edge here
+                //(Edge{ sharedPoints[0], sharedPoints[1] }).print("fedge 1:");
+                //(Edge{ sharedPoints[1], sharedPoints[2] }).print("fedge 2:");
+                fedge->insert({ sharedPoints[0], sharedPoints[1] });
+                fedge->insert({ sharedPoints[1], sharedPoints[2] });
+                fedge->insert({ sharedPoints[2], sharedPoints[0] });
+                if (!p.includeMe)
                 {
-                    //push back forbidden edge here
-                    (Edge{ sharedPoints[0], sharedPoints[1] }).print("fedge 1:");
-                    (Edge{ sharedPoints[1], sharedPoints[2] }).print("fedge 2:");
-                    fedge->insert({ sharedPoints[0], sharedPoints[1] });
-                    fedge->insert({ sharedPoints[1], sharedPoints[2] });
-                    triangles.erase(t);
+                    t++;
+                    //triangles.erase(t);
                 }
                 else
                 {
@@ -163,11 +166,18 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
                 }
 
             }
+            else
+            {
+                t++;
+            }
+
         }
     }
+
+    printf("#### num fedges: %i\n", fedge->size());
+    /*
     printf("size of triangles after removing fedges: %lu: \n", triangles.size());
 
-    addAPoint(triangles, vec2(3000, 1500));
 
 
     printf("size of triangles after adding random point: %lu: \n", triangles.size());
@@ -235,7 +245,7 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
         fedge->insert(e);
     }
 
-
+    */
 
 
 
@@ -292,6 +302,7 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
         }
     }*/
 
+    printf("checking counterclockwiseness\n");
 
     for (Triangle& t : triangles) //TODO: not needed once you're not rendering the navmesh
     {
