@@ -207,11 +207,14 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 					Edge dc = { *(nodeIter+2), f.points[0] };
 					if (!intersectsListOfEdges(ad, fedges) && !intersectsListOfEdges(dc, fedges))
 					{
-						//if (ad.length() + dc.length() < ab.length() + bc.length())
-						//{
+						if (fedges.find(ad) != fedges.end() || fedges.find(dc) != fedges.end())
+						{
+							//if (ad.length() + dc.length() < ab.length() + bc.length())
+							//{
 							*(nodeIter + 1) = f.points[0];
 							break;
-						//}
+							//}
+						}
 					}
 					else
 					{
@@ -219,11 +222,14 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 						Edge ec = { *(nodeIter + 2), f.points[1] };
 						if (!intersectsListOfEdges(ae, fedges) && !intersectsListOfEdges(ec, fedges))
 						{
-							//if (ae.length() + ec.length() < ab.length() + bc.length())
-							//{
+							if (fedges.find(ae) != fedges.end() || fedges.find(ec) != fedges.end())
+							{
+								//if (ae.length() + ec.length() < ab.length() + bc.length())
+								//{
 								*(nodeIter + 1) = f.points[1];
 								break;
-							//}
+								//}
+							}
 						}
 					}
 				}

@@ -157,8 +157,9 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
                 fedge->insert({ sharedPoints[2], sharedPoints[0] });
                 if (!p.includeMe)
                 {
-                    t++;
-                    //triangles.erase(t);
+                    //t++;
+                    //printf("erasing\n");
+                    triangles.erase(t);
                 }
                 else
                 {
@@ -175,15 +176,8 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
     }
 
     printf("#### num fedges: %i\n", fedge->size());
+
     /*
-    printf("size of triangles after removing fedges: %lu: \n", triangles.size());
-
-
-
-    printf("size of triangles after adding random point: %lu: \n", triangles.size());
-
-
-
     vector<Edge> fedgesToRemove;
     vector<Edge> fedgesToAdd;
     auto fIter = fedge->begin();
@@ -230,7 +224,6 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
         fIter++;
     }
 
-
     for (const Edge& e : fedgesToRemove)
     {
         auto toRemove = std::find(fedge->begin(), fedge->end(), e);
@@ -246,6 +239,7 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
     }
 
     */
+    
 
 
 
