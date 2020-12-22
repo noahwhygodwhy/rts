@@ -106,6 +106,11 @@ float getHCost(const Triangle& tri, vec2 end)
 	return distance(tri.closestPoint(end), end);
 }
 
+float getTransitionCost(const Triangle& parent, const Triangle& tri, vec2 end, vec2 start, unordered_map<Triangle, vec2> entryPoints)
+{
+	vec2 p = entryPoints[parent];
+	return distance(p, tri.closestPoint(p));
+}
 
 float getGCost(const Triangle& parent, const Triangle& tri, vec2 end, vec2 start, const unordered_map<Triangle, float>& gcost)
 {
@@ -170,6 +175,7 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 	//printf("%f, %f\n", end.x, end.y);
 	vector<vec2> nodes;
 	nodes.push_back(end);
+	vec2 prev = cameFrom.at(end);
 	try
 	{
 		//vec2 curr = cameFrom.at(end);
@@ -180,13 +186,20 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 			printf("curr: %f,%f\n", curr.x, curr.y);
 			nodes.push_back(curr);
 			curr = cameFrom.at(curr);
+			if (curr == prev)
+			{
+				break;
+			}
+			prev = curr;
 		}
 	}
 	catch (exception e)
 	{
 		printf("exception\n");
 	}
+	nodes.push_back(start);
 
+	/*
 	if (nodes.size() > 2)
 	{
 		auto nodeIter = nodes.begin();
@@ -243,7 +256,7 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 				nodeIter++;//is this and the breaks in the right location?
 			}
 		}
-	}
+	}*/
 
 
 
@@ -266,6 +279,9 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 	unordered_map<Triangle, float> gcost;
 	unordered_map<Triangle, float> fcost;
 
+	unordered_map<Triangle, vec2> entryPoints;
+
+
 	for (const Triangle& t : this->tris)
 	{
 		gcost[t] = INFINITY;
@@ -282,8 +298,8 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 	Triangle endTri = this->triTree.getTriangle(end);
 
 	unordered_map<vec2, vec2> cameFrom;
-
-	cameFrom[startTri.geoCenter] = start;
+	entryPoints[startTri] = start;
+	//cameFrom[startTri.geoCenter] = start;
 
 	auto comparerer = [&fcost](Triangle a, Triangle b)
 	{
@@ -303,7 +319,7 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 		openContents.erase(find(openContents.begin(), openContents.end(), curr));
 		if (curr == endTri)
 		{
-			cameFrom[end] = curr.geoCenter;
+			cameFrom[end] = entryPoints[curr];// curr.geoCenter;
 			printf("reconstructing\n");
 			return reconstructPath(start, end, cameFrom, fedges);
 			//return reconstruct(start, end, cameFrom);//todo:
@@ -312,14 +328,18 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 		for (Triangle neighbor : this->adjacencySet.at(curr))
 		{
 			neighbor.print("neighbor: ");
-			vec2 cameFromPoint = curr.geoCenter; //TODO: need to calculate this https://raygun.com/blog/`-development-triangulated-spaces-part-2/
-			float tentativeG = gcost[curr] + getGCost(curr, neighbor, start, end, gcost);
+			//float tentativeG = gcost[curr] + getGCost(curr, neighbor, start, end, gcost);
+
+			float tentativeG = gcost[curr] + getTransitionCost(curr, neighbor, start, end, entryPoints);
 			printf("tentative g: %f\n", tentativeG);
 			printf("neighbor g: %f\n", gcost[neighbor]);
 			if (tentativeG < gcost[neighbor])
 			{
 				printf("cheaper\n");
-				cameFrom[neighbor.geoCenter] = curr.geoCenter; //~~maybe~~definetly not right
+				vec2 p = neighbor.closestPoint(entryPoints[curr]);
+				cameFrom[p] = entryPoints[curr];
+				entryPoints[neighbor] = neighbor.closestPoint(p);// nearest point on the neighbor compared to parents entry point
+
 				gcost[neighbor] = tentativeG;
 				fcost[neighbor] = gcost[neighbor] + getHCost(neighbor, end);
 				printf("does it exist in open yet? %i\n", std::count(openContents.begin(), openContents.end(), neighbor));
