@@ -161,15 +161,37 @@ bool intersectsListOfEdges(const Edge& e, const unordered_set<Edge>& fedges)
 	return false;
 }
 
-vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec2>& cameFrom, const unordered_set<Edge>& fedges)
+
+
+//rount to two (decimal places)
+float rtt(float val)
+{
+	return round(val * 100) / 100;
+}
+
+
+vector<vec2> NavMesh::reconstructPath(vec2 startUR, vec2 endUR, const unordered_map<vec2, vec2>& cameFromUnrounded, const unordered_set<Edge>& fedges)
 {
 
-	printf("start %f, %f\n", start.x, start.y);
-	printf("end %f, %f\n", end.x, end.y);
-	printf("there are %i nodes\n", cameFrom.size());
+
+	vec2 start = vec2(rtt(startUR.x), rtt(startUR.y));
+	vec2 end = vec2(rtt(endUR.x), rtt(endUR.y));
+
+	unordered_map<vec2, vec2> cameFrom;
+
+
+	for (auto x : cameFromUnrounded)
+	{
+		cameFrom[vec2(rtt(x.first.x), rtt(x.first.y))] = vec2(rtt(x.second.x), rtt(x.second.y));
+	}
+
+
+	//printf("start %f, %f\n", start.x, start.y);
+	//printf("end %f, %f\n", end.x, end.y);
+	//printf("there are %i nodes\n", cameFrom.size());
 	for (pair<vec2, vec2> x : cameFrom)
 	{
-		printf("%f,%f came from %f, %f\n", x.first.x, x.first.y, x.second.x, x.second.y);
+		//printf("%f,%f came from %f, %f\n", x.first.x, x.first.y, x.second.x, x.second.y);
 		//this->triTree.getTriangle(x.second).print();
 	}
 	//printf("%f, %f\n", end.x, end.y);
@@ -183,7 +205,7 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 		vec2 curr = cameFrom.at(end);
 		while (true)
 		{
-			printf("curr: %f,%f\n", curr.x, curr.y);
+			//printf("curr: %f,%f\n", curr.x, curr.y);
 			nodes.push_back(curr);
 			curr = cameFrom.at(curr);
 			if (curr == prev)
@@ -195,11 +217,11 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 	}
 	catch (exception e)
 	{
-		printf("exception\n");
+		//printf("exception\n");
 	}
 	nodes.push_back(start);
 
-	/*
+	
 	if (nodes.size() > 2)
 	{
 		auto nodeIter = nodes.begin();
@@ -215,19 +237,23 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 				//acIntersect = ac.intersects(f) || acIntersect;
 				if (ac.intersects(f))
 				{
+					//printf("ac intersects a fedge\n");
 					shouldErase = false;
 					Edge ad = { *nodeIter, f.points[0] };
 					Edge dc = { *(nodeIter+2), f.points[0] };
 					if (!intersectsListOfEdges(ad, fedges) && !intersectsListOfEdges(dc, fedges))
 					{
-						if (fedges.find(ad) != fedges.end() || fedges.find(dc) != fedges.end())
-						{
+						*(nodeIter + 1) = f.points[0];
+						break;
+						//if (fedges.find(ad) != fedges.end() || fedges.find(dc) != fedges.end())
+						//{
+
 							//if (ad.length() + dc.length() < ab.length() + bc.length())
 							//{
-							*(nodeIter + 1) = f.points[0];
-							break;
+							//*(nodeIter + 1) = f.points[0];
+							//break;
 							//}
-						}
+						//}
 					}
 					else
 					{
@@ -235,14 +261,14 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 						Edge ec = { *(nodeIter + 2), f.points[1] };
 						if (!intersectsListOfEdges(ae, fedges) && !intersectsListOfEdges(ec, fedges))
 						{
-							if (fedges.find(ae) != fedges.end() || fedges.find(ec) != fedges.end())
-							{
+							//if (fedges.find(ae) != fedges.end() || fedges.find(ec) != fedges.end())
+							//{
 								//if (ae.length() + ec.length() < ab.length() + bc.length())
 								//{
 								*(nodeIter + 1) = f.points[1];
 								break;
 								//}
-							}
+							//}
 						}
 					}
 				}
@@ -256,7 +282,7 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 				nodeIter++;//is this and the breaks in the right location?
 			}
 		}
-	}*/
+	}
 
 
 
@@ -264,16 +290,18 @@ vector<vec2> NavMesh::reconstructPath(vec2 start, vec2 end, const unordered_map<
 	return nodes;
 }
 
+
+
 vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 {
-	printf("getting path from %f,%f to %f,%f\n", start.x, start.y, end.x, end.y);
+	//printf("getting path from %f,%f to %f,%f\n", start.x, start.y, end.x, end.y);
 
-	printf("Navmesh triangles:\n");
-	for (const Triangle& t : this->tris)
-	{
-		t.print();
-	}
-	printf("end of navmesh triangles\n");
+	//printf("Navmesh triangles:\n");
+	//for (const Triangle& t : this->tris)
+	//{
+	//	t.print();
+	//}
+	//printf("end of navmesh triangles\n");
 	/**/
 	//unordered_map<Triangle, float> hcost;
 	unordered_map<Triangle, float> gcost;
@@ -291,8 +319,8 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 		fcost[t] = INFINITY;
 	}
 	Triangle startTri = this->triTree.getTriangle(start);
-	startTri.print("Start Tri:");
-	printf("center of startTri: %f,%f\n", startTri.geoCenter.x, startTri.geoCenter.y);
+	//startTri.print("Start Tri:");
+	//printf("center of startTri: %f,%f\n", startTri.geoCenter.x, startTri.geoCenter.y);
 	gcost[startTri] = 0;
 	fcost[startTri] = 0;
 	Triangle endTri = this->triTree.getTriangle(end);
@@ -314,38 +342,39 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 	while (!open.empty())
 	{
 		Triangle curr = open.top();
-		curr.print("======curr: ");
+		//curr.print("======curr: ");
 		open.pop();
 		openContents.erase(find(openContents.begin(), openContents.end(), curr));
 		if (curr == endTri)
 		{
 			cameFrom[end] = entryPoints[curr];// curr.geoCenter;
-			printf("reconstructing\n");
+			//printf("reconstructing\n");
 			return reconstructPath(start, end, cameFrom, fedges);
 			//return reconstruct(start, end, cameFrom);//todo:
 		}
-		printf("has %i neighbors\n", this->adjacencySet[curr].size());
+		//printf("has %i neighbors\n", this->adjacencySet[curr].size());
 		for (Triangle neighbor : this->adjacencySet.at(curr))
 		{
-			neighbor.print("neighbor: ");
+			//neighbor.print("neighbor: ");
 			//float tentativeG = gcost[curr] + getGCost(curr, neighbor, start, end, gcost);
 
 			float tentativeG = gcost[curr] + getTransitionCost(curr, neighbor, start, end, entryPoints);
-			printf("tentative g: %f\n", tentativeG);
-			printf("neighbor g: %f\n", gcost[neighbor]);
+			//printf("tentative g: %f\n", tentativeG);
+			//printf("neighbor g: %f\n", gcost[neighbor]);
 			if (tentativeG < gcost[neighbor])
 			{
-				printf("cheaper\n");
-				vec2 p = neighbor.closestPoint(entryPoints[curr]);
+				//printf("cheaper\n");
+				//vec2 p = neighbor.closestPoint(entryPoints[curr]);
+				vec2 p = neighbor.closestPoint(curr.geoCenter);
 				cameFrom[p] = entryPoints[curr];
 				entryPoints[neighbor] = neighbor.closestPoint(p);// nearest point on the neighbor compared to parents entry point
 
 				gcost[neighbor] = tentativeG;
 				fcost[neighbor] = gcost[neighbor] + getHCost(neighbor, end);
-				printf("does it exist in open yet? %i\n", std::count(openContents.begin(), openContents.end(), neighbor));
+				//printf("does it exist in open yet? %i\n", std::count(openContents.begin(), openContents.end(), neighbor));
 				if (std::count(openContents.begin(), openContents.end(), neighbor) == 0)
 				{
-					printf("pushing into open\n");
+					//printf("pushing into open\n");
 					openContents.push_back(neighbor);
 					open.push(neighbor);
 				}
@@ -353,7 +382,7 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 			}
 			else
 			{
-				printf("expensive\n");
+				//printf("expensive\n");
 			}
 		}
 	}
@@ -387,14 +416,14 @@ vector<Vertex> fedgesToLineVerts(const unordered_set<Edge>& edges)
 
 void NavMesh::setupBuffers()
 {
-	printf("number of fedges 2 %i\n", this->fedges.size());
+	//printf("number of fedges 2 %i\n", this->fedges.size());
 	this->vertices = trisToLineVerts(this->tris);
 	this->numTriVertices = vertices.size();
 	vector<Vertex> fedgeVertiecs = fedgesToLineVerts(this->fedges);;
 	this->vertices.insert(this->vertices.end(), fedgeVertiecs.begin(), fedgeVertiecs.end());
 	this->numFedgeVertices = fedgeVertiecs.size();
 
-	printf("%i\n", this->numFedgeVertices);
+	//printf("%i\n", this->numFedgeVertices);
 
 	/*for (Vertex v : this->vertices)
 	{
