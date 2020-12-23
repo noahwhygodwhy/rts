@@ -227,6 +227,8 @@ int Triangle::contains(vec2 point) const
     {
         return -1;
     }
+    //bool neg = x <= 0 || y <= 0 || z <= 0;
+    //bool pos = x >= 0 || y >= 0 || z >= 0;
     bool neg = x < 0 || y < 0 || z < 0;
     bool pos = x > 0 || y > 0 || z > 0;
 
@@ -278,16 +280,21 @@ bool Triangle::isAdjacent(const Triangle& other) const
 
 bool Triangle::shareAPoint(const Triangle& other) const
 {
+    printf("do these share a point?\n");
+    this->print();
+    other.print();
     for (vec2 a : this->points)
     {
         for (vec2 b : other.points)
         {
             if (a == b)
             {
+                printf("yes\n");
                 return true;
             }
         }
     }
+    printf("no\n");
     return false;
 }
 

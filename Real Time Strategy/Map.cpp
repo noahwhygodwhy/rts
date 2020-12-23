@@ -98,7 +98,7 @@ bool checkForFedges(const vector<Edge>& fedges, const vector<Triangle>& triangle
     return allContained;
 }
 
-vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec2 dims, unordered_set<Edge>* fedge)
+vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec2 dims, unordered_set<Edge>* fedge, unordered_set<Edge>* illegalEdges)
 {
     string s;
     printf("reading file %s\n", inFilePath.c_str());
@@ -120,6 +120,7 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
         shapes.push_back(Polygon(pointInts, ele->FindAttribute("style")->Value() == fillNone));
     }
     vector<vec2> allPoints;
+
     for (Polygon x : shapes)
     {
         allPoints.insert(allPoints.end(), x.points.begin(), x.points.end());
@@ -152,9 +153,14 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
                 //push back forbidden edge here
                 //(Edge{ sharedPoints[0], sharedPoints[1] }).print("fedge 1:");
                 //(Edge{ sharedPoints[1], sharedPoints[2] }).print("fedge 2:");
-                fedge->insert({ sharedPoints[0], sharedPoints[1] });
-                fedge->insert({ sharedPoints[1], sharedPoints[2] });
-                fedge->insert({ sharedPoints[2], sharedPoints[0] });
+                for (int i = 0; i < 3; i++)
+                {
+                    auto x = fedge->insert({ sharedPoints[i], sharedPoints[(i + 1) % 3] });
+                    if (x.second == false)
+                    {
+                        illegalEdges->insert({ sharedPoints[i], sharedPoints[(i + 1) % 3] });
+                    }
+                }
                 if (!p.includeMe)
                 {
                     //t++;
@@ -172,6 +178,24 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
                 t++;
             }
 
+        }
+    }
+    for (const Edge& e : *illegalEdges)
+    {
+        fedge->erase(std::find(fedge->begin(), fedge->end(), e));
+    }
+    for (auto x : shapes)
+    {
+        for (int i = 0; i < x.points.size() - 1; i++)
+        {
+            for (int k = i + 1; k < x.points.size(); k++)
+            {
+                Edge e = { x.points[i], x.points[k] };
+                if (!fedge->count(e))
+                {
+                    illegalEdges->insert(e);
+                }
+            }
         }
     }
 
@@ -236,9 +260,9 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
     for (const Edge& e : fedgesToAdd)
     {
         fedge->insert(e);
-    }
+    }*/
 
-    */
+    
     
 
 
@@ -322,8 +346,9 @@ Map::Map(string path, vec2 dims)
 {
     printf("path: %s\n", path.c_str());
     unordered_set<Edge> fedges = unordered_set<Edge>();
-    vector<Triangle> navMeshTris = generateNavMeshVerts(path + "navMesh.svg", "outFile.json", dims, &fedges);
-    this->navMesh = NavMesh(navMeshTris, fedges, dims.x, dims.y);
+    unordered_set<Edge> illegalEdges = unordered_set<Edge>();
+    vector<Triangle> navMeshTris = generateNavMeshVerts(path + "navMesh.svg", "outFile.json", dims, &fedges, &illegalEdges);
+    this->navMesh = NavMesh(navMeshTris, fedges, illegalEdges, dims.x, dims.y);
     printf("made triangle tree\n");
     //this->navMesh.getTriangle(vec2(1)).print("Encasing 1,1: ");
 

@@ -39,7 +39,7 @@ unordered_map<Triangle, vector<Triangle>> constructAdjacencySet(vector<Triangle>
 	return toReturn;
 }
 
-NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, int width, int height)
+NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, unordered_set<Edge> illegalEdges, int width, int height)
 {
 	this->tris = tris;
 	printf("Navmesh triangles:\n");
@@ -51,6 +51,7 @@ NavMesh::NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, int width, i
 	this->triTree = TriangleTree(tris, width, height);
 	this->adjacencySet = constructAdjacencySet(this->tris);
 	this->fedges = fedges;
+	this->illegalEdges = illegalEdges;
 	setupBuffers();
 }
 
@@ -170,7 +171,7 @@ float rtt(float val)
 }
 
 
-vector<vec2> NavMesh::reconstructPath(vec2 startUR, vec2 endUR, const unordered_map<vec2, vec2>& cameFromUnrounded, const unordered_set<Edge>& fedges)
+vector<vec2> NavMesh::reconstructPath(vec2 startUR, vec2 endUR, const unordered_map<vec2, vec2>& cameFromUnrounded)
 {
 
 
@@ -241,8 +242,10 @@ vector<vec2> NavMesh::reconstructPath(vec2 startUR, vec2 endUR, const unordered_
 					shouldErase = false;
 					Edge ad = { *nodeIter, f.points[0] };
 					Edge dc = { *(nodeIter+2), f.points[0] };
-					if (!intersectsListOfEdges(ad, fedges) && !intersectsListOfEdges(dc, fedges))
+					if (!intersectsListOfEdges(ad, fedges) && !intersectsListOfEdges(dc, fedges) && !illegalEdges.count(ad) && !illegalEdges.count(dc))
 					{
+						shouldErase = false;
+						f.print("using fedge ");
 						*(nodeIter + 1) = f.points[0];
 						break;
 						//if (fedges.find(ad) != fedges.end() || fedges.find(dc) != fedges.end())
@@ -259,12 +262,14 @@ vector<vec2> NavMesh::reconstructPath(vec2 startUR, vec2 endUR, const unordered_
 					{
 						Edge ae = { *nodeIter, f.points[1] };
 						Edge ec = { *(nodeIter + 2), f.points[1] };
-						if (!intersectsListOfEdges(ae, fedges) && !intersectsListOfEdges(ec, fedges))
+						if (!intersectsListOfEdges(ae, fedges) && !intersectsListOfEdges(ec, fedges) && !illegalEdges.count(ae) && !illegalEdges.count(ec))
 						{
 							//if (fedges.find(ae) != fedges.end() || fedges.find(ec) != fedges.end())
 							//{
 								//if (ae.length() + ec.length() < ab.length() + bc.length())
 								//{
+								shouldErase = false;
+								f.print("using fedge ");
 								*(nodeIter + 1) = f.points[1];
 								break;
 								//}
@@ -349,7 +354,7 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 		{
 			cameFrom[end] = entryPoints[curr];// curr.geoCenter;
 			//printf("reconstructing\n");
-			return reconstructPath(start, end, cameFrom, fedges);
+			return reconstructPath(start, end, cameFrom);
 			//return reconstruct(start, end, cameFrom);//todo:
 		}
 		//printf("has %i neighbors\n", this->adjacencySet[curr].size());

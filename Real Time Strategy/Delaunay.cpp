@@ -13,9 +13,12 @@ float distance(const vec2& p1, const vec2& p2)
     return std::sqrt((dx * dx) + (dy * dy));
 }
 
+
+
+
 void addAPoint(vector<Triangle>& triangles, vec2 point)
 {
-    //printf("add a point, %f,%f\n", point.x, point.y);
+    printf("add a point, %f,%f\n", point.x, point.y);
     vector<Triangle> badTriangles;
 
     for (const Triangle& t : triangles) //for each triangle in triangles
@@ -59,7 +62,13 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
     }
     for (const Edge& e : polygon)
     {
-        triangles.push_back({ e.points[0], e.points[1], point });
+        Edge ab = { e.points[0], e.points[1] };
+        Edge bc = { e.points[1], point };
+        Edge ac = { e.points[0], point };
+        if (!(ab.slope() == ac.slope() || ab.slope() == bc.slope()))
+        {
+            triangles.push_back({ e.points[0], e.points[1], point });
+        }
     }
 }
 
@@ -93,9 +102,11 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 to
     }
     else
     {
-        t1 = { bottomLeft, vec2(bottomLeft.x-1, topRight.y+1), topRight+ vec2(1) };
-        t2 = { bottomLeft, vec2(topRight.x+1, bottomLeft.y-1), topRight + vec2(1)};
+        t1 = { bottomLeft-vec2(1), vec2(bottomLeft.x-1, topRight.y+1), topRight+ vec2(1) };
+        t2 = { bottomLeft-vec2(1), vec2(topRight.x+1, bottomLeft.y-1), topRight + vec2(1)};
     }
+    t1.print("t1: ");
+    t2.print("t2: ");
 
     triangles.push_back(t1);
     triangles.push_back(t2);
@@ -108,7 +119,7 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 to
     {
         addAPoint(triangles, point);
     }
-    /*
+    
     auto triIter = triangles.begin();
     while (triIter != triangles.end())
     {
@@ -124,7 +135,7 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 to
         {
             triIter++;
         }
-    }*/
+    }
 
     
     return triangles;

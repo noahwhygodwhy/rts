@@ -4,6 +4,15 @@
 #include <glm/gtx/string_cast.hpp>
 #include "Entity.hpp"
 #include "GlobalContext.hpp"
+
+
+#include "ft2build.h"
+#include "freetype/freetype.h"
+
+FT_Library library;
+//#include "freetype/freetype.h"
+
+
 //#include "UtilityFunctions.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -297,7 +306,7 @@ void Renderer::run()
 
 
 
-		path = GLBL::map.getPath(vec2(1, 1), mousePos);
+		//path = GLBL::map.getPath(vec2(1, 1), mousePos);
 		drawPath(shader, path);
 		for (Entity* t : GLBL::things) //Everything else
 		{

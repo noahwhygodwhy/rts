@@ -14,6 +14,7 @@ using namespace glm;
 
 bool counterClockwise(vec2 a, vec2 b, vec2 c);
 
+
 struct Edge;
 
 struct Edge
@@ -41,6 +42,17 @@ struct Edge
     float length() const
     {
         return distance(this->points[0], this->points[1]);
+    }
+
+    float slope() const
+    {
+
+        return ((points[1].y - points[0].y) / (points[1].x - points[0].x));
+    }
+
+    bool colinearWith(const Edge& e) const
+    {
+        return this->slope() != e.slope();
     }
 
 

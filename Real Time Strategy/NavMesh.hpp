@@ -86,7 +86,7 @@ class NavMesh
 {
 public:
 	NavMesh();
-    NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, int width = 0, int height = 0);
+    NavMesh(vector<Triangle> tris, unordered_set<Edge> fedges, unordered_set<Edge> illegalEdges, int width = 0, int height = 0);
 	~NavMesh();
 	vector<vec2> getPath(vec2 start, vec2 end);
     void draw(const Shader& shader);
@@ -98,12 +98,13 @@ private:
 	TriangleTree triTree;
 	unordered_map<Triangle, vector<Triangle>> adjacencySet;
     unordered_set<Edge> fedges;
+    unordered_set<Edge> illegalEdges;
     vector<Vertex> vertices;
     int numTriVertices;
     int numFedgeVertices;
 
 
-    vector<vec2> reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec2>& cameFrom, const unordered_set<Edge>& fedges);
+    vector<vec2> reconstructPath(vec2 start, vec2 end, const unordered_map<vec2, vec2>& cameFrom);
 
 
 };

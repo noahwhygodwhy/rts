@@ -67,19 +67,35 @@ unordered_map<string, unordered_map<textureAttributes, vector<Texture>*>> getEnt
 int main(void)
 {
 
-	Triangle a{ vec2(4785.0f, 2983.0f), vec2(6309.0f, 2983.0f), vec2(6307.0, 4187.0f) };
-	Triangle b{ vec2(4402.0f, 3601.0f), vec2(4785.0f, 2983.0f), vec2(6307.0, 4187.0f) };
-	if (b.isAdjacent(a))
+
+	/*vector<vec2> points = { vec2(0), vec2(8000, 0), vec2(0, 8000), vec2(8000) };
+
+
+	vector<Triangle> t = delaunay(points);
+	printf("===============\n");
+	for (Triangle x : t)
 	{
-		printf("adj\n");
-	}
-	else
-	{
-		printf("not adjacent\n");
+		x.print();
 	}
 
 
-	//exit(0);
+	exit(0);*/
+
+	/*vector<vec2> points = { vec2(0, 0), vec2(1000, 0), vec2(500, 500)};
+	vector<Triangle> t = delaunay(points);
+	printf("===============\n");
+	for (Triangle x : t)
+	{
+		x.print();
+	}
+	printf("===============\n");
+	addAPoint(t, vec2(500, 0));
+	for (Triangle x : t)
+	{
+		x.print();
+	}
+	printf("===============\n");
+	exit(0);*/
 
 	printf("###starting\n");
 	Renderer r = Renderer(1920, 1080);
