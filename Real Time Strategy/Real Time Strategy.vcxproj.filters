@@ -40,7 +40,7 @@
     <Filter Include="Source Files\Utility">
       <UniqueIdentifier>{b805cd10-d1d3-4f95-8222-864cec86a54a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Entity">
+    <Filter Include="Header Files\Map\Entity">
       <UniqueIdentifier>{fc3e4fa0-3967-4776-a06b-3de8a2f7a19e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -147,10 +147,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Entity.hpp">
-      <Filter>Header Files\Entity</Filter>
+      <Filter>Header Files\Map\Entity</Filter>
     </ClInclude>
     <ClInclude Include="SelectionBox.hpp">
-      <Filter>Header Files\Entity</Filter>
+      <Filter>Header Files\Map\Entity</Filter>
     </ClInclude>
     <ClInclude Include="stb_image_write.h">
       <Filter>Header Files\Utility</Filter>

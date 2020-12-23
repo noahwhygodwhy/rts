@@ -5,6 +5,17 @@ using namespace std;
 using namespace glm;
 
 //TODO: what if the 3 points are inline
+
+float rtt(float val)
+{
+    return round(val * 100.0f) / 100.0f;
+}
+vec2 rtt(vec2 val)
+{
+    return vec2(round(val.x * 100.0f) / 100.0f, round(val.y * 100.0f) / 100.0f);
+}
+
+
 vec2 Triangle::makeCircleCenter()
 {
     Triangle t = *this;
@@ -280,21 +291,21 @@ bool Triangle::isAdjacent(const Triangle& other) const
 
 bool Triangle::shareAPoint(const Triangle& other) const
 {
-    printf("do these share a point?\n");
-    this->print();
-    other.print();
+    //printf("do these share a point?\n");
+    //this->print();
+    //other.print();
     for (vec2 a : this->points)
     {
         for (vec2 b : other.points)
         {
             if (a == b)
             {
-                printf("yes\n");
+                //printf("yes\n");
                 return true;
             }
         }
     }
-    printf("no\n");
+    //printf("no\n");
     return false;
 }
 

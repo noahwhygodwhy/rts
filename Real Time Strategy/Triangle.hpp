@@ -14,6 +14,11 @@ using namespace glm;
 
 bool counterClockwise(vec2 a, vec2 b, vec2 c);
 
+float rtt(float val);
+
+vec2 rtt(vec2 val);
+
+
 
 struct Edge;
 
@@ -73,11 +78,11 @@ struct Edge
             {
                 return false;
             }
-            if (this->points[0] == otherEdge->points[0] && this->points[1] == otherEdge->points[1])
+            if (rtt(this->points[0]) == rtt(otherEdge->points[0]) && rtt(this->points[1]) == rtt(otherEdge->points[1]))
             {
                 return true;
             }
-            if (this->points[0] == otherEdge->points[1] && this->points[1] == otherEdge->points[0])
+            if (rtt(this->points[0]) == rtt(otherEdge->points[1]) && rtt(this->points[1]) == rtt(otherEdge->points[0]))
             {
                 return true;
             }

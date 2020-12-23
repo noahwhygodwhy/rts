@@ -164,13 +164,6 @@ bool intersectsListOfEdges(const Edge& e, const unordered_set<Edge>& fedges)
 
 
 
-//rount to two (decimal places)
-float rtt(float val)
-{
-	return round(val * 100) / 100;
-}
-
-
 vector<vec2> NavMesh::reconstructPath(vec2 startUR, vec2 endUR, const unordered_map<vec2, vec2>& cameFromUnrounded)
 {
 

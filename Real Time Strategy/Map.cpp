@@ -201,6 +201,19 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
 
     printf("#### num fedges: %i\n", fedge->size());
 
+
+
+    vector<Edge> required;
+    required.insert(required.end(), fedge->begin(), fedge->end());
+
+    while (!checkForFedges(required, triangles))
+    {
+        vector<Edge> fedgesToRemove;
+        vector<Edge> fedgesToAdd;
+    }
+
+
+    //TODO: tomorrow
     /*
     vector<Edge> fedgesToRemove;
     vector<Edge> fedgesToAdd;
@@ -232,6 +245,7 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
 
 
             vec2 mid = (curr.points[0] + curr.points[1]) / 2.0f;
+
             printf("adding the point %f, %f\n", mid.x, mid.y);
             addAPoint(triangles, mid);
             printf("size of tringles %i\n", triangles.size());
@@ -260,8 +274,8 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
     for (const Edge& e : fedgesToAdd)
     {
         fedge->insert(e);
-    }*/
-
+    }
+    //*/
     
     
 

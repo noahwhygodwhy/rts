@@ -33,9 +33,21 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
         }
     }
     //printf("results in %i bad triangles\n", badTriangles.size());
+    printf("size of bad triangles: %i\n", badTriangles.size());
+
+    for (const Triangle& t : triangles)
+    {
+        if (t.contains(point))
+        {
+            t.print("contains the point: ");
+        }
+    }
+
+
     vector<Edge> polygon;
     for (const Triangle& t : badTriangles)//for each triangle in bad triangles
     {
+        t.print("bad tringle: ");
         for (int i = 0; i < t.points.size(); i++) //for each edge
         {
             bool shared = false;
@@ -73,9 +85,9 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
 }
 
 
-vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 topRight)
+vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 topRight, vector<Triangle> triangles )
 {
-    vector<Triangle> triangles;
+    //vector<Triangle> triangles;
     vec2 mins = vec2(INT64_MAX);
     vec2 maxs = vec2(INT64_MIN);
     for (vec2 point : pointsIn)

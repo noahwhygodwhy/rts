@@ -81,7 +81,7 @@ int main(void)
 
 	exit(0);*/
 
-	/*vector<vec2> points = { vec2(0, 0), vec2(1000, 0), vec2(500, 500)};
+	/*vector<vec2> points = { vec2(0, 0), vec2(1000, 0), vec2(500, 500), vec2(500, 0)};
 	vector<Triangle> t = delaunay(points);
 	printf("===============\n");
 	for (Triangle x : t)
@@ -89,7 +89,7 @@ int main(void)
 		x.print();
 	}
 	printf("===============\n");
-	addAPoint(t, vec2(500, 0));
+	addAPoint(t, vec2(500, 250));
 	for (Triangle x : t)
 	{
 		x.print();
