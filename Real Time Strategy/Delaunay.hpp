@@ -18,6 +18,6 @@ float distance(const vec2& p1, const vec2& p2);
 void addAPoint(vector<Triangle>& triangles, vec2 point);
 
 
-vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft = vec2(0), vec2 topRight = vec2(0), vector<Triangle> triangles = vector<Triangle>());
+vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft = vec2(0), vec2 topRight = vec2(0), vector<Triangle> triangles = vector<Triangle>(), bool removeSuperTriangles = false, vector<Triangle>* superTriangles = new vector<Triangle>());
 
 #endif

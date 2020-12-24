@@ -18,7 +18,6 @@ float distance(const vec2& p1, const vec2& p2)
 
 void addAPoint(vector<Triangle>& triangles, vec2 point)
 {
-    printf("add a point, %f,%f\n", point.x, point.y);
     vector<Triangle> badTriangles;
 
     for (const Triangle& t : triangles) //for each triangle in triangles
@@ -33,21 +32,12 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
         }
     }
     //printf("results in %i bad triangles\n", badTriangles.size());
-    printf("size of bad triangles: %i\n", badTriangles.size());
-
-    for (const Triangle& t : triangles)
-    {
-        if (t.contains(point))
-        {
-            t.print("contains the point: ");
-        }
-    }
+    
 
 
     vector<Edge> polygon;
     for (const Triangle& t : badTriangles)//for each triangle in bad triangles
     {
-        t.print("bad tringle: ");
         for (int i = 0; i < t.points.size(); i++) //for each edge
         {
             bool shared = false;
@@ -85,7 +75,7 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
 }
 
 
-vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 topRight, vector<Triangle> triangles )
+vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 topRight, vector<Triangle> triangles, bool removeSuperTriangles, vector<Triangle>* superTriangles)
 {
     vec2 mins = vec2(INT64_MAX);
     vec2 maxs = vec2(INT64_MIN);
@@ -108,16 +98,22 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 to
     Triangle t1;
     Triangle t2;
 
-    if (bottomLeft == topRight)
+    if (superTriangles->empty())
     {
-        t1 = { mins - vec2(1), vec2(mins.x - 1, maxs.y + 1), vec2(maxs.x + 1, mins.y - 1) };
-        t2 = { maxs + vec2(1), vec2(mins.x - 1, maxs.y + 1), vec2(maxs.x + 1, mins.y - 1) };
+        if (bottomLeft == topRight)
+        {
+            t1 = { mins - vec2(1), vec2(mins.x - 1, maxs.y + 1), vec2(maxs.x + 1, mins.y - 1) };
+            t2 = { maxs + vec2(1), vec2(mins.x - 1, maxs.y + 1), vec2(maxs.x + 1, mins.y - 1) };
+        }
+        else
+        {
+            t1 = { bottomLeft - vec2(1), vec2(bottomLeft.x - 1, topRight.y + 1), topRight + vec2(1) };
+            t2 = { bottomLeft - vec2(1), vec2(topRight.x + 1, bottomLeft.y - 1), topRight + vec2(1) };
+        }
+        superTriangles->push_back(t1);
+        superTriangles->push_back(t2);
     }
-    else
-    {
-        t1 = { bottomLeft-vec2(1), vec2(bottomLeft.x-1, topRight.y+1), topRight+ vec2(1) };
-        t2 = { bottomLeft-vec2(1), vec2(topRight.x+1, bottomLeft.y-1), topRight + vec2(1)};
-    }
+
     t1.print("t1: ");
     t2.print("t2: ");
 
@@ -133,23 +129,24 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 to
         addAPoint(triangles, point);
     }
     
-    auto triIter = triangles.begin();
-    while (triIter != triangles.end())
+    if (removeSuperTriangles)
     {
-        if (triIter->shareAPoint(t1))
+        printf("removing super tringles\n");
+        for (Triangle ttr : *superTriangles)
         {
-            triangles.erase(triIter);
-        }
-        else if (triIter->shareAPoint(t2))
-        {
-            triangles.erase(triIter);
-        }
-        else
-        {
-            triIter++;
+            auto triIter = triangles.begin();
+            while (triIter != triangles.end())
+            {
+                if (triIter->shareAPoint(ttr))
+                {
+                    triangles.erase(triIter);
+                }
+                else
+                {
+                    triIter++;
+                }
+            }
         }
     }
-
-    
     return triangles;
 }

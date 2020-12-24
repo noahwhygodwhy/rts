@@ -134,7 +134,11 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
     }
     printf("given dims: %f,%f\n", dims.x, dims.y);
 
-    vector<Triangle> triangles = delaunay(allPoints, vec2(0), dims); //not guarenteed to be CCW
+
+
+    vector<Triangle>* superTriangles = new vector<Triangle>();
+
+    vector<Triangle> triangles = delaunay(allPoints, vec2(0), dims, vector<Triangle>(), false, superTriangles); //not guarenteed to be CCW
 
     printf("size of triangles: %lu: \n", triangles.size());
 
@@ -214,6 +218,12 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
     required.insert(required.end(), fedge->begin(), fedge->end());
 
     
+
+
+    //TODO: why are the other three sides not fedges? Somethings fucky
+
+
+
     while (!required.empty())
     {
         vector<Edge> noLongerRequired;
@@ -235,7 +245,7 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
         }
         if (!pointsToAdd.empty())
         {
-            triangles = delaunay(pointsToAdd, vec2(0), dims, triangles);
+            triangles = delaunay(pointsToAdd, vec2(0), dims, triangles, false, superTriangles);
         }
         for (const Edge& nr : noLongerRequired)
         {
@@ -243,6 +253,9 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
         }
     }
 
+
+
+    triangles = delaunay(vector<vec2>(), vec2(0), dims, triangles, true, superTriangles);
 
 
 

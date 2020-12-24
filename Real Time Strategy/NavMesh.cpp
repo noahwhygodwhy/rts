@@ -19,19 +19,13 @@ unordered_map<Triangle, vector<Triangle>> constructAdjacencySet(vector<Triangle>
 	unordered_map<Triangle, vector<Triangle>> toReturn;
 	for (const Triangle& t : tris)
 	{
-		t.print("finding adjancet tris for ");
+		t.print("getting adjacencies for ");
 		vector<Triangle> adjacentTris;
 		for (Triangle& ot : tris)
 		{
-			//ot.print();
 			if (t.isAdjacent(ot))
 			{
-				//printf("### adj\n");
 				adjacentTris.push_back(ot);
-			}
-			else
-			{
-				//printf("not adj\n");
 			}
 		}
 		toReturn[t] = adjacentTris;
@@ -340,7 +334,7 @@ vector<vec2> NavMesh::getPath(vec2 start, vec2 end)
 	while (!open.empty())
 	{
 		Triangle curr = open.top();
-		//curr.print("======curr: ");
+		curr.print("======curr: ");
 		open.pop();
 		openContents.erase(find(openContents.begin(), openContents.end(), curr));
 		if (curr == endTri)

@@ -147,7 +147,7 @@ public:
             }
             for (int i = 0; i < 3; i++)
             {
-                if (this->points[i] != otherTri->points[i])
+                if (rtt(this->points[i]) != rtt(otherTri->points[i]))
                 {
                     return false;
                 }
