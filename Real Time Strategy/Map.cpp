@@ -74,25 +74,32 @@ bool counterClockwise(Triangle t)
     return (t.points[1].x - t.points[0].x) * (t.points[2].y - t.points[0].y) > (t.points[2].x - t.points[0].x) * (t.points[1].y - t.points[0].y);
 }
 
+bool checkForFedge(const Edge& f, const vector<Triangle>& triangles)
+{
 
+    for (const Triangle& tri : triangles)
+    {
+        for (const Edge e : tri.edges)
+        {
+            if (f == e)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 bool checkForFedges(const vector<Edge>& fedges, const vector<Triangle>& triangles) //expensive as fuck, but only done at map creation
 {
     bool allContained = true;
     for (const Edge& f : fedges)
     {
-        bool contained = false;
-        for (const Triangle& tri : triangles)
+        allContained = allContained && checkForFedge(f, triangles);
+        if (!allContained)
         {
-            for (const Edge e : tri.edges)
-            {
-                if (f == e)
-                {
-                    contained = true;
-                }
-            }
+            break;
         }
-        allContained = allContained && contained;
     }
     printf("all contained: %s\n", allContained ? "true" : "false");
     return allContained;
@@ -206,11 +213,43 @@ vector<Triangle> generateNavMeshVerts(string inFilePath, string outFilePath, vec
     vector<Edge> required;
     required.insert(required.end(), fedge->begin(), fedge->end());
 
-    while (!checkForFedges(required, triangles))
+    
+    while (!required.empty())
     {
-        vector<Edge> fedgesToRemove;
-        vector<Edge> fedgesToAdd;
+        vector<Edge> noLongerRequired;
+        vector<vec2> pointsToAdd;
+        for (const Edge& r : required)
+        {
+            if (!checkForFedge(r, triangles))
+            {
+                vec2 mid = (r.points[0] + r.points[1]) / 2.0f;
+                required.erase(std::find(required.begin(), required.end(), r));
+                required.push_back(Edge{ mid, r.points[0] });
+                required.push_back(Edge{ mid, r.points[1] });
+                pointsToAdd.push_back(mid);
+            }
+            else
+            {
+                noLongerRequired.push_back(r);
+            }
+        }
+        if (!pointsToAdd.empty())
+        {
+            triangles = delaunay(pointsToAdd, vec2(0), dims, triangles);
+        }
+        for (const Edge& nr : noLongerRequired)
+        {
+            required.erase(std::find(required.begin(), required.end(), nr));
+        }
     }
+
+
+
+
+
+
+
+
 
 
     //TODO: tomorrow

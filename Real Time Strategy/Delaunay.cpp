@@ -87,7 +87,6 @@ void addAPoint(vector<Triangle>& triangles, vec2 point)
 
 vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 topRight, vector<Triangle> triangles )
 {
-    //vector<Triangle> triangles;
     vec2 mins = vec2(INT64_MAX);
     vec2 maxs = vec2(INT64_MIN);
     for (vec2 point : pointsIn)
@@ -95,18 +94,20 @@ vector<Triangle> delaunay(const vector<vec2>& pointsIn, vec2 bottomLeft, vec2 to
         mins = glm::min(mins, point);
         maxs = glm::max(maxs, point);
     }
-
-    /*Triangle superTriangle = { mins - vec2(10),
-        vec2(mins.x - 100, mins.y + 10 + ((maxs.y - mins.y) * 2)),
-        vec2(mins.x + 100 + ((maxs.x - mins.x) * 2), mins.y - 10) };*/
+    if (!triangles.empty())
+    {
+        for (const Triangle& t : triangles)
+        {
+            for (vec2 point : t.points)
+            {
+                mins = glm::min(mins, point);
+                maxs = glm::max(maxs, point);
+            }
+        }
+    }
     Triangle t1;
     Triangle t2;
-    //Triangle t1 = { bottomLeft, vec2(bottomLeft.x-1, topRight.y+1), topRight+ vec2(1) };
-    //Triangle t2 = { bottomLeft, vec2(topRight.x+1, bottomLeft.y-1), topRight + vec2(1)};
-    //Triangle t1 = { bottomLeft, vec2(bottomLeft.x - 1, topRight.y + 1), topRight + vec2(1) };
-    //Triangle t2 = { bottomLeft, vec2(topRight.x + 1, bottomLeft.y - 1), topRight + vec2(1) };
 
-    //triangles.push_back(superTriangle);
     if (bottomLeft == topRight)
     {
         t1 = { mins - vec2(1), vec2(mins.x - 1, maxs.y + 1), vec2(maxs.x + 1, mins.y - 1) };
